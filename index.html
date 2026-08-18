@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pourquoi il y a des saisons ? — Petit labo d’astronomie</title>
+  <meta name="description" content="Un petit labo pour les enfants : attrape la Terre penchée, fais-lui faire le tour du Soleil et découvre pourquoi l’été et l’hiver se relaient chaque année.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%8D%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="entete">
+    <p class="kicker">Petit labo d’astronomie</p>
+    <h1>Pourquoi il y a des saisons ?</h1>
+    <p class="tagline">
+      L’été, on mange des glaces dehors ; l’hiver, la nuit tombe avant le dîner…
+      Qui décide de tout ça ? Attrape la Terre, fais-lui faire le tour du Soleil,
+      et regarde ce qui change chez nous.
+    </p>
+  </header>
+
+  <main>
+
+    <!-- Le cœur interactif : les deux vues, toujours synchronisées. -->
+    <section class="vues">
+      <div class="carte carte-fenetre">
+        <h2>🏡 Chez nous, par la fenêtre</h2>
+        <p class="sous-titre">Le Soleil de midi, l’arbre du jardin et la longueur du jour.</p>
+        <div class="cadre-canvas">
+          <canvas id="canvas-fenetre"
+            aria-label="Chez nous, au fil de l’année : le Soleil de midi monte haut l’été et reste bas l’hiver, l’arbre du jardin change avec les saisons, et la barre dorée montre combien d’heures le jour dure. Utilise le curseur des mois pour changer de moment de l’année."></canvas>
+        </div>
+        <p class="phrase-moment" id="phrase-moment" aria-live="polite"></p>
+      </div>
+
+      <div class="carte carte-orbite">
+        <h2>🛰 Depuis l’espace</h2>
+        <p class="sous-titre">La Terre penchée fait le tour du Soleil. Le Soleil ne bouge pas — et le penchant non plus !</p>
+        <div class="cadre-canvas">
+          <canvas id="canvas-orbite"
+            aria-label="Le Soleil fixe au centre, la Terre penchée sur son orbite tout autour. L’axe de la Terre penche toujours vers la même direction : selon l’endroit de l’orbite, notre moitié penche vers le Soleil (c’est l’été) ou à l’opposé (c’est l’hiver). Glisse la Terre avec le doigt ou la souris pour lui faire faire le tour du Soleil."></canvas>
+        </div>
+        <p class="astuce" id="astuce-geste">✋ Attrape la Terre et fais-lui faire le tour !</p>
+      </div>
+    </section>
+
+    <!-- Le grand curseur maître : les mois de l’année. -->
+    <section class="carte carte-curseur">
+      <h2 id="titre-curseur">📅 Les mois de l’année</h2>
+      <div class="piste-emojis" aria-hidden="true">
+        <span>❄️</span><span>🌸</span><span>☀️</span><span>🍂</span><span>❄️</span>
+      </div>
+      <input type="range" id="curseur-jours" min="0" max="365" step="0.5" value="0"
+        aria-label="Choisis le jour de l’année, de janvier à décembre : la Terre avance sur son orbite et les saisons changent chez nous.">
+      <p class="legende-curseur">Fais glisser pour traverser l’année, mois après mois !</p>
+    </section>
+
+    <!-- La boîte d’explication. -->
+    <section class="carte carte-explication">
+      <div class="titre-avec-bouton">
+        <h2>💡 Pourquoi il y a des saisons ?</h2>
+        <div class="boutons-voix">
+          <button id="bouton-ecouter" class="bouton-son bouton-ecouter" type="button" hidden>🔊 Écouter l’histoire</button>
+          <select id="menu-voix" class="menu-voix" hidden aria-label="Choisir la voix du conteur"></select>
+        </div>
+      </div>
+      <div id="texte-explication">
+        <p>La Terre est comme une grosse toupie qui penche un peu sur le côté. Et elle garde toujours son penchant, sans jamais en changer.</p>
+        <p>Toute l’année, elle fait un grand voyage autour du Soleil. Un tour complet, c’est une année entière !</p>
+        <p>Quand notre moitié de la Terre penche vers le Soleil, il monte tout haut dans le ciel, il chauffe fort, et les jours sont très longs : c’est l’été.</p>
+        <p>Six mois plus tard, la Terre est de l’autre côté du Soleil. Notre moitié penche maintenant loin de lui : il reste tout bas, il chauffe moins, la nuit tombe vite… c’est l’hiver.</p>
+        <p>Le Soleil n’est pas plus près en été, ni plus loin en hiver : c’est le penchant qui fait tout ! D’ailleurs, quand c’est l’hiver chez nous, les enfants d’Australie, sur l’autre moitié de la Terre, fêtent Noël en plein été, sur la plage…</p>
+      </div>
+      <p class="conseil-voix" id="conseil-voix" hidden>
+        🗣 Pour une plus jolie voix, ouvre cette page dans Chrome ou Edge, ou installe une voix
+        française « améliorée » dans les réglages de l’appareil.
+      </p>
+    </section>
+
+    <!-- La note aux parents. -->
+    <details class="note-parents">
+      <summary>📖 La note aux parents (ce que le site simplifie)</summary>
+      <ul>
+        <li><strong>Le penchant est exagéré au dessin.</strong> L’axe de la Terre est incliné de 23,44°
+          par rapport à la perpendiculaire de son orbite — le site le dessine à 30° pour qu’il se
+          voie bien. Sa direction reste quasi fixe d’une année sur l’autre (elle dérive très
+          lentement, sur 26 000 ans).</li>
+        <li><strong>Ce n’est vraiment pas la distance.</strong> L’orbite est quasi circulaire
+          (~150 millions de km) et, surprise : la Terre est même un peu <em>plus près</em> du Soleil
+          début janvier (147 millions de km) qu’en juillet (152 millions) — en plein hiver chez nous.
+          Ce sont bien le penchant, la hauteur du Soleil et la longueur des jours qui font les
+          saisons.</li>
+        <li><strong>Les repères de l’année sont espacés régulièrement.</strong> Le site place solstices
+          et équinoxes tous les quarts d’année pile. En vrai : équinoxes vers les 20 mars et
+          22-23 septembre, solstices vers les 20-21 juin et 21-22 décembre — et les saisons n’ont
+          pas exactement la même durée, car l’orbite est légèrement elliptique.</li>
+        <li><strong>Les chiffres de la fenêtre sont ceux de chez nous, arrondis.</strong> Hauteur du
+          Soleil à midi (~20° à ~66°) et durée du jour (8 h à 16 h) correspondent à la latitude de
+          la France (~47° nord), avec une formule simplifiée. À l’équateur, les jours durent presque
+          toujours 12 h ; aux pôles, il y a le soleil de minuit et la nuit polaire !</li>
+        <li><strong>Une seule maison, l’hémisphère nord.</strong> L’Australie de l’histoire vit les
+          saisons à l’envers des nôtres. Près de l’équateur, on parle plutôt de saison sèche et de
+          saison des pluies.</li>
+        <li><strong>La Terre tourne aussi sur elle-même</strong> (le jour et la nuit) — la vue de
+          l’espace l’ignore pour ne montrer que le voyage de l’année. Le jour et la nuit ont leur
+          propre épisode : <a href="https://davidb-prog.github.io/ou-va-le-soleil/">Où va le Soleil
+          la nuit ?</a></li>
+      </ul>
+    </details>
+
+  </main>
+
+  <!-- Le médaillon flottant (mobile) : chez nous en miniature, toujours
+       visible quand la fenêtre est sortie de l’écran. Un tap y ramène. -->
+  <button id="medaillon-fenetre" class="medaillon-fenetre" type="button" hidden
+    aria-label="Chez nous en ce moment — remonter à la fenêtre">
+    <canvas id="canvas-medaillon" aria-hidden="true"></canvas>
+  </button>
+
+  <footer class="pied-serie">
+    <p>Petit labo d’astronomie 🌌</p>
+    <ul>
+      <li><a href="https://davidb-prog.github.io/eclipse-explorer/">La mécanique des éclipses</a></li>
+      <li><a href="https://davidb-prog.github.io/ou-va-le-soleil/">Où va le Soleil la nuit ?</a></li>
+      <li><a href="https://davidb-prog.github.io/la-terre-tourne/">Quelle heure est-il là-bas ?</a></li>
+      <li><a href="https://davidb-prog.github.io/la-lune-change-de-forme/">Pourquoi la Lune change de forme ?</a></li>
+      <li aria-current="page">Pourquoi il y a des saisons ?</li>
+    </ul>
+  </footer>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
