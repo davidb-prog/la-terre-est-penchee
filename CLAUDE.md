@@ -73,6 +73,11 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   `etat.jour`.
 - **Les repères de saison (❄️🌸☀️🍂) autour de l'orbite s'effacent** quand la
   Terre est dessus (elle y est déjà — pas de doublon visuel).
+- **Pas de jour/nuit dans la vue de l'espace** : à l'échelle de l'année, un
+  côté nuit qui tourne embrouille (retour utilisateur). Seuls comptent le
+  penchant et les deux moitiés : nord vert lagon avec la maison (~45° nord,
+  jamais sur le pôle), sud bleu océan avec le kangourou (~45° sud, tête en
+  bas), séparées par un équateur doré bien marqué.
 - **Sur mobile (< 880 px) seulement** : un médaillon flottant (haut droit,
   hors du chemin du pouce) montre la fenêtre de chez nous en miniature dès
   qu'elle sort de l'écran — un tap y ramène. Rien de tel sur grand écran, et

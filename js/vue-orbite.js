@@ -104,14 +104,20 @@ export function creerVueOrbite(canvas) {
     ctx.restore();
   }
 
+  /* Tourne un vecteur canvas de `angle` radians (sens horaire à l'écran). */
+  function tourner(v, angle) {
+    var c = Math.cos(angle);
+    var s = Math.sin(angle);
+    return { x: v.x * c - v.y * s, y: v.x * s + v.y * c };
+  }
+
   function dessinerTerre(ctx, g, jour, halo) {
     var p = positionTerreCanvas(jour, g);
     var r = g.rTerre;
     var axe = axeDirection(jour);
     /* Bascule math → canvas : le haut de l'axe à l'écran. */
-    var ax = axe.x;
-    var ay = -axe.y;
-    var angleAxe = Math.atan2(ax, -ay); /* rotation canvas : 0 = tout droit */
+    var a = { x: axe.x, y: -axe.y };
+    var angleAxe = Math.atan2(a.x, -a.y); /* rotation canvas : 0 = tout droit */
 
     /* L'anneau « attrape-moi ». */
     if (halo > 0) {
@@ -125,48 +131,41 @@ export function creerVueOrbite(canvas) {
     /* L'axe penché : un grand bâton qui traverse la Terre.
      * Sa direction ne change JAMAIS — c'est la vérité n° 1. */
     ctx.beginPath();
-    ctx.moveTo(p.x - ax * r * 1.55, p.y - ay * r * 1.55);
-    ctx.lineTo(p.x + ax * r * 1.55, p.y + ay * r * 1.55);
+    ctx.moveTo(p.x - a.x * r * 1.55, p.y - a.y * r * 1.55);
+    ctx.lineTo(p.x + a.x * r * 1.55, p.y + a.y * r * 1.55);
     ctx.strokeStyle = 'rgba(233, 237, 248, 0.75)';
     ctx.lineWidth = Math.max(2, r * 0.12);
     ctx.lineCap = 'round';
     ctx.stroke();
 
-    /* Le globe. */
+    /* Le globe : DEUX moitiés bien distinctes, séparées par l'équateur.
+     * La moitié nord (côté du haut de l'axe) porte la maison — chez nous ;
+     * la moitié sud porte le kangourou — l'Australie. Pas de jour/nuit ici :
+     * à l'échelle de l'année, seule compte la moitié qui penche vers le
+     * Soleil (la rotation quotidienne a son propre épisode). */
+    var angleNord = Math.atan2(a.y, a.x);
     ctx.beginPath();
-    ctx.arc(p.x, p.y, r, 0, TAU);
-    ctx.fillStyle = '#3d8bd4';
+    ctx.arc(p.x, p.y, r, angleNord + Math.PI / 2, angleNord + (3 * Math.PI) / 2, false);
+    ctx.closePath();
+    ctx.fillStyle = '#2f6fb5';  /* la moitié sud, bleu océan */
     ctx.fill();
-    /* Quelques continents joufflus, découpés dans le disque. */
-    ctx.save();
     ctx.beginPath();
-    ctx.arc(p.x, p.y, r, 0, TAU);
-    ctx.clip();
-    ctx.fillStyle = '#46c2a5';
-    ctx.beginPath();
-    ctx.arc(p.x - r * 0.35, p.y - r * 0.3, r * 0.45, 0, TAU);
-    ctx.arc(p.x + r * 0.4, p.y + r * 0.35, r * 0.38, 0, TAU);
-    ctx.arc(p.x + r * 0.3, p.y - r * 0.55, r * 0.3, 0, TAU);
+    ctx.arc(p.x, p.y, r, angleNord - Math.PI / 2, angleNord + Math.PI / 2, false);
+    ctx.closePath();
+    ctx.fillStyle = '#3fa98e';  /* la moitié nord, vert lagon */
     ctx.fill();
-    /* L'équateur : la ceinture de la Terre, perpendiculaire à l'axe. */
+
+    /* L'équateur : la ceinture de la Terre, bien marquée. */
     ctx.save();
     ctx.translate(p.x, p.y);
     ctx.rotate(angleAxe);
     ctx.beginPath();
-    ctx.ellipse(0, 0, r, r * 0.22, 0, 0, TAU);
-    ctx.strokeStyle = 'rgba(233, 237, 248, 0.4)';
-    ctx.lineWidth = Math.max(1, r * 0.05);
+    ctx.moveTo(-r, 0);
+    ctx.lineTo(r, 0);
+    ctx.strokeStyle = 'rgba(255, 207, 92, 0.85)';
+    ctx.lineWidth = Math.max(2, r * 0.09);
     ctx.stroke();
     ctx.restore();
-    ctx.restore();
-
-    /* La nuit : la moitié qui tourne le dos au Soleil (il est au centre). */
-    var versSoleil = Math.atan2(g.cy - p.y, g.cx - p.x);
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, r + 0.5, versSoleil + Math.PI / 2, versSoleil + (3 * Math.PI) / 2, false);
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(4, 7, 18, 0.72)';
-    ctx.fill();
 
     /* Le contour. */
     ctx.beginPath();
@@ -175,9 +174,21 @@ export function creerVueOrbite(canvas) {
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    /* Chez nous : une petite maison plantée sur la moitié nord (le haut de
-     * l'axe), debout dans le prolongement de l'axe penché. */
-    dessinerMaison(ctx, p.x + ax * r, p.y + ay * r, angleAxe, r * 0.55);
+    /* Chez nous : la maison à mi-hauteur de la moitié nord (pas sur le
+     * pôle !), debout sur la surface. Et l'Australie à mi-hauteur de la
+     * moitié sud, du même côté — la tête en bas, comme dans l'histoire. */
+    var dMaison = tourner(a, Math.PI / 4);        /* ~45° nord */
+    var dKangourou = tourner(a, (3 * Math.PI) / 4); /* ~45° sud */
+    dessinerMaison(ctx, p.x + dMaison.x * r, p.y + dMaison.y * r,
+      Math.atan2(dMaison.x, -dMaison.y), r * 0.5);
+    ctx.save();
+    ctx.translate(p.x + dKangourou.x * r, p.y + dKangourou.y * r);
+    ctx.rotate(Math.atan2(dKangourou.x, -dKangourou.y));
+    ctx.font = Math.round(r * 0.72) + 'px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText('🦘', 0, 0);
+    ctx.restore();
     return p;
   }
 
@@ -245,7 +256,8 @@ export function creerVueOrbite(canvas) {
         ctx.textAlign = 'center';
         ctx.textBaseline = 'alphabetic';
         ctx.fillText('Soleil', g.cx, g.cy + g.rSoleil + taille * 1.4);
-        ctx.fillText('Terre', p.x, p.y + g.rTerre + taille * 1.8);
+        /* Décalée vers la gauche : la maison et le kangourou vivent à droite. */
+        ctx.fillText('Terre', p.x - g.rTerre * 0.8, p.y + g.rTerre + taille * 1.8);
       }
     },
 

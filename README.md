@@ -18,7 +18,9 @@ L'idée centrale, celle que l'enfant doit retenir :
 
 - **Le geste-signature** : attraper la Terre et la faire glisser le long de son
   orbite — l'année défile sous le doigt, le Soleil reste fixe au centre et l'axe
-  garde son penchant, quoi qu'il arrive.
+  garde son penchant, quoi qu'il arrive. La Terre montre ses deux moitiés
+  (maison au nord, kangourou au sud, équateur doré) — sans jour/nuit : à
+  l'échelle de l'année, seul le penchant compte.
 - **La fenêtre de chez nous**, toujours synchronisée : le Soleil de midi qui
   monte haut l'été et reste bas l'hiver, l'arbre du jardin (nu, fleuri, vert,
   roux), la barre du jour (8 h à 16 h de lumière) et la petite phrase du moment.
@@ -79,8 +81,10 @@ desktop, `prefers-reduced-motion` et mobile 390 px.
 - **Une seule maison, l'hémisphère nord.** L'Australie de l'histoire vit les
   saisons à l'envers ; près de l'équateur on parle plutôt de saison sèche et de
   saison des pluies.
-- **La rotation quotidienne est ignorée** dans la vue de l'espace — le jour et
-  la nuit ont leur propre épisode (ci-dessous).
+- **La rotation quotidienne est ignorée** dans la vue de l'espace : ni rotation,
+  ni côté nuit dessinés — le jour et la nuit ont leur propre épisode
+  (ci-dessous). La maison (~45° nord) et le kangourou (~45° sud) marquent les
+  hémisphères sans prétendre à la vraie géographie.
 
 ## Structure
 
