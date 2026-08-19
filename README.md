@@ -78,6 +78,10 @@ desktop, `prefers-reduced-motion` et mobile 390 px.
   avec une formule sinusoïdale simple : Soleil de midi entre ~20° et ~66°,
   jour entre 8 h et 16 h. À l'équateur, presque pas de variation ; aux pôles,
   soleil de minuit et nuit polaire.
+- **Pas de températures affichées.** Le site montre les causes (hauteur du
+  Soleil, durée du jour) et relie la chaleur en une phrase ; la météo réelle
+  suit avec du retard (inertie thermique : le plus chaud fin juillet-août, le
+  plus froid fin janvier) et ses caprices — expliqué dans la note aux parents.
 - **Une seule maison, l'hémisphère nord.** L'Australie de l'histoire vit les
   saisons à l'envers ; près de l'équateur on parle plutôt de saison sèche et de
   saison des pluies.
