@@ -3,26 +3,42 @@
 **Petit labo d'astronomie.** Site statique d'une page, en français, qui
 explique les saisons à un enfant d'environ 5 ans. Le parent lit à voix haute ;
 l'enfant attrape la Terre penchée et lui fait faire le tour du Soleil.
+En ligne : <https://petit-labo.fr/la-terre-est-penchee/> (tous les liens
+croisés de la famille vivent sur ce domaine, jamais `github.io`).
 
 ## Contraintes (non négociables)
 
 - **Zéro dépendance, zéro build** : HTML + CSS + JS vanilla (modules ES),
-  canvas 2D dessiné à la main. La page s'ouvre avec `python3 -m http.server`
-  et se déploie telle quelle sur GitHub Pages.
+  canvas 2D dessiné à la main. Aucune police tierce à l'exécution : les titres
+  parlent en **Baloo 2 auto-hébergée** (`assets/fonts/`, licence OFL, repli
+  Arial Rounded/Trebuchet), le corps du texte reste en pile système. La page
+  s'ouvre avec `python3 -m http.server` et se déploie telle quelle sur GitHub
+  Pages.
 - **Compat mobiles anciens** : pas d'optional chaining `?.` ni de nullish `??`,
   pas de lookbehind regex, repli `@supports` pour `aspect-ratio`,
-  `top/right/bottom/left` plutôt qu'`inset`, `touch-action: none` sur le canvas
-  interactif. Tester à 390 px de large.
+  `top/right/bottom/left` plutôt qu'`inset`. Tester à 390 px de large.
+- **Blindage tactile** : `touch-action: none` sur les canvas interactifs et
+  leurs cadres, doublé du repli JS `touchstart`/`touchmove` non passifs ;
+  `user-select: none` sur `body`, `* { touch-action: pan-x pan-y }`, viewport
+  `maximum-scale=1` + filet `gesturestart` → la page ne se sélectionne pas et
+  ne se zoome pas sous les doigts d'un enfant (les zooms d'accessibilité du
+  système restent utilisables).
 - **`js/model.js` est pur** (aucun accès DOM) : toutes les constantes du récit
-  (jours-repères de l'année, penchant, saisons, mois, arbres, phrases générées)
-  vivent dedans. Il se teste avec `node test/model.test.mjs`.
-- **Boucle rAF résiliente** : le `requestAnimationFrame` suivant se planifie
-  dans un `try/finally`.
-- **`prefers-reduced-motion` respecté** : le halo « attrape-moi » ne pulse
-  plus, le retour du médaillon vers la fenêtre se fait sans défilement animé.
+  (jours-repères de l'année, penchant, saisons, mois, arbres, scénarios, défis,
+  phrases générées, textes oraux) vivent dedans. Il se teste avec
+  `node test/model.test.mjs`.
+- **Boucle rAF résiliente et sobre** : le `requestAnimationFrame` suivant se
+  planifie dans un `try/finally`, et rien ne se redessine quand rien ne change
+  (en pause, zéro travail par frame — le halo « attrape-moi » ne respire que
+  pendant la lecture, il est sage en pause).
+- **`prefers-reduced-motion` respecté** : la lecture automatique ne démarre
+  pas, les glissements de scénario deviennent des sauts secs, le halo ne pulse
+  pas, le retour du médaillon se fait sans défilement animé.
 - **Public 5 ans** : phrases courtes, apostrophe typographique « ’ », zéro
   jargon côté enfant (« penchant », pas « obliquité » ; les mots savants et les
   vrais chiffres vont dans la note aux parents).
+- **Le code s'écrit en français** (identifiants, constantes, fichiers de
+  vues), sans accents ; les API navigateur restent en anglais.
 
 ## L'idée centrale (la vérité à préserver)
 
@@ -70,7 +86,22 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
 - **Glisser fait avancer le phénomène** : attraper la Terre la déplace sur son
   orbite (dans les deux sens) ; le curseur maître fait la même chose. Les deux
   vues (espace + fenêtre) restent **synchronisées en permanence** sur le même
-  `etat.jour`.
+  `etat.jour`, chacune avec sa petite phrase (le même jour, deux regards).
+- **La lecture automatique** (un tour de l'année en ~85 s,
+  `LECTURE_JOURS_PAR_SEC`) se commande UNIQUEMENT par le bouton ⏸/▶ (libellés
+  empilés, largeur stable) et la barre d'espace. Reprendre la main (glisser,
+  curseur, scénario, ouvrir le jeu) met en pause ; `prefers-reduced-motion` la
+  désactive au chargement.
+- **Les scénarios vont au moment choisi en douceur, toujours vers l'avant**
+  (le vrai sens de l'année) ; reprendre la main efface l'histoire et désarme
+  le bouton. L'histoire s'écrit en deux lignes à puces : 🏡 chez nous /
+  🚀 vu de l'espace.
+- **Le jeu ne se gagne qu'en fabriquant soi-même** (jamais pendant un
+  glissement animé) : fenêtre de victoire = la saison demandée, tempo de
+  maintien `DEFI_ATTENTE_MS`, hystérésis de sortie `DEFI_SORTIE_MARGE_JOURS`
+  (le bravo ne clignote pas au bord et ne ment jamais). Recalage doux vers le
+  cœur de la saison à la première victoire seulement. Le défi du kangourou
+  (l'été australien) est la révélation du site.
 - **Les repères de saison (❄️🌸☀️🍂) autour de l'orbite s'effacent** quand la
   Terre est dessus (elle y est déjà — pas de doublon visuel).
 - **Pas de jour/nuit dans la vue de l'espace** : à l'échelle de l'année, un
@@ -78,52 +109,79 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   penchant et les deux moitiés : nord vert lagon avec la maison (~45° nord,
   jamais sur le pôle), sud bleu océan avec le kangourou (~45° sud, tête en
   bas), séparées par un équateur doré bien marqué.
+- **Le seuil mobile UNIQUE de l'épisode : 880 px.** La grille CSS, le
+  médaillon, le repli de la boîte d'explication et la vue unique du jeu lisent
+  tous ce chiffre.
 - **Sur mobile (< 880 px) seulement** : un médaillon flottant (haut droit,
   hors du chemin du pouce) montre la fenêtre de chez nous en miniature dès
-  qu'elle sort de l'écran — un tap y ramène. Rien de tel sur grand écran, et
-  rien n'est incrusté dans le canvas qu'on manipule.
+  qu'elle sort de l'écran — un tap y ramène. Le jeu n'affiche qu'une vue
+  (l'espace) : c'est le médaillon qui montre le résultat. Rien de tel sur
+  grand écran, et rien n'est incrusté dans le canvas qu'on manipule.
 
-## Le conteur (synthèse vocale)
+## Le conteur (synthèse + voix enregistrée)
 
-Voir la charte de la famille : moteur unique `narrateur` (générations pour
-invalider les lectures annulées), découpage en phrases, ton (rate/pitch selon
-la ponctuation), score des voix françaises (fr-FR > fr > fr-CA, bonus
-naturelles/neurales, malus robotiques), menu 🗣 si ≥ 2 voix (choix en
-`localStorage`, clé `petit-labo-saisons-voix`), textes oraux sans émoji avec
-espaces recollées avant la ponctuation, `pagehide` → `cancel()`. Pas de
-scénarios dans cet épisode : seul le bouton « 🔊 Écouter l'histoire » parle.
-Sans synthèse, les boutons sonores se cachent et le site reste complet.
+Patron de la famille (voir le skill `petit-labo`,
+`references/narrateur.md` et `references/voix-enregistree.md`) : moteur unique
+`narrateur.narrate(blocs)` — chaque bloc `{ id, texte, pause? }` joue son mp3
+enregistré si `assets/audio/manifest.json` le connaît ET que son texte
+correspond encore au site, sinon repli synthèse (générations, découpage en
+phrases, ton rate/pitch, score des voix françaises sans menu). Bouton
+« 🔊 Écouter l'histoire » (blocs `histoire-1…6`), bouton 🔇/🔊 jumeau
+scénarios/jeu (clé de famille `petit-labo-son`), `visibilitychange` +
+`pagehide` → `stop()`. Sans synthèse, les boutons sonores se cachent et le
+site reste complet.
+
+**La voix enregistrée n'est pas encore générée** : manifeste vide, tout passe
+à la synthèse. Le corpus vit dans `tools/voix-lib.mjs`, la production se
+déroule avec le skill `generer-voix-petit-labo` sur la machine de
+l'utilisateur (clé dans `.cle-elevenlabs`, gitignoré). Tant que rien n'est
+enregistré, les textes du site restent libres — après, ils sont GELÉS.
 
 ## Structure
 
 ```
-index.html           la page unique
-css/style.css        palette commune de la série astronomie (fond nuit)
-js/model.js          modèle pur + constantes du récit
+index.html           la page unique (socle SEO + og: dans le <head>)
+css/style.css        palette de la série astronomie + Baloo 2 (fond nuit)
+js/model.js          modèle pur + constantes du récit + textes oraux
 js/vue-orbite.js     la vue de l'espace (Soleil fixe, orbite, geste-signature)
 js/vue-fenetre.js    chez nous par la fenêtre (+ dessinerMiniFenetre, médaillon)
-js/main.js           câblage : boucle rAF, curseur, geste, conteur, médaillon
+js/main.js           câblage : boucle rAF, lecture auto, curseur, geste,
+                     scénarios, jeu, conteur narrate(), médaillon
 test/model.test.mjs  tests du modèle (Node)
-docs/                captures d'écran du README
+test/voix.test.mjs   tests du corpus vocal et du manifeste
+tools/voix-lib.mjs   le corpus de l'épisode (la seule partie propre à lui)
+tools/build-voix.mjs génération ElevenLabs (hors site — voir docs/voix-conteur.md)
+tools/controle-voix.mjs  contrôle « sans oreilles » des mp3
+assets/fonts/        Baloo 2 (woff2, OFL)
+assets/audio/        manifest.json (+ mp3 une fois la voix générée)
+docs/                captures du README + og.png (carte de partage)
 ```
 
 ## Vérification navigateur
 
 Suite Playwright maintenue **hors dépôt** (scratchpad de session,
 `test-site.js`) : trois passes — desktop 1200 px, `reducedMotion: 'reduce'`,
-mobile 390 px (`hasTouch`, `isMobile`). Vérifie la structure, le
-geste-signature (glisser simulé le long de l'orbite), la synchronisation
-curseur/vues/phrase, le câblage du son, le médaillon mobile, zéro erreur
-console, pas de débordement horizontal, et des sondes de pixels (le Soleil doré
-fixe au centre ; le ciel de la fenêtre). Servir avant :
+mobile 390 px (`hasTouch`, `isMobile`), avec la synthèse vocale FIGÉE par un
+stub (le câblage se teste, pas le son). Vérifie la structure (fiole, pied
+harmonisé sans lien github.io, socle SEO), la lecture auto (avance seule,
+pause à la reprise en main, rien ne bouge en mouvement réduit), le
+geste-signature, les scénarios (glissement, histoire à deux regards,
+effacement), le jeu (consigne, bravo, rangement), le conteur, le médaillon
+mobile, zéro erreur console, pas de débordement horizontal, et des sondes de
+pixels (le Soleil doré fixe au centre ; le ciel de la fenêtre). Servir avant :
 `python3 -m http.server 8123`. Régénérer les captures `docs/*.png` à chaque
 évolution visuelle (variable `CAPTURES=docs` ; les passes `reduit-*.png` ne se
-committent pas).
+committent pas). La carte `docs/og.png` se régénère depuis le dépôt du portail
+(`tools/build-og.mjs`) à chaque changement de titre.
 
 ## La série
 
-Pieds de page croisés avec : `eclipse-explorer`, `ou-va-le-soleil`,
-`la-terre-tourne`, `la-lune-change-de-forme`. En publiant cet épisode, ajouter
-son lien dans les pieds de page des quatre voisins. Les épisodes ne sont **pas
-numérotés** (ni kicker, ni pieds de page) : l'ordre de publication vit dans le
-registre du skill, pas dans l'interface.
+Pied de page harmonisé : « Pourquoi il y a des saisons ? » — un épisode du
+Petit labo d'astronomie 🔭, liens vers `ou-va-le-soleil`, `la-terre-tourne`
+et `la-lune-change-de-forme` (médaillons SVG repris du portail — le pied ne
+liste pas « La mécanique des éclipses », décision de la famille), et le bouton
+fiole « Tous les épisodes du Petit labo » vers <https://petit-labo.fr/>. En
+publiant cet épisode : ajouter son lien dans les pieds de page des voisins,
+l'épisode au registre `tools/build-og.mjs` + `sitemap.xml` + cartes du portail,
+et sa ligne au registre du skill. Les épisodes ne sont **pas numérotés** :
+l'ordre de publication vit dans le registre du skill, pas dans l'interface.

@@ -210,3 +210,177 @@ export function phraseDuMoment(jour) {
   }
   return debut + 'Le Soleil redescend, et le jour raccourcit : plus que ' + heures + ' heures.';
 }
+
+/* La phrase de la vue de l'espace : où penche notre moitié, en ce moment. */
+export function phraseEspace(jour) {
+  var p = penchementNord(jour);
+  if (p > 0.7) return '🏡 Chez nous penche à fond vers le Soleil : c’est le grand été !';
+  if (p > 0.15) return '🏡 Chez nous penche vers le Soleil — et l’Australie, à l’opposé.';
+  if (p < -0.7) return '🏡 Chez nous penche à fond loin du Soleil : c’est le grand hiver.';
+  if (p < -0.15) return '🏡 Chez nous penche loin du Soleil — l’Australie, elle, penche vers lui.';
+  return '🏡 Ni vers le Soleil, ni à l’opposé : les deux moitiés sont à égalité.';
+}
+
+/* ------------------------------------------------------------------ */
+/* La lecture automatique                                              */
+/* ------------------------------------------------------------------ */
+
+/* Le phénomène avance tout seul : un tour de l'année en ~85 secondes. */
+export var LECTURE_JOURS_PAR_SEC = ANNEE_JOURS / 85;
+
+/* ------------------------------------------------------------------ */
+/* Les boutons-scénarios : « 🎲 Joue avec les saisons »                */
+/* ------------------------------------------------------------------ */
+
+/* Les quatre moments-clés de l'année, aux dégradés communs de la famille
+ * (attribués au sens du moment : printemps rose, été or, automne violet,
+ * hiver bleu). `fenetre` et `espace` s'affichent en lignes à puces (le même
+ * instant, deux regards) ; `intro` n'existe qu'à l'oral — c'est la voix qui
+ * nomme le moment fabriqué. */
+export var SCENARIOS = [
+  {
+    id: 'printemps',
+    emoji: '🌸',
+    jour: JOUR_EQUINOXE_PRINTEMPS,
+    teinte: 'rose',
+    label: 'Le printemps revient',
+    sub: 'l’équinoxe de mars',
+    intro: 'Au mois de mars, le printemps revient…',
+    fenetre: 'L’arbre du jardin se couvre de fleurs ! Le jour et la nuit durent pareil : douze heures chacun. Et chaque jour qui passe, le Soleil grimpe un peu plus haut.',
+    espace: 'La Terre ne penche ni vers le Soleil, ni à l’opposé : les deux moitiés sont à égalité. Mais elle avance… Et bientôt, ce sera notre tour de pencher vers lui !'
+  },
+  {
+    id: 'ete',
+    emoji: '☀️',
+    jour: JOUR_SOLSTICE_ETE,
+    teinte: 'or',
+    label: 'Le grand été',
+    sub: 'le solstice de juin',
+    intro: 'Fin juin, c’est le grand été…',
+    fenetre: 'Le Soleil monte tout là-haut dans le ciel, et le soir, il fait encore jour très tard : seize heures de lumière ! L’arbre est vert, on mange dehors.',
+    espace: 'Regarde la Terre : notre moitié penche à fond vers le Soleil. C’est le jour le plus long de toute l’année — et en Australie, c’est le jour le plus court.'
+  },
+  {
+    id: 'automne',
+    emoji: '🍂',
+    jour: JOUR_EQUINOXE_AUTOMNE,
+    teinte: 'violet',
+    label: 'L’automne arrive',
+    sub: 'l’équinoxe de septembre',
+    intro: 'Fin septembre, l’automne arrive…',
+    fenetre: 'Les feuilles de l’arbre deviennent rousses et s’envolent. Le jour et la nuit durent encore pareil… Mais maintenant, le Soleil descend un peu plus chaque jour.',
+    espace: 'La Terre est de nouveau à égalité : ni vers le Soleil, ni à l’opposé. Elle continue son voyage — et cette fois, c’est l’autre moitié qui va pencher vers lui.'
+  },
+  {
+    id: 'hiver',
+    emoji: '❄️',
+    jour: JOUR_SOLSTICE_HIVER,
+    teinte: 'bleu',
+    label: 'Noël en Australie',
+    sub: 'le solstice de décembre',
+    intro: 'Fin décembre, c’est le grand hiver…',
+    fenetre: 'Le Soleil reste tout bas, la nuit tombe avant le dîner : huit heures de jour, pas plus. L’arbre est tout nu, et parfois, il neige sur le jardin.',
+    espace: 'Notre moitié penche à fond loin du Soleil… Mais regarde le kangourou : l’Australie penche vers lui ! Là-bas, les enfants fêtent Noël en plein été, sur la plage.'
+  }
+];
+
+/* Les enchaînements que seul l'oral entend. */
+export var VOIX_TRANSITIONS = {
+  espace: 'Et maintenant, vu de l’espace…'
+};
+
+/* ------------------------------------------------------------------ */
+/* Le jeu « 🎯 Fabrique la saison ! »                                  */
+/* ------------------------------------------------------------------ */
+
+/* Gagné quand le jour RESTE un petit instant dans la saison demandée
+ * (tempo anti « gagné en passant »), rangé seulement une marge au-delà de
+ * ses bords (hystérésis : le bravo ne clignote pas à la frontière). */
+export var DEFI_ATTENTE_MS = 350;
+export var DEFI_SORTIE_MARGE_JOURS = 6;
+
+export var DEFIS = [
+  {
+    id: 'fleurs',
+    emoji: '🌸',
+    cible: 'printemps',
+    hemisphere: 'nord',
+    consigne: 'Fais fleurir l’arbre du jardin !',
+    bravo: 'Bravo ! Tu as fabriqué le printemps : l’arbre est tout fleuri !'
+  },
+  {
+    id: 'grand-ete',
+    emoji: '☀️',
+    cible: 'ete',
+    hemisphere: 'nord',
+    consigne: 'Fabrique l’été chez nous !',
+    bravo: 'Bravo ! C’est l’été : le Soleil monte tout là-haut et les jours n’en finissent plus !'
+  },
+  {
+    id: 'neige',
+    emoji: '❄️',
+    cible: 'hiver',
+    hemisphere: 'nord',
+    consigne: 'Fais tomber la neige sur le jardin !',
+    bravo: 'Bravo ! C’est l’hiver : la neige est là et la nuit tombe tôt.'
+  },
+  {
+    id: 'australie',
+    emoji: '🦘',
+    cible: 'ete',
+    hemisphere: 'sud',
+    consigne: 'Offre l’été aux enfants d’Australie !',
+    bravo: 'Bravo ! L’Australie penche vers le Soleil… Et pendant ce temps, chez nous, c’est l’hiver !'
+  }
+];
+
+/* Le cœur de chaque saison (nord) : le milieu de son quart d'année — c'est
+ * là que le recalage doux emmène l'image parfaite du bravo. */
+export function coeurDeSaison(saisonCible, hemisphere) {
+  var nord = saisonCible;
+  if (hemisphere === 'sud') {
+    var opposees = { hiver: 'ete', ete: 'hiver', printemps: 'automne', automne: 'printemps' };
+    nord = opposees[saisonCible];
+  }
+  var debut = {
+    printemps: JOUR_EQUINOXE_PRINTEMPS,
+    ete: JOUR_SOLSTICE_ETE,
+    automne: JOUR_EQUINOXE_AUTOMNE,
+    hiver: JOUR_SOLSTICE_HIVER
+  }[nord];
+  return jourNormalise(debut + ANNEE_JOURS / 8);
+}
+
+export function defiReussi(defi, jour) {
+  return saison(jour, defi.hemisphere) === defi.cible;
+}
+
+/* Le bravo se range seulement une marge AU-DELÀ des bords de la saison. */
+export function defiEncoreProche(defi, jour) {
+  if (defiReussi(defi, jour)) return true;
+  for (var d = 1; d <= DEFI_SORTIE_MARGE_JOURS; d++) {
+    if (saison(jour + d, defi.hemisphere) === defi.cible) return true;
+    if (saison(jour - d, defi.hemisphere) === defi.cible) return true;
+  }
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+/* Le texte oral : ce que la voix a le droit de dire                   */
+/* ------------------------------------------------------------------ */
+
+/* Les émojis, imprononçables (plage large + variantes et liaisons). */
+export var EMOJI_RE = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]/gu;
+
+/* Prépare un texte du site pour la voix : émojis retirés, guillemets
+ * français retirés (la synthèse trébuche dessus), tirets cadratins en
+ * virgules, espaces recollées devant la ponctuation. */
+export function texteOral(t) {
+  return t.replace(EMOJI_RE, '')
+    .replace(/[«»]/g, ' ')
+    .replace(/\s+—\s+/g, ', ')
+    .replace(/\s+/g, ' ')
+    .replace(/\s+([.,…])/g, '$1')
+    .replace(/([!?…])\s*\./g, '$1') /* le point orphelin d'un émoji retiré */
+    .trim();
+}
