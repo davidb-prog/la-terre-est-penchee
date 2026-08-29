@@ -676,7 +676,7 @@ var defiJeu = $('defi-jeu');
 var bravoJeu = $('bravo-jeu');
 
 var defi = null;        /* le défi en cours (null : jeu fermé) */
-var defiIndice = -1;
+var panierDefis = [];   /* tirage SANS remise : chaque défi sort avant qu'on remélange */
 var defiEntreeMs = null; /* entrée dans la saison (tempo anti « gagné en passant ») */
 var defiGagne = false;
 var bravoVisible = false;
@@ -687,13 +687,30 @@ function raconterDefi(genre, texte) {
   }
 }
 
-function prochainDefi() {
-  /* le défi suivant — en sautant celui que le jour actuel réussit déjà */
-  for (var i = 1; i <= DEFIS.length; i++) {
-    var candidat = (defiIndice + i) % DEFIS.length;
-    if (!defiReussi(DEFIS[candidat], etat.jour)) { defiIndice = candidat; break; }
+function remplirPanierDefis() {
+  panierDefis = DEFIS.slice();
+  for (var i = panierDefis.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var echange = panierDefis[i];
+    panierDefis[i] = panierDefis[j];
+    panierDefis[j] = echange;
   }
-  defi = DEFIS[defiIndice];
+}
+
+function prochainDefi() {
+  /* Tirage au panier, sans remise : tous les défis sortent avant qu'on
+   * remélange — et jamais deux fois le même d'affilée au remélange. */
+  if (!panierDefis.length) remplirPanierDefis();
+  if (defi && panierDefis.length > 1 && panierDefis[0].id === defi.id) {
+    panierDefis.push(panierDefis.shift());
+  }
+  /* Ne pas tirer un défi que le jour actuel réussit déjà (gagné d'avance) —
+   * sauf s'il ne reste que ceux-là dans le panier. */
+  var indice = 0;
+  for (var i = 0; i < panierDefis.length; i++) {
+    if (!defiReussi(panierDefis[i], etat.jour)) { indice = i; break; }
+  }
+  defi = panierDefis.splice(indice, 1)[0];
   defiGagne = false;
   bravoVisible = false;
   defiEntreeMs = null;

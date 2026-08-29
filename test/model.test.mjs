@@ -270,6 +270,11 @@ test('chaque scénario raconte la bonne saison, aux deux regards', function () {
 /* Le jeu « Fabrique la saison ! »                                     */
 /* ------------------------------------------------------------------ */
 
+function defiParId(id) {
+  for (var i = 0; i < DEFIS.length; i++) { if (DEFIS[i].id === id) return DEFIS[i]; }
+  throw new Error('défi introuvable : ' + id);
+}
+
 test('chaque défi est atteignable, et gagné pile dans sa saison', function () {
   DEFIS.forEach(function (d) {
     var atteignable = false;
@@ -279,19 +284,30 @@ test('chaque défi est atteignable, et gagné pile dans sa saison', function () 
     assert.ok(atteignable, 'défi inatteignable : ' + d.id);
     assert.ok(d.consigne && d.bravo && d.emoji, 'défi complet : ' + d.id);
   });
-  assert.ok(defiReussi(DEFIS[1], JOUR_SOLSTICE_ETE), 'l’été au solstice d’été');
-  assert.ok(!defiReussi(DEFIS[1], JOUR_SOLSTICE_HIVER), 'pas d’été au solstice d’hiver');
+  assert.ok(defiReussi(defiParId('ete'), JOUR_SOLSTICE_ETE), 'l’été au solstice d’été');
+  assert.ok(!defiReussi(defiParId('ete'), JOUR_SOLSTICE_HIVER), 'pas d’été au solstice d’hiver');
+});
+
+test('les quatre saisons de chez nous ont chacune leur défi — l’automne compris', function () {
+  var couvertes = {};
+  DEFIS.forEach(function (d) {
+    if (d.hemisphere === 'nord') couvertes[d.cible] = true;
+  });
+  ORDRE_SAISONS.forEach(function (s) {
+    assert.ok(couvertes[s], 'saison sans défi : ' + s);
+  });
+  assert.ok(defiReussi(defiParId('feuilles'), 290), 'les feuilles tombent à la mi-octobre');
 });
 
 test('le défi de la révélation : l’été australien se gagne en plein hiver chez nous', function () {
-  var australie = DEFIS[3];
+  var australie = defiParId('australie');
   assert.equal(australie.hemisphere, 'sud');
   assert.ok(defiReussi(australie, JOUR_SOLSTICE_HIVER + 5));
   assert.equal(saison(JOUR_SOLSTICE_HIVER + 5, 'nord'), 'hiver');
 });
 
 test('l’hystérésis : le bravo se range une marge au-delà des bords de la saison, pas au bord', function () {
-  var ete = DEFIS[1];
+  var ete = defiParId('ete');
   var sortie = JOUR_EQUINOXE_AUTOMNE; /* premier jour hors de l’été */
   assert.ok(!defiReussi(ete, sortie + 0.5));
   assert.ok(defiEncoreProche(ete, sortie + 0.5), 'à un demi-jour du bord, le bravo reste');
@@ -332,11 +348,15 @@ test('tous les textes du conteur sont propres pour l’oral', function () {
   });
 });
 
-test('la phrase de l’espace suit le penchant', function () {
+test('la phrase de l’espace suit le penchant, et nomme toujours qui penche', function () {
   assert.ok(phraseEspace(JOUR_SOLSTICE_ETE).indexOf('à fond vers le Soleil') !== -1);
   assert.ok(phraseEspace(JOUR_SOLSTICE_HIVER).indexOf('loin du Soleil') !== -1);
+  assert.ok(phraseEspace(JOUR_SOLSTICE_HIVER).indexOf('les plus courts') !== -1);
   assert.ok(phraseEspace(JOUR_EQUINOXE_PRINTEMPS).indexOf('égalité') !== -1);
-  assert.ok(phraseEspace(JOUR_SOLSTICE_HIVER).indexOf('grand hiver') !== -1);
+  for (var j = 0; j < ANNEE_JOURS; j += 3) {
+    assert.ok(phraseEspace(j).indexOf('Chez nous') !== -1 || phraseEspace(j).indexOf('chez nous') !== -1,
+      'la phrase nomme chez nous au jour ' + j);
+  }
 });
 
 /* ------------------------------------------------------------------ */

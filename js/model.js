@@ -214,11 +214,11 @@ export function phraseDuMoment(jour) {
 /* La phrase de la vue de l'espace : où penche notre moitié, en ce moment. */
 export function phraseEspace(jour) {
   var p = penchementNord(jour);
-  if (p > 0.7) return '🏡 Chez nous penche à fond vers le Soleil : c’est le grand été !';
+  if (p > 0.7) return '🏡 Chez nous penche à fond vers le Soleil : les jours sont les plus longs de l’année !';
   if (p > 0.15) return '🏡 Chez nous penche vers le Soleil — et l’Australie, à l’opposé.';
-  if (p < -0.7) return '🏡 Chez nous penche à fond loin du Soleil : c’est le grand hiver.';
+  if (p < -0.7) return '🏡 Chez nous penche à fond loin du Soleil : les jours sont les plus courts de l’année.';
   if (p < -0.15) return '🏡 Chez nous penche loin du Soleil — l’Australie, elle, penche vers lui.';
-  return '🏡 Ni vers le Soleil, ni à l’opposé : les deux moitiés sont à égalité.';
+  return '🏡 Personne ne penche vers le Soleil : chez nous et l’Australie sont à égalité.';
 }
 
 /* ------------------------------------------------------------------ */
@@ -244,19 +244,19 @@ export var SCENARIOS = [
     jour: JOUR_EQUINOXE_PRINTEMPS,
     teinte: 'rose',
     label: 'Le printemps revient',
-    sub: 'l’équinoxe de mars',
+    sub: 'l’équinoxe de printemps',
     intro: 'Au mois de mars, le printemps revient…',
     fenetre: 'L’arbre du jardin se couvre de fleurs ! Le jour et la nuit durent pareil : douze heures chacun. Et chaque jour qui passe, le Soleil grimpe un peu plus haut.',
-    espace: 'La Terre ne penche ni vers le Soleil, ni à l’opposé : les deux moitiés sont à égalité. Mais elle avance… Et bientôt, ce sera notre tour de pencher vers lui !'
+    espace: 'Les deux moitiés de la Terre sont à égalité : ni chez nous, ni l’Australie ne penche vers le Soleil. Mais la Terre avance… Et bientôt, c’est notre moitié qui penchera vers lui !'
   },
   {
     id: 'ete',
     emoji: '☀️',
     jour: JOUR_SOLSTICE_ETE,
     teinte: 'or',
-    label: 'Le grand été',
-    sub: 'le solstice de juin',
-    intro: 'Fin juin, c’est le grand été…',
+    label: 'L’été est là',
+    sub: 'le solstice d’été',
+    intro: 'Fin juin, l’été commence…',
     fenetre: 'Le Soleil monte tout là-haut dans le ciel, et le soir, il fait encore jour très tard : seize heures de lumière ! L’arbre est vert, on mange dehors.',
     espace: 'Regarde la Terre : notre moitié penche à fond vers le Soleil. C’est le jour le plus long de toute l’année — et en Australie, c’est le jour le plus court.'
   },
@@ -266,19 +266,19 @@ export var SCENARIOS = [
     jour: JOUR_EQUINOXE_AUTOMNE,
     teinte: 'violet',
     label: 'L’automne arrive',
-    sub: 'l’équinoxe de septembre',
+    sub: 'l’équinoxe d’automne',
     intro: 'Fin septembre, l’automne arrive…',
     fenetre: 'Les feuilles de l’arbre deviennent rousses et s’envolent. Le jour et la nuit durent encore pareil… Mais maintenant, le Soleil descend un peu plus chaque jour.',
-    espace: 'La Terre est de nouveau à égalité : ni vers le Soleil, ni à l’opposé. Elle continue son voyage — et cette fois, c’est l’autre moitié qui va pencher vers lui.'
+    espace: 'Les deux moitiés de la Terre sont de nouveau à égalité : ni chez nous, ni l’Australie ne penche vers le Soleil. Elle continue son voyage… Et cette fois, c’est l’Australie qui va pencher vers lui.'
   },
   {
     id: 'hiver',
     emoji: '❄️',
     jour: JOUR_SOLSTICE_HIVER,
     teinte: 'bleu',
-    label: 'Noël en Australie',
-    sub: 'le solstice de décembre',
-    intro: 'Fin décembre, c’est le grand hiver…',
+    label: 'L’hiver est là',
+    sub: 'le solstice d’hiver',
+    intro: 'Fin décembre, l’hiver commence…',
     fenetre: 'Le Soleil reste tout bas, la nuit tombe avant le dîner : huit heures de jour, pas plus. L’arbre est tout nu, et parfois, il neige sur le jardin.',
     espace: 'Notre moitié penche à fond loin du Soleil… Mais regarde le kangourou : l’Australie penche vers lui ! Là-bas, les enfants fêtent Noël en plein été, sur la plage.'
   }
@@ -309,12 +309,20 @@ export var DEFIS = [
     bravo: 'Bravo ! Tu as fabriqué le printemps : l’arbre est tout fleuri !'
   },
   {
-    id: 'grand-ete',
+    id: 'ete',
     emoji: '☀️',
     cible: 'ete',
     hemisphere: 'nord',
     consigne: 'Fabrique l’été chez nous !',
     bravo: 'Bravo ! C’est l’été : le Soleil monte tout là-haut et les jours n’en finissent plus !'
+  },
+  {
+    id: 'feuilles',
+    emoji: '🍂',
+    cible: 'automne',
+    hemisphere: 'nord',
+    consigne: 'Fais tomber les feuilles de l’arbre !',
+    bravo: 'Bravo ! C’est l’automne : les feuilles roussissent et s’envolent !'
   },
   {
     id: 'neige',

@@ -175,10 +175,11 @@ export function creerVueOrbite(canvas) {
     ctx.stroke();
 
     /* Chez nous : la maison à mi-hauteur de la moitié nord (pas sur le
-     * pôle !), debout sur la surface. Et l'Australie à mi-hauteur de la
-     * moitié sud, du même côté — la tête en bas, comme dans l'histoire. */
-    var dMaison = tourner(a, Math.PI / 4);        /* ~45° nord */
-    var dKangourou = tourner(a, (3 * Math.PI) / 4); /* ~45° sud */
+     * pôle !), debout sur la surface. Et l'Australie aux ANTIPODES de la
+     * maison, à ~45° sud de l'autre côté — la tête en bas, comme dans
+     * l'histoire. */
+    var dMaison = tourner(a, Math.PI / 4);              /* ~45° nord */
+    var dKangourou = tourner(a, Math.PI + Math.PI / 4); /* l'exact opposé */
     dessinerMaison(ctx, p.x + dMaison.x * r, p.y + dMaison.y * r,
       Math.atan2(dMaison.x, -dMaison.y), r * 0.5);
     ctx.save();
@@ -256,8 +257,9 @@ export function creerVueOrbite(canvas) {
         ctx.textAlign = 'center';
         ctx.textBaseline = 'alphabetic';
         ctx.fillText('Soleil', g.cx, g.cy + g.rSoleil + taille * 1.4);
-        /* Décalée vers la gauche : la maison et le kangourou vivent à droite. */
-        ctx.fillText('Terre', p.x - g.rTerre * 0.8, p.y + g.rTerre + taille * 1.8);
+        /* Sous le globe : la maison vit en haut à droite, le kangourou à
+         * gauche — le bas reste libre. */
+        ctx.fillText('Terre', p.x + g.rTerre * 0.4, p.y + g.rTerre + taille * 1.8);
       }
     },
 

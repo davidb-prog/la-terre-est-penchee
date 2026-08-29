@@ -34,11 +34,11 @@ const blocs = corpus();
     const g = b.id.split('-')[0];
     groupes[g] = (groupes[g] || 0) + 1;
   }
-  check('l’ossature y est : 12 blocs de scénarios, 1 transition, 8 blocs de jeu, 6 paragraphes d’histoire',
-    groupes.scn === 12 && groupes.transition === 1 && groupes.defi === 8 && groupes.histoire === 6,
+  check('l’ossature y est : 12 blocs de scénarios, 1 transition, 10 blocs de jeu, 6 paragraphes d’histoire',
+    groupes.scn === 12 && groupes.transition === 1 && groupes.defi === 10 && groupes.histoire === 6,
     JSON.stringify(groupes));
-  check('le corpus reste petit (moins de 30 blocs : tout est écrit, rien de généré)',
-    blocs.length < 30, blocs.length);
+  check('le corpus reste petit (moins de 35 blocs : tout est écrit, rien de généré)',
+    blocs.length < 35, blocs.length);
 }
 {
   const ids = {};

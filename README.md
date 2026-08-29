@@ -77,7 +77,7 @@ fixe au centre) et l'absence d'erreurs console, en desktop,
 
 ## La voix enregistrée
 
-Le corpus vocal de l'épisode (27 blocs : scénarios, transitions, jeu, grande
+Le corpus vocal de l'épisode (29 blocs : scénarios, transitions, jeu, grande
 histoire) vit dans `tools/voix-lib.mjs` ; `tools/build-voix.mjs` génère les mp3
 avec ElevenLabs, hors site (la clé ne touche jamais le dépôt), et
 `assets/audio/manifest.json` garantit que la voix enregistrée ne dit jamais
