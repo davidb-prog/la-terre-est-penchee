@@ -14,7 +14,9 @@ import {
   ORDRE_SAISONS, SAISONS, saison,
   MOIS, JOURS_PAR_MOIS, moisDuJour,
   hauteurSoleilMidi, dureeJourHeures, heureLever, heureCoucher,
-  ARBRES, arbreDuJour, phraseDuMoment, phraseEspace,
+  ARBRES, arbreDuJour, jardinDuJour,
+  LATITUDE_REPERES_DEGRES, positionLocaleMaison, positionLocaleKangourou, extremitesAnneau,
+  phraseDuMoment, phraseEspace,
   LECTURE_JOURS_PAR_SEC, SCENARIOS, VOIX_TRANSITIONS,
   DEFIS, DEFI_ATTENTE_MS, DEFI_SORTIE_MARGE_JOURS,
   defiReussi, defiEncoreProche, coeurDeSaison,
@@ -221,6 +223,74 @@ test('la phrase du moment finit par une ponctuation et garde l’apostrophe typo
     assert.ok(/[.!?…]$/.test(p), 'ponctuation finale au jour ' + j + ' : ' + p);
     assert.ok(p.indexOf("'") === -1, 'apostrophe droite interdite au jour ' + j);
   }
+});
+
+/* ------------------------------------------------------------------ */
+/* La maison sur son anneau : rien ne se rapproche du Soleil           */
+/* ------------------------------------------------------------------ */
+
+test('la maison vit sur son anneau, pile sur l’axe — jamais sur la face qui regarde le Soleil', function () {
+  var m = positionLocaleMaison();
+  /* colinéaire à l'axe (composante perpendiculaire nulle), côté nord */
+  presque(m.x * AXE_DIR.y - m.y * AXE_DIR.x, 0);
+  assert.ok(m.x * AXE_DIR.x + m.y * AXE_DIR.y > 0, 'la maison est du côté nord de l’axe');
+  presque(Math.hypot(m.x, m.y), Math.sin((LATITUDE_REPERES_DEGRES * Math.PI) / 180));
+});
+
+test('le kangourou vit aux antipodes exacts de la maison', function () {
+  var m = positionLocaleMaison();
+  var k = positionLocaleKangourou();
+  presque(k.x, -m.x);
+  presque(k.y, -m.y);
+});
+
+test('l’anneau touche le globe à ses deux bouts, symétriques autour de l’axe — même distance au Soleil été comme hiver', function () {
+  ['nord', 'sud'].forEach(function (hemisphere) {
+    var bouts = extremitesAnneau(hemisphere);
+    presque(Math.hypot(bouts[0].x, bouts[0].y), 1, 1e-9);
+    presque(Math.hypot(bouts[1].x, bouts[1].y), 1, 1e-9);
+    /* le milieu des deux bouts est sur l'axe : l'anneau est symétrique */
+    var milieu = { x: (bouts[0].x + bouts[1].x) / 2, y: (bouts[0].y + bouts[1].y) / 2 };
+    presque(milieu.x * AXE_DIR.y - milieu.y * AXE_DIR.x, 0);
+  });
+  /* et l'anneau ne dépend pas du jour : posé sur le globe une fois pour toutes */
+  var a = extremitesAnneau('nord');
+  var b = extremitesAnneau('nord');
+  presque(a[0].x, b[0].x);
+});
+
+/* ------------------------------------------------------------------ */
+/* Le jardin continu de la fenêtre                                     */
+/* ------------------------------------------------------------------ */
+
+test('le jardin change à petits pas : aucun paramètre ne saute d’un jour à l’autre', function () {
+  var precedent = jardinDuJour(0);
+  for (var j = 1; j <= ANNEE_JOURS; j += 1) {
+    var courant = jardinDuJour(j);
+    ['feuilles', 'rousseur', 'fleurs', 'neige'].forEach(function (cle) {
+      assert.ok(Math.abs(courant[cle] - precedent[cle]) <= 0.06,
+        cle + ' saute au jour ' + j + ' (' + precedent[cle].toFixed(2) + ' → ' + courant[cle].toFixed(2) + ')');
+      assert.ok(courant[cle] >= 0 && courant[cle] <= 1, cle + ' hors bornes au jour ' + j);
+    });
+    precedent = courant;
+  }
+});
+
+test('le jardin raconte la bonne saison, en continu', function () {
+  var ete = jardinDuJour(200);
+  assert.equal(ete.feuilles, 1, 'plein été : la couronne est pleine');
+  assert.equal(ete.fleurs, 0, 'plein été : les fleurs du printemps sont passées');
+  assert.equal(ete.neige, 0, 'plein été : pas de neige');
+  var hiver = jardinDuJour(20);
+  assert.equal(hiver.neige, 1, 'cœur de l’hiver : la neige est là');
+  assert.equal(hiver.feuilles, 0, 'cœur de l’hiver : l’arbre est nu');
+  var printemps = jardinDuJour(125);
+  assert.equal(printemps.fleurs, 1, 'cœur du printemps : tout est fleuri');
+  assert.ok(printemps.feuilles > 0.2 && printemps.feuilles < 0.8, 'les feuilles poussent encore');
+  var automne = jardinDuJour(290);
+  assert.ok(automne.rousseur > 0.5, 'l’automne roussit les feuilles');
+  assert.ok(automne.feuilles < 0.9 && automne.feuilles > 0.1, 'les feuilles tombent');
+  assert.ok(automne.rousseur * (1 - automne.feuilles) > 0.05, 'le tas de feuilles grossit');
 });
 
 /* ------------------------------------------------------------------ */

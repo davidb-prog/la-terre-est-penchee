@@ -191,6 +191,116 @@ export function arbreDuJour(jour) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Le jardin continu : d'un jour au suivant, tout change à petits pas  */
+/* ------------------------------------------------------------------ */
+
+/* Rampe linéaire : 0 avant `debut`, 1 après `fin`, en pente entre les deux
+ * (sur l'année qui reboucle). */
+function rampe(jour, debut, fin) {
+  var longueur = jourNormalise(fin - debut);
+  var t = jourNormalise(jour - debut);
+  if (t >= longueur) {
+    /* après la fin : encore « 1 » jusqu'à mi-chemin du retour, sinon 0 */
+    return null;
+  }
+  return t / longueur;
+}
+
+/* Tout ce que la fenêtre dessine, en continu — AUCUN saut de décor :
+ * - feuilles : la couronne de l'arbre, de 0 (nu) à 1 (pleine) ;
+ * - rousseur : 0 = feuilles vertes, 1 = feuilles rousses ;
+ * - fleurs   : les fleurs du printemps (arbre et jardin), 0 à 1 ;
+ * - neige    : le manteau blanc de l'hiver (sol, flocons, bonhomme), 0 à 1.
+ * Les rampes s'appuient sur les repères de l'année : les feuilles poussent
+ * au printemps, roussissent puis tombent à l'automne, la neige s'installe
+ * autour du solstice d'hiver, les fleurs éclosent au cœur du printemps. */
+export function jardinDuJour(jour) {
+  var j = jourNormalise(jour);
+  var t;
+
+  /* Les feuilles : poussent d'avril à juin, tombent d'octobre à décembre. */
+  var feuilles;
+  t = rampe(j, 90, JOUR_SOLSTICE_ETE);          /* elles poussent */
+  if (t !== null) feuilles = t;
+  else {
+    t = rampe(j, 275, JOUR_SOLSTICE_HIVER);     /* elles tombent */
+    if (t !== null) feuilles = 1 - t;
+    else feuilles = (j >= JOUR_SOLSTICE_ETE && j < 275) ? 1 : 0;
+  }
+
+  /* La rousseur : les feuilles vertes roussissent en septembre-octobre, et
+   * la teinte s'efface en douceur à la fin de l'hiver (l'arbre est nu, mais
+   * aucun paramètre ne saute jamais — le décor bouge à petits pas). */
+  var rousseur;
+  t = rampe(j, 250, 300);
+  if (t !== null) rousseur = t;
+  else {
+    t = rampe(j, 20, 60);
+    if (t !== null) rousseur = 1 - t;
+    else rousseur = (j >= 300 || j < 20) ? 1 : 0;
+  }
+
+  /* Les fleurs : elles éclosent en avril-mai, s'effacent au début de l'été. */
+  var fleurs;
+  t = rampe(j, 85, 115);
+  if (t !== null) fleurs = t;
+  else {
+    t = rampe(j, 140, JOUR_SOLSTICE_ETE);
+    if (t !== null) fleurs = 1 - t;
+    else fleurs = (j >= 115 && j < 140) ? 1 : 0;
+  }
+
+  /* La neige : elle s'installe en décembre, fond en février-mars. */
+  var neige;
+  t = rampe(j, 330, 360);
+  if (t !== null) neige = t;
+  else {
+    t = rampe(j, 40, 75);
+    if (t !== null) neige = 1 - t;
+    else neige = (j >= 360 || j < 40) ? 1 : 0;
+  }
+
+  return { feuilles: feuilles, rousseur: rousseur, fleurs: fleurs, neige: neige };
+}
+
+/* ------------------------------------------------------------------ */
+/* La maison et le kangourou sur le globe (vue de l'espace)            */
+/* ------------------------------------------------------------------ */
+
+/* La maison n'habite pas un point du globe : elle habite tout son anneau de
+ * latitude (elle en fait le tour chaque jour). Le dessin pose donc la maison
+ * au-devant du globe, SUR L'AXE de symétrie de son anneau — jamais sur la
+ * face qui regarde le Soleil : rien, dans le dessin, ne se rapproche du
+ * Soleil en été. Position locale en rayons de globe, coordonnées math,
+ * indépendante du jour. */
+export var LATITUDE_REPERES_DEGRES = 45;
+var RAYON_LATITUDE = Math.sin((LATITUDE_REPERES_DEGRES * Math.PI) / 180);
+
+export function positionLocaleMaison() {
+  return { x: AXE_DIR.x * RAYON_LATITUDE, y: AXE_DIR.y * RAYON_LATITUDE };
+}
+
+/* Le kangourou vit aux antipodes de la maison, sur l'anneau sud. */
+export function positionLocaleKangourou() {
+  var m = positionLocaleMaison();
+  return { x: -m.x, y: -m.y };
+}
+
+/* Les deux bouts de l'anneau de latitude (là où il touche le bord du globe),
+ * en rayons de globe : le liseré que la vue dessine sous la maison. */
+export function extremitesAnneau(hemisphere) {
+  var signe = hemisphere === 'sud' ? -1 : 1;
+  var hauteur = RAYON_LATITUDE * signe;          /* le long de l'axe */
+  var demiLargeur = Math.cos((LATITUDE_REPERES_DEGRES * Math.PI) / 180);
+  /* perpendiculaire à l'axe (math) : (cos ε, −sin ε) pour un axe (sin ε, cos ε) */
+  var perp = { x: AXE_DIR.y, y: -AXE_DIR.x };
+  return [
+    { x: AXE_DIR.x * hauteur - perp.x * demiLargeur, y: AXE_DIR.y * hauteur - perp.y * demiLargeur },
+    { x: AXE_DIR.x * hauteur + perp.x * demiLargeur, y: AXE_DIR.y * hauteur + perp.y * demiLargeur }
+  ];
+}
+
+/* ------------------------------------------------------------------ */
 /* La petite phrase du moment, affichée sous la fenêtre                */
 /* ------------------------------------------------------------------ */
 

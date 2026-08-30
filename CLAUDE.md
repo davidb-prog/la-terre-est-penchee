@@ -76,6 +76,10 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   d'année — les vraies dates vivent dans la note aux parents).
 - Chez nous (France, ~47° nord) : `hauteurSoleilMidi = 43 + 23,5 · penchement`
   (degrés) ; `dureeJourHeures = 12 + 4 · penchement`.
+- Le récit explique le maillon central par le « bien en face / de biais »
+  (l'expérience de la lampe, dans l'histoire) : penchée vers le Soleil, notre
+  moitié le regarde en face → il monte haut et reste longtemps → il a le
+  temps de chauffer.
 
 ## Invariants d'interaction
 
@@ -106,9 +110,25 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   Terre est dessus (elle y est déjà — pas de doublon visuel).
 - **Pas de jour/nuit dans la vue de l'espace** : à l'échelle de l'année, un
   côté nuit qui tourne embrouille (retour utilisateur). Seuls comptent le
-  penchant et les deux moitiés : nord vert lagon avec la maison (~45° nord,
-  jamais sur le pôle), sud bleu océan avec le kangourou (~45° sud, tête en
-  bas), séparées par un équateur doré bien marqué.
+  penchant et les deux moitiés : nord vert lagon, sud bleu océan, équateur
+  doré bien marqué.
+- **Rien ne se rapproche du Soleil dans le dessin** (retour utilisateur : une
+  maison posée sur une face du globe semblait s'approcher du Soleil en été —
+  la fausse explication que le site réfute). La maison et le kangourou sont
+  assis sur leurs **anneaux de latitude** (rubans teal/bleu à ~45°, courbés
+  vers l'équateur), au-devant du globe, sur l'axe de symétrie de leur anneau
+  (`positionLocaleMaison`/`positionLocaleKangourou`/`extremitesAnneau` dans le
+  modèle, verrouillés par tests) — un cran vers l'équateur au dessin pour ne
+  pas se coller au bâton de l'axe. Le kangourou reste aux antipodes exacts de
+  la maison, tête en bas.
+- **La fenêtre évolue continûment** (retour utilisateur : la vue semblait
+  statique) : `jardinDuJour(jour)` livre quatre paramètres continus
+  (feuilles, rousseur, fleurs, neige) — aucun saut de décor d'un jour à
+  l'autre, verrouillé par test. Le décor en découle : fleurs une à une, tas
+  de feuilles, bonhomme de neige progressif, nuages, oiseaux. Les chutes
+  (flocons, feuilles, pétales) ne s'animent que pendant la lecture ou le
+  glisser (`tempsMs`, null en pause et en mouvement réduit → scène figée,
+  déterministe pour le jour affiché).
 - **Le seuil mobile UNIQUE de l'épisode : 880 px.** La grille CSS, le
   médaillon, le repli de la boîte d'explication et la vue unique du jeu lisent
   tous ce chiffre.

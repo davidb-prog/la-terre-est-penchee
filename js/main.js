@@ -348,9 +348,12 @@ function boucle(maintenant) {
     var tailles = cleTailles();
     if (etat.jour !== dessine.jour || halo !== dessine.halo || tailles !== dessine.tailles) {
       dessine.jour = etat.jour; dessine.halo = halo; dessine.tailles = tailles;
+      /* L'horloge des chutes (flocons, feuilles, pétales) ne tourne que
+       * pendant la lecture ou le glisser — en pause, la scène est figée. */
+      var horloge = (etat.lecture || etat.glisse) && !mouvementReduit ? maintenant : null;
       ajusterCanvas(canvasFenetre);
       ajusterCanvas(canvasOrbite);
-      vueFenetre.rendre(etat.jour);
+      vueFenetre.rendre(etat.jour, horloge);
       vueOrbite.rendre(etat.jour, halo);
       if (!zoneJeu.hidden) {
         ajusterCanvas(canvasOrbiteJeu);
@@ -359,7 +362,7 @@ function boucle(maintenant) {
          * feuille de style, c'est le médaillon flottant qui la remplace. */
         if (canvasFenetreJeu.offsetWidth > 0) {
           ajusterCanvas(canvasFenetreJeu);
-          vueFenetreJeu.rendre(etat.jour);
+          vueFenetreJeu.rendre(etat.jour, horloge);
         }
       }
       dessinerMedaillon();

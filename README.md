@@ -20,12 +20,18 @@ L'idée centrale, celle que l'enfant doit retenir :
 
 - **Le geste-signature** : attraper la Terre et la faire glisser le long de son
   orbite — l'année défile sous le doigt, le Soleil reste fixe au centre et l'axe
-  garde son penchant, quoi qu'il arrive. La Terre montre ses deux moitiés
-  (maison au nord, kangourou au sud, équateur doré) — sans jour/nuit : à
-  l'échelle de l'année, seul le penchant compte.
-- **La fenêtre de chez nous**, toujours synchronisée : le Soleil de midi qui
-  monte haut l'été et reste bas l'hiver, l'arbre du jardin (nu, fleuri, vert,
-  roux), la barre du jour (8 h à 16 h de lumière) et la petite phrase du moment.
+  garde son penchant, quoi qu'il arrive. La Terre montre ses deux moitiés et
+  leurs **anneaux de latitude** : la maison et le kangourou sont assis sur leur
+  ruban (jamais sur la face qui regarde le Soleil — rien ne se « rapproche » du
+  Soleil en été), séparés par l'équateur doré, sans jour/nuit : à l'échelle de
+  l'année, seul le penchant compte.
+- **La fenêtre de chez nous**, toujours synchronisée et vivante : le Soleil de
+  midi qui monte haut l'été et reste bas l'hiver, et un jardin qui change
+  chaque jour à petits pas (`jardinDuJour`, continu — verrouillé par test) —
+  fleurs qui éclosent une à une, feuilles qui poussent, roussissent et tombent,
+  tas de feuilles, neige qui s'installe, bonhomme de neige qui se construit,
+  nuages, oiseaux, flocons et pétales qui tombent pendant la lecture — plus la
+  barre du jour (8 h à 16 h de lumière) et la petite phrase du moment.
 - **La lecture automatique** : l'année avance toute seule (un tour en ~85 s),
   bouton ⏸/▶ — et tout geste de l'enfant la met en pause.
 - **Les quatre boutons-saisons** « 🎲 Joue avec les saisons » : l'année glisse
@@ -77,7 +83,7 @@ fixe au centre) et l'absence d'erreurs console, en desktop,
 
 ## La voix enregistrée
 
-Le corpus vocal de l'épisode (29 blocs : scénarios, transitions, jeu, grande
+Le corpus vocal de l'épisode (30 blocs : scénarios, transitions, jeu, grande
 histoire) vit dans `tools/voix-lib.mjs` ; `tools/build-voix.mjs` génère les mp3
 avec ElevenLabs, hors site (la clé ne touche jamais le dépôt), et
 `assets/audio/manifest.json` garantit que la voix enregistrée ne dit jamais
@@ -106,9 +112,16 @@ manifeste est vide (c'est le cas), tout passe à la synthèse. Marche à suivre 
   Soleil, durée du jour) et relie la chaleur en une phrase ; la météo réelle
   suit avec du retard (inertie thermique : le plus chaud fin juillet-août, le
   plus froid fin janvier) et ses caprices — expliqué dans la note aux parents.
-- **Une maison, un kangourou.** Ils marquent les deux moitiés (~45° nord et
-  ~45° sud) sans prétendre à la vraie géographie ; près de l'équateur on parle
-  plutôt de saison sèche et de saison des pluies.
+- **La maison ne se rapproche jamais du Soleil.** Sans rotation quotidienne,
+  une maison posée sur une face du globe semblerait s'approcher du Soleil en
+  été — la fausse explication classique. Maison et kangourou sont donc assis
+  sur leur **anneau de latitude** (dessiné sur le globe), au-devant, sur l'axe
+  de symétrie — un anneau reste à la même distance du Soleil toute l'année
+  (verrouillé par test) : ce qui change, c'est l'angle des rayons et la durée
+  du jour, jamais la distance.
+- **Une maison, un kangourou.** Ils marquent les deux moitiés (leurs anneaux,
+  ~45° nord et ~45° sud) sans prétendre à la vraie géographie ; près de
+  l'équateur on parle plutôt de saison sèche et de saison des pluies.
 - **La rotation quotidienne est ignorée** dans la vue de l'espace : ni rotation,
   ni côté nuit dessinés — le jour et la nuit ont leur propre épisode
   (ci-dessous).

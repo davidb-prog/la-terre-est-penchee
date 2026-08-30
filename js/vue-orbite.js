@@ -4,8 +4,9 @@
  * geste-signature : attraper la Terre et lui faire faire le tour du Soleil.
  */
 import {
-  TAU, ANNEE_JOURS, JOUR_SOLSTICE_ETE,
-  positionTerre, axeDirection, angleAnnee, jourNormalise
+  TAU, ANNEE_JOURS, JOUR_SOLSTICE_ETE, AXE_DIR,
+  positionTerre, axeDirection, angleAnnee, jourNormalise,
+  positionLocaleMaison, positionLocaleKangourou, extremitesAnneau
 } from './model.js';
 
 var CIEL = '#070b17';
@@ -104,13 +105,6 @@ export function creerVueOrbite(canvas) {
     ctx.restore();
   }
 
-  /* Tourne un vecteur canvas de `angle` radians (sens horaire à l'écran). */
-  function tourner(v, angle) {
-    var c = Math.cos(angle);
-    var s = Math.sin(angle);
-    return { x: v.x * c - v.y * s, y: v.x * s + v.y * c };
-  }
-
   function dessinerTerre(ctx, g, jour, halo) {
     var p = positionTerreCanvas(jour, g);
     var r = g.rTerre;
@@ -167,6 +161,26 @@ export function creerVueOrbite(canvas) {
     ctx.stroke();
     ctx.restore();
 
+    /* Les anneaux de latitude : chez nous et l'Australie n'habitent pas un
+     * point du globe, ils habitent tout leur ruban (la Terre tourne dessus
+     * chaque jour) — et un ruban reste à la même distance du Soleil été
+     * comme hiver : rien ne se rapproche du Soleil dans ce dessin. Dessinés
+     * bombés vers l'équateur, comme de vrais rubans posés sur la boule. */
+    ['nord', 'sud'].forEach(function (hemisphere) {
+      var bouts = extremitesAnneau(hemisphere);
+      var signe = hemisphere === 'nord' ? 1 : -1;
+      var controleX = p.x + ((bouts[0].x + bouts[1].x) / 2 - a.x * signe * 0.4) * r;
+      var controleY = p.y - ((bouts[0].y + bouts[1].y) / 2 + a.y * signe * 0.4) * r;
+      ctx.beginPath();
+      ctx.moveTo(p.x + bouts[0].x * r, p.y - bouts[0].y * r);
+      ctx.quadraticCurveTo(controleX, controleY, p.x + bouts[1].x * r, p.y - bouts[1].y * r);
+      ctx.strokeStyle = hemisphere === 'nord'
+        ? 'rgba(143, 224, 203, 0.8)' : 'rgba(188, 217, 255, 0.65)';
+      ctx.lineWidth = Math.max(1.5, r * 0.06);
+      ctx.lineCap = 'round';
+      ctx.stroke();
+    });
+
     /* Le contour. */
     ctx.beginPath();
     ctx.arc(p.x, p.y, r, 0, TAU);
@@ -174,18 +188,20 @@ export function creerVueOrbite(canvas) {
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    /* Chez nous : la maison à mi-hauteur de la moitié nord (pas sur le
-     * pôle !), debout sur la surface. Et l'Australie aux ANTIPODES de la
-     * maison, à ~45° sud de l'autre côté — la tête en bas, comme dans
-     * l'histoire. */
-    var dMaison = tourner(a, Math.PI / 4);              /* ~45° nord */
-    var dKangourou = tourner(a, Math.PI + Math.PI / 4); /* l'exact opposé */
-    dessinerMaison(ctx, p.x + dMaison.x * r, p.y + dMaison.y * r,
-      Math.atan2(dMaison.x, -dMaison.y), r * 0.5);
+    /* La maison, assise SUR SON RUBAN, au-devant du globe (sur l'axe de
+     * symétrie de l'anneau — jamais sur la face qui regarde le Soleil, et
+     * un cran vers l'équateur pour ne pas se coller au bâton de l'axe).
+     * Le kangourou aux antipodes, sur le ruban sud, la tête en bas. */
+    var m = positionLocaleMaison();
+    var k = positionLocaleKangourou();
+    var versEquateur = 0.18; /* en rayons de globe, le long de l'axe */
+    var dMaison = { x: m.x - AXE_DIR.x * versEquateur, y: -(m.y - AXE_DIR.y * versEquateur) };
+    var dKangourou = { x: k.x + AXE_DIR.x * versEquateur, y: -(k.y + AXE_DIR.y * versEquateur) };
+    dessinerMaison(ctx, p.x + dMaison.x * r, p.y + dMaison.y * r, angleAxe, r * 0.42);
     ctx.save();
     ctx.translate(p.x + dKangourou.x * r, p.y + dKangourou.y * r);
-    ctx.rotate(Math.atan2(dKangourou.x, -dKangourou.y));
-    ctx.font = Math.round(r * 0.72) + 'px system-ui, sans-serif';
+    ctx.rotate(angleAxe + Math.PI);
+    ctx.font = Math.round(r * 0.6) + 'px system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'alphabetic';
     ctx.fillText('🦘', 0, 0);
