@@ -188,7 +188,7 @@ export function creerVueOrbite(canvas) {
     var compact = Math.min(w, h) < 400 * (window.devicePixelRatio || 1);
     return {
       w: w, h: h, cx: w * 0.5, cy: h * 0.52,
-      f: Math.min(w * 0.8, h * 1.35), compact: compact
+      f: Math.min(w * 1.18, h * 1.22), compact: compact
     };
   }
 
@@ -468,8 +468,8 @@ export function creerVueOrbite(canvas) {
       /* l'orbite en perspective : la moitié ARRIÈRE discrète, puis la
        * moitié AVANT nette et plus épaisse — l'œil lit un vrai cercle */
       ctx.setLineDash([6, 8]);
-      [[Math.PI, TAU, 'rgba(154, 165, 195, 0.2)', 1.5],
-       [0, Math.PI, 'rgba(154, 165, 195, 0.48)', 2.6]].forEach(function (moitie) {
+      [[Math.PI, TAU, 'rgba(154, 165, 195, 0.34)', 1.9],
+       [0, Math.PI, 'rgba(154, 165, 195, 0.52)', 2.8]].forEach(function (moitie) {
         ctx.beginPath();
         for (var k = 0; k <= 60; k++) {
           var a = moitie[0] + (k / 60) * (moitie[1] - moitie[0]);
@@ -490,7 +490,7 @@ export function creerVueOrbite(canvas) {
         if (ecart > Math.PI) ecart = TAU - ecart;
         if (ecart < 0.45) return;
         ctx.globalAlpha = Math.min(1, (ecart - 0.45) / 0.5);
-        var e = projeter({ x: -Math.cos(rep.angle) * 1.22, y: 0, z: Math.sin(rep.angle) * 1.22 }, g);
+        var e = projeter({ x: -Math.cos(rep.angle) * 1.17, y: 0, z: Math.sin(rep.angle) * 1.17 }, g);
         ctx.font = Math.round((g.compact ? 0.11 : 0.095) * e.s) + 'px system-ui, sans-serif';
         ctx.fillText(rep.emoji, e.x, e.y);
       });
