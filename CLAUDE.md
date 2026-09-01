@@ -83,8 +83,9 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   d'ellipse : le faisceau diffus raconte seul), jamais de saut. Sa cible
   glisse sur le bord éclairé du globe (rotation de versSoleil vers le haut
   de l'axe, 15° l'été → 75° l'hiver, adoucie aux alignements) — jamais
-  derrière. La légende fixe « Terre–Soleil : toujours
-  150 millions de km » ne bouge jamais.
+  derrière. (La légende de distance a été retirée — décision utilisateur :
+  elle n'apportait rien ; la constance de la distance reste racontée dans
+  la note aux parents et verrouillée par test.)
 - `angleAnnee(jour) = (jour − 171) / 365 · τ` (0 = solstice d'été, 21 juin) ;
   `positionTerre(jour) = (−cos a, −sin a)` (sens trigonométrique). Solstice
   d'été : Terre à gauche du Soleil ; hiver : à droite ; l'automne passe par le
@@ -148,8 +149,7 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   `attrapeTerre` garde sa zone généreuse pour les petits doigts.
 - L'étiquette « Terre » s'écrit sous le globe, décalée vers la droite (le
   bas-gauche porte le kangourou, le haut la maison). Mode compact (< 400 px
-  de canvas) : étiquettes Soleil/Terre masquées, légende de distance
-  conservée.
+  de canvas) : étiquettes Soleil/Terre masquées.
 - **La fenêtre évolue continûment** (retour utilisateur : la vue semblait
   statique) : `jardinDuJour(jour)` livre quatre paramètres continus
   (feuilles, rousseur, fleurs, neige) — aucun saut de décor d'un jour à

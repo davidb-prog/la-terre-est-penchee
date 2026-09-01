@@ -360,13 +360,6 @@ export function creerVueOrbite(canvas) {
       /* la tache de lumière : ramassée et vive quand le Soleil frappe en
        * face (été), effacée quand il rase (le faisceau diffus suffit) */
       dessinerLumiere(ctx, g.cx, g.cy, g.rSoleil, cibleX, cibleY, p.x, p.y, g.rTerre, aplomb, 'tache', force);
-      /* la distance ne change JAMAIS : la légende fixe le rappelle */
-      var tailleLegende = Math.max(10, Math.round(Math.min(g.w, g.h) * 0.032));
-      ctx.font = '600 ' + tailleLegende + 'px system-ui, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'alphabetic';
-      ctx.fillStyle = 'rgba(255, 207, 92, 0.65)';
-      ctx.fillText('Terre–Soleil : toujours 150 millions de km', g.cx, g.h * 0.97);
       /* Les petites étiquettes (pas en mode compact). */
       if (!g.compact) {
         var taille = Math.round(Math.min(g.w, g.h) * 0.035);

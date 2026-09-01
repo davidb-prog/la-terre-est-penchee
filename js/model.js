@@ -159,7 +159,7 @@ export function moisDuJour(jour) {
 /* ------------------------------------------------------------------ */
 
 /* Hauteur du Soleil à midi, en degrés au-dessus de l'horizon (chez nous).
- * Été : tout là-haut (~66°) ; hiver : tout bas (~20°). */
+ * Été : très haut (~66°) ; hiver : tout bas (~20°). */
 export function hauteurSoleilMidi(jour) {
   return HAUTEUR_MIDI_EQUINOXE + INCLINAISON_DEGRES * penchementNord(jour);
 }
@@ -213,7 +213,8 @@ function rampe(jour, debut, fin) {
  * - neige    : le manteau blanc de l'hiver (sol, flocons, bonhomme), 0 à 1.
  * Les rampes s'appuient sur les repères de l'année : les feuilles poussent
  * au printemps, roussissent puis tombent à l'automne, la neige s'installe
- * autour du solstice d'hiver, les fleurs éclosent au cœur du printemps. */
+ * autour du solstice d'hiver, les premières fleurs dès l'équinoxe de
+ * printemps. */
 export function jardinDuJour(jour) {
   var j = jourNormalise(jour);
   var t;
@@ -240,9 +241,11 @@ export function jardinDuJour(jour) {
     else rousseur = (j >= 300 || j < 20) ? 1 : 0;
   }
 
-  /* Les fleurs : elles éclosent en avril-mai, s'effacent au début de l'été. */
+  /* Les fleurs : les premières s'ouvrent dès l'équinoxe de printemps (le
+   * scénario en montre une ou deux), tout est fleuri en mai, et elles
+   * s'effacent au début de l'été. */
   var fleurs;
-  t = rampe(j, 85, 115);
+  t = rampe(j, 70, 115);
   if (t !== null) fleurs = t;
   else {
     t = rampe(j, 140, JOUR_SOLSTICE_ETE);
@@ -340,7 +343,7 @@ export function phraseDuMoment(jour) {
     return debut + 'Le Soleil grimpe plus haut chaque jour, et le jour grandit : déjà ' + heures + ' heures.';
   }
   if (s === 'ete') {
-    return debut + 'Le Soleil monte tout là-haut, et le jour est très long : environ ' + heures + ' heures.';
+    return debut + 'Le Soleil monte très haut dans le ciel, et le jour est très long : environ ' + heures + ' heures.';
   }
   return debut + 'Le Soleil redescend, et le jour raccourcit : plus que ' + heures + ' heures.';
 }
@@ -380,7 +383,7 @@ export var SCENARIOS = [
     label: 'Le printemps revient',
     sub: 'l’équinoxe de printemps',
     intro: 'Au mois de mars, le printemps revient…',
-    fenetre: 'L’arbre du jardin se couvre de fleurs ! Le jour et la nuit durent pareil : douze heures chacun. Et chaque jour qui passe, le Soleil grimpe un peu plus haut.',
+    fenetre: 'Sur l’arbre du jardin, les premières fleurs s’ouvrent ! Le jour et la nuit durent pareil : douze heures chacun. Et chaque jour qui passe, le Soleil grimpe un peu plus haut.',
     espace: 'Les deux moitiés de la Terre sont à égalité : ni chez nous, ni l’Australie ne penche vers le Soleil. Mais la Terre avance… Et bientôt, c’est notre moitié qui penchera vers lui !'
   },
   {
@@ -391,7 +394,7 @@ export var SCENARIOS = [
     label: 'L’été est là',
     sub: 'le solstice d’été',
     intro: 'Fin juin, l’été commence…',
-    fenetre: 'Le Soleil monte tout là-haut dans le ciel, et le soir, il fait encore jour très tard : seize heures de lumière ! L’arbre est vert, on mange dehors.',
+    fenetre: 'Le Soleil monte très haut dans le ciel, et le soir, il fait encore jour très tard : seize heures de lumière ! L’arbre est vert, on mange dehors.',
     espace: 'Regarde la Terre : notre moitié penche à fond vers le Soleil. C’est le jour le plus long de toute l’année — et en Australie, c’est le jour le plus court.'
   },
   {
@@ -402,7 +405,7 @@ export var SCENARIOS = [
     label: 'L’automne arrive',
     sub: 'l’équinoxe d’automne',
     intro: 'Fin septembre, l’automne arrive…',
-    fenetre: 'Les feuilles de l’arbre deviennent rousses et s’envolent. Le jour et la nuit durent encore pareil… Mais maintenant, le Soleil descend un peu plus chaque jour.',
+    fenetre: 'Les feuilles de l’arbre deviennent rousses et s’envolent. Le jour et la nuit durent pareil : douze heures chacun. Mais maintenant, le Soleil descend un peu plus chaque jour.',
     espace: 'Les deux moitiés de la Terre sont de nouveau à égalité : ni chez nous, ni l’Australie ne penche vers le Soleil. Elle continue son voyage… Et cette fois, c’est l’Australie qui va pencher vers lui.'
   },
   {
@@ -448,7 +451,7 @@ export var DEFIS = [
     cible: 'ete',
     hemisphere: 'nord',
     consigne: 'Fabrique l’été chez nous !',
-    bravo: 'Bravo ! C’est l’été : le Soleil monte tout là-haut et les jours n’en finissent plus !'
+    bravo: 'Bravo ! C’est l’été : le Soleil monte très haut et les jours n’en finissent plus !'
   },
   {
     id: 'feuilles',

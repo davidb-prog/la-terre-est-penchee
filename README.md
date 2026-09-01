@@ -24,8 +24,7 @@ L'idée centrale, celle que l'enfant doit retenir :
   maison et le kangourou sont assis sur leur ruban, au-devant — rien ne se
   « rapproche » du Soleil en été. Autour des solstices, un **faisceau de
   lumière** montre le mécanisme : il frappe notre moitié bien en face l'été
-  (tache généreuse et vive), la rase l'hiver (faisceau diffus, sans tache) —
-  et la légende fixe rappelle que la distance Terre–Soleil ne change jamais.
+  (tache généreuse et vive), la rase l'hiver (faisceau diffus, sans tache).
 - **La fenêtre de chez nous**, toujours synchronisée et vivante : le Soleil de
   midi qui monte haut l'été et reste bas l'hiver, et un jardin qui change
   chaque jour à petits pas (`jardinDuJour`, continu — verrouillé par test) —

@@ -287,6 +287,9 @@ test('le jardin raconte la bonne saison, en continu', function () {
   assert.equal(hiver.feuilles, 0, 'cœur de l’hiver : l’arbre est nu');
   var printemps = jardinDuJour(125);
   assert.equal(printemps.fleurs, 1, 'cœur du printemps : tout est fleuri');
+  var equinoxe = jardinDuJour(80);
+  assert.ok(equinoxe.fleurs > 0.05 && equinoxe.fleurs < 0.5,
+    'équinoxe de printemps : les premières fleurs s’ouvrent (une ou deux), pas toutes');
   assert.ok(printemps.feuilles > 0.2 && printemps.feuilles < 0.8, 'les feuilles poussent encore');
   var automne = jardinDuJour(290);
   assert.ok(automne.rousseur > 0.5, 'l’automne roussit les feuilles');

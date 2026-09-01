@@ -120,16 +120,32 @@ function dessinerArbre(ctx, x, sol, taille, jardin) {
         boules[b][2] * taille * gonfle, 0, TAU);
       ctx.fill();
     }
-    /* Les fleurs roses semées sur la couronne. */
-    if (jardin.fleurs > 0.05) {
-      ctx.fillStyle = '#ff9dbf';
+  }
+
+  /* Les fleurs roses : les toutes premières s'ouvrent au bout des branches
+   * encore nues (l'équinoxe de mars en montre une ou deux, comme le raconte
+   * le scénario), puis elles se sèment sur la couronne dès qu'elle est là. */
+  if (jardin.fleurs > 0.05) {
+    ctx.fillStyle = '#ff9dbf';
+    var f;
+    if (jardin.feuilles > 0.3) {
+      var gonfleFl = 0.35 + 0.65 * jardin.feuilles;
       var pointsFleurs = [[-0.35, -0.2], [0.05, -0.45], [0.38, -0.15], [-0.1, -0.05], [0.2, -0.38], [-0.28, -0.42]];
       var nb = Math.round(jardin.fleurs * pointsFleurs.length);
-      for (var f = 0; f < nb; f++) {
+      for (f = 0; f < nb; f++) {
         ctx.beginPath();
-        ctx.arc(x + pointsFleurs[f][0] * taille * gonfle,
-          sol - tronc + pointsFleurs[f][1] * taille * gonfle - taille * 0.1,
+        ctx.arc(x + pointsFleurs[f][0] * taille * gonfleFl,
+          sol - tronc + pointsFleurs[f][1] * taille * gonfleFl - taille * 0.1,
           taille * 0.055, 0, TAU);
+        ctx.fill();
+      }
+    } else {
+      var nbBranches = Math.max(1, Math.round(jardin.fleurs * branches.length));
+      for (f = 0; f < nbBranches && f < branches.length; f++) {
+        ctx.beginPath();
+        ctx.arc(x + branches[f][0] * taille * 0.55,
+          sol + branches[f][1] * taille * 0.55 - tronc * 0.4,
+          taille * 0.07, 0, TAU);
         ctx.fill();
       }
     }
