@@ -23,8 +23,9 @@ var PHI = (32 * Math.PI) / 180;
 var COS_PHI = Math.cos(PHI);
 var SIN_PHI = Math.sin(PHI);
 var DISTANCE_CAMERA = 3.1;
-var RAYON_TERRE_MONDE = 0.17;   /* en rayons d'orbite (exagéré, documenté) */
-var RAYON_SOLEIL_MONDE = 0.14;  /* rayon du Soleil à l'écran, en unités projetées */
+/* Les rayons dessinés (en rayons d'orbite, exagérés — documenté) vivent dans
+ * geometrie() : plus gros en mode compact, pour que les astres se voient
+ * sur un téléphone. */
 
 /* L'axe de la Terre : un vrai vecteur 3D, constant (la vérité n° 1). */
 var INCLINAISON_RAD = (INCLINAISON_DESSIN_DEGRES * Math.PI) / 180;
@@ -187,8 +188,10 @@ export function creerVueOrbite(canvas) {
     var h = canvas.height;
     var compact = Math.min(w, h) < 400 * (window.devicePixelRatio || 1);
     return {
-      w: w, h: h, cx: w * 0.5, cy: h * 0.52,
-      f: Math.min(w * 1.18, h * 1.22), compact: compact
+      w: w, h: h, cx: w * 0.5, cy: h * 0.47,
+      f: Math.min(w * 1.18, h * 1.5), compact: compact,
+      rTerreM: compact ? 0.2 : 0.17,
+      rSoleilM: compact ? 0.16 : 0.14
     };
   }
 
@@ -250,7 +253,7 @@ export function creerVueOrbite(canvas) {
 
   function dessinerSoleil(ctx, g) {
     var e = projeter({ x: 0, y: 0, z: 0 }, g);
-    var r = RAYON_SOLEIL_MONDE * e.s;
+    var r = g.rSoleilM * e.s;
     /* la couronne, puis la BOULE : cœur blanc-chaud, bord orangé */
     var halo = ctx.createRadialGradient(e.x, e.y, r * 0.4, e.x, e.y, r * 3);
     halo.addColorStop(0, 'rgba(255, 207, 92, 0.5)');
@@ -290,7 +293,7 @@ export function creerVueOrbite(canvas) {
   function dessinerTerre(ctx, g, jour, halo) {
     var c = terre3D(jour);
     var e = projeter(c, g);
-    var r = RAYON_TERRE_MONDE * e.s;
+    var r = g.rTerreM * e.s;
     var axeEcranHaut = projeter({ x: c.x + AXE3.x, y: c.y + AXE3.y, z: c.z + AXE3.z }, g);
     var axeDir = { x: axeEcranHaut.x - e.x, y: axeEcranHaut.y - e.y };
     var normeAxe = Math.hypot(axeDir.x, axeDir.y) || 1;
@@ -308,8 +311,8 @@ export function creerVueOrbite(canvas) {
 
     /* le bâton de l'axe (recouvert par la boule au milieu) : sa direction
      * ne change JAMAIS — c'est la vérité n° 1 */
-    var hautAxe = projeter({ x: c.x + AXE3.x * RAYON_TERRE_MONDE * 1.55, y: c.y + AXE3.y * RAYON_TERRE_MONDE * 1.55, z: c.z + AXE3.z * RAYON_TERRE_MONDE * 1.55 }, g);
-    var basAxe = projeter({ x: c.x - AXE3.x * RAYON_TERRE_MONDE * 1.55, y: c.y - AXE3.y * RAYON_TERRE_MONDE * 1.55, z: c.z - AXE3.z * RAYON_TERRE_MONDE * 1.55 }, g);
+    var hautAxe = projeter({ x: c.x + AXE3.x * g.rTerreM * 1.55, y: c.y + AXE3.y * g.rTerreM * 1.55, z: c.z + AXE3.z * g.rTerreM * 1.55 }, g);
+    var basAxe = projeter({ x: c.x - AXE3.x * g.rTerreM * 1.55, y: c.y - AXE3.y * g.rTerreM * 1.55, z: c.z - AXE3.z * g.rTerreM * 1.55 }, g);
     ctx.beginPath();
     ctx.moveTo(basAxe.x, basAxe.y);
     ctx.lineTo(hautAxe.x, hautAxe.y);
@@ -324,12 +327,12 @@ export function creerVueOrbite(canvas) {
     ctx.arc(e.x, e.y, r, 0, TAU);
     ctx.fillStyle = '#3fa98e';
     ctx.fill();
-    var equateur = cercle(c, RAYON_TERRE_MONDE, 72);
+    var equateur = cercle(c, g.rTerreM, 72);
     var devant = chaineVisible(equateur, c);
     if (devant.length > 2) {
       var A = projeter(devant[0], g);
       var B = projeter(devant[devant.length - 1], g);
-      var pole = projeter({ x: c.x + AXE3.x * RAYON_TERRE_MONDE, y: c.y + AXE3.y * RAYON_TERRE_MONDE, z: c.z + AXE3.z * RAYON_TERRE_MONDE }, g);
+      var pole = projeter({ x: c.x + AXE3.x * g.rTerreM, y: c.y + AXE3.y * g.rTerreM, z: c.z + AXE3.z * g.rTerreM }, g);
       var angA = Math.atan2(A.y - e.y, A.x - e.x);
       var angB = Math.atan2(B.y - e.y, B.x - e.x);
       var angPole = Math.atan2(pole.y - e.y, pole.x - e.x);
@@ -356,11 +359,11 @@ export function creerVueOrbite(canvas) {
     /* les anneaux de latitude : les rubans de chez nous et de l'Australie */
     [1, -1].forEach(function (signe) {
       var centreAnneau = {
-        x: c.x + AXE3.x * RAYON_TERRE_MONDE * Math.sin(LATITUDE_RAD) * signe,
-        y: c.y + AXE3.y * RAYON_TERRE_MONDE * Math.sin(LATITUDE_RAD) * signe,
-        z: c.z + AXE3.z * RAYON_TERRE_MONDE * Math.sin(LATITUDE_RAD) * signe
+        x: c.x + AXE3.x * g.rTerreM * Math.sin(LATITUDE_RAD) * signe,
+        y: c.y + AXE3.y * g.rTerreM * Math.sin(LATITUDE_RAD) * signe,
+        z: c.z + AXE3.z * g.rTerreM * Math.sin(LATITUDE_RAD) * signe
       };
-      var anneau = cercle(centreAnneau, RAYON_TERRE_MONDE * Math.cos(LATITUDE_RAD), 60);
+      var anneau = cercle(centreAnneau, g.rTerreM * Math.cos(LATITUDE_RAD), 60);
       var visible = chaineVisible(anneau, c);
       if (visible.length > 1) {
         tracer(ctx, visible, g);
@@ -398,9 +401,9 @@ export function creerVueOrbite(canvas) {
     devantRing.x /= nfd; devantRing.y /= nfd; devantRing.z /= nfd;
     [1, -1].forEach(function (signe) {
       var pos = {
-        x: c.x + (AXE3.x * Math.sin(LATITUDE_RAD) * signe + devantRing.x * Math.cos(LATITUDE_RAD)) * RAYON_TERRE_MONDE,
-        y: c.y + (AXE3.y * Math.sin(LATITUDE_RAD) * signe + devantRing.y * Math.cos(LATITUDE_RAD)) * RAYON_TERRE_MONDE,
-        z: c.z + (AXE3.z * Math.sin(LATITUDE_RAD) * signe + devantRing.z * Math.cos(LATITUDE_RAD)) * RAYON_TERRE_MONDE
+        x: c.x + (AXE3.x * Math.sin(LATITUDE_RAD) * signe + devantRing.x * Math.cos(LATITUDE_RAD)) * g.rTerreM,
+        y: c.y + (AXE3.y * Math.sin(LATITUDE_RAD) * signe + devantRing.y * Math.cos(LATITUDE_RAD)) * g.rTerreM,
+        z: c.z + (AXE3.z * Math.sin(LATITUDE_RAD) * signe + devantRing.z * Math.cos(LATITUDE_RAD)) * g.rTerreM
       };
       var ep = projeter(pos, g);
       if (signe > 0) {
@@ -433,15 +436,15 @@ export function creerVueOrbite(canvas) {
       z: versSoleil.z * cosG + perpAxe.z * sinG
     };
     var cible = {
-      x: c.x + dirCible.x * RAYON_TERRE_MONDE,
-      y: c.y + dirCible.y * RAYON_TERRE_MONDE,
-      z: c.z + dirCible.z * RAYON_TERRE_MONDE
+      x: c.x + dirCible.x * g.rTerreM,
+      y: c.y + dirCible.y * g.rTerreM,
+      z: c.z + dirCible.z * g.rTerreM
     };
     var force = forceFaisceau(jour);
     var aplomb = aplombLumiere(jour);
     var eCible = projeter(cible, g);
     var eSoleil = projeter({ x: 0, y: 0, z: 0 }, g);
-    var rSoleil = RAYON_SOLEIL_MONDE * eSoleil.s;
+    var rSoleil = g.rSoleilM * eSoleil.s;
     dessinerLumiere(ctx, eSoleil.x, eSoleil.y, rSoleil, eCible.x, eCible.y, e.x, e.y, r, aplomb, 'faisceau', force);
     if (coteCamera(cible, c)) {
       dessinerLumiere(ctx, eSoleil.x, eSoleil.y, rSoleil, eCible.x, eCible.y, e.x, e.y, r, aplomb, 'tache', force);
@@ -490,7 +493,7 @@ export function creerVueOrbite(canvas) {
         if (ecart > Math.PI) ecart = TAU - ecart;
         if (ecart < 0.45) return;
         ctx.globalAlpha = Math.min(1, (ecart - 0.45) / 0.5);
-        var e = projeter({ x: -Math.cos(rep.angle) * 1.17, y: 0, z: Math.sin(rep.angle) * 1.17 }, g);
+        var e = projeter({ x: -Math.cos(rep.angle) * 1.1, y: 0, z: Math.sin(rep.angle) * 1.1 }, g);
         ctx.font = Math.round((g.compact ? 0.11 : 0.095) * e.s) + 'px system-ui, sans-serif';
         ctx.fillText(rep.emoji, e.x, e.y);
       });
@@ -520,7 +523,7 @@ export function creerVueOrbite(canvas) {
         ctx.fillStyle = 'rgba(154, 165, 195, 0.9)';
         ctx.font = '600 ' + taille + 'px system-ui, sans-serif';
         ctx.fillText('Soleil', eSoleil.x, g.cy + soleil.r + taille * 1.3);
-        var rT = RAYON_TERRE_MONDE * projeter(terre3D(jour), g).s;
+        var rT = g.rTerreM * projeter(terre3D(jour), g).s;
         var eT = projeter(terre3D(jour), g);
         /* au-dessus derrière le Soleil, sur le côté quand la Terre passe
          * devant (jamais sur la légende du bas), en dessous sinon */
@@ -558,7 +561,7 @@ export function creerVueOrbite(canvas) {
     attrapeTerre: function (x, y, jour) {
       var g = geometrie();
       var e = projeter(terre3D(jour), g);
-      var marge = Math.max(RAYON_TERRE_MONDE * e.s * 2.4, 44 * (window.devicePixelRatio || 1));
+      var marge = Math.max(g.rTerreM * e.s * 2.4, 44 * (window.devicePixelRatio || 1));
       return (e.x - x) * (e.x - x) + (e.y - y) * (e.y - y) <= marge * marge;
     }
   };

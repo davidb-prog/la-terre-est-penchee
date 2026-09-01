@@ -70,8 +70,9 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   dans le plan xz, `terre3D(jour) = (−cos a, 0, sin a)` ; caméra à 32°
   au-dessus du plan (`PHI`), distance 3,1 — le bas de l'écran est PRÈS, le
   haut est LOIN, la Terre grossit devant et passe derrière le Soleil au fond.
-  Le Soleil se projette toujours PILE en (0,5 w ; 0,52 h) : la sonde de
-  pixels « Soleil fixe » tient. Équateur et anneaux sont de vrais cercles 3D
+  Le Soleil se projette toujours PILE en (0,5 w ; 0,47 h) : la sonde de
+  pixels « Soleil fixe » tient. Cadrage f = min(1,18 l ; 1,5 h), astres
+  grossis en mode compact (téléphone) — retour utilisateur « trop petit ». Équateur et anneaux sont de vrais cercles 3D
   projetés (moitiés cachées non dessinées), la couture de l'équateur est
   exacte.
 - **Le faisceau de lumière** vit dans le modèle (`forceFaisceau`,
