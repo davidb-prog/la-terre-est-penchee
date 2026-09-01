@@ -18,17 +18,14 @@ L'idée centrale, celle que l'enfant doit retenir :
 
 ## Fonctionnalités
 
-- **Le geste-signature, en 3D** : attraper la Terre et lui faire faire le tour
-  du Soleil sur une orbite vue en perspective — elle grossit en passant devant,
-  disparaît derrière le Soleil au fond, et l'axe garde son penchant, quoi qu'il
-  arrive (le Soleil-boule reste fixe au centre). La Terre montre ses deux
-  moitiés et leurs **anneaux de latitude** (vrais cercles 3D, couture d'équateur
-  exacte) : la maison et le kangourou (une silhouette dessinée) sont assis sur
-  leur ruban, face à nous — rien ne se « rapproche » du Soleil en été. Autour
-  des solstices, un **faisceau de lumière** montre le mécanisme : il frappe
-  notre moitié bien en face l'été (tache ronde et vive), la rase l'hiver (tache
-  longue et pâle) — et la légende fixe rappelle que la distance Terre–Soleil ne
-  change jamais.
+- **Le geste-signature** : attraper la Terre et lui faire faire le tour du
+  Soleil-boule, fixe au centre — l'axe garde son penchant, quoi qu'il arrive.
+  La Terre montre ses deux moitiés et leurs **anneaux de latitude** : la
+  maison et le kangourou sont assis sur leur ruban, au-devant — rien ne se
+  « rapproche » du Soleil en été. Autour des solstices, un **faisceau de
+  lumière** montre le mécanisme : il frappe notre moitié bien en face l'été
+  (tache généreuse et vive), la rase l'hiver (faisceau diffus, sans tache) —
+  et la légende fixe rappelle que la distance Terre–Soleil ne change jamais.
 - **La fenêtre de chez nous**, toujours synchronisée et vivante : le Soleil de
   midi qui monte haut l'été et reste bas l'hiver, et un jardin qui change
   chaque jour à petits pas (`jardinDuJour`, continu — verrouillé par test) —
@@ -140,7 +137,7 @@ manifeste est vide (c'est le cas), tout passe à la synthèse. Marche à suivre 
 index.html           la page unique (socle SEO + carte de partage dans le <head>)
 css/style.css        palette commune de la série astronomie + Baloo 2 (fond nuit)
 js/model.js          modèle pur + constantes du récit + textes oraux
-js/vue-orbite.js     la vue de l'espace en 3D (Soleil-boule fixe, perspective,
+js/vue-orbite.js     la vue de l'espace (orbite-ellipse, Soleil-boule fixe,
                      faisceau de lumière, geste-signature)
 js/vue-fenetre.js    chez nous par la fenêtre (+ dessinerMiniFenetre, médaillon)
 js/main.js           câblage : boucle rAF, lecture auto, curseur, geste,
