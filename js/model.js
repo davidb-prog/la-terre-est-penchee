@@ -301,6 +301,30 @@ export function extremitesAnneau(hemisphere) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Le faisceau de lumière de la vue de l'espace                        */
+/* ------------------------------------------------------------------ */
+
+/* La force du faisceau (0..1) : pleine autour des solstices — là où le
+ * dessin raconte juste —, extinction rapide dès qu'on s'en éloigne, éteint
+ * bien avant les équinoxes (quand la Terre est en haut ou en bas de
+ * l'orbite dessinée, la face « éclairée » serait la région des pôles : le
+ * faisceau s'efface plutôt que de raconter ça de travers). Continue,
+ * jamais de saut. */
+export function forceFaisceau(jour) {
+  var p = Math.abs(penchementNord(jour));
+  var t = Math.min(1, Math.max(0, (p - 0.55) / 0.4));
+  return t * t * (3 - 2 * t);
+}
+
+/* L'aplomb de la lumière sur chez nous (0..1) : la tache d'arrivée du
+ * faisceau est ramassée et vive quand la lumière frappe bien en face
+ * (solstice d'été), moyenne aux équinoxes, longue et pâle quand elle rase
+ * (solstice d'hiver). C'est l'expérience de la lampe, en continu. */
+export function aplombLumiere(jour) {
+  return Math.max(0.12, 0.5 + 0.45 * penchementNord(jour));
+}
+
+/* ------------------------------------------------------------------ */
 /* La petite phrase du moment, affichée sous la fenêtre                */
 /* ------------------------------------------------------------------ */
 

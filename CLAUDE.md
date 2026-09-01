@@ -65,6 +65,24 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
 - Coordonnées **mathématiques** (y vers le haut) dans le modèle ; les vues font
   la bascule canvas (y vers le bas).
 - Le Soleil est **fixe au centre**. Jour 0 = 1er janvier.
+- **La vue de l'espace est en 3D** (choix utilisateur, après comparaison 2D /
+  hybride / 3D en artefact) : monde avec Soleil à l'origine, orbite de rayon 1
+  dans le plan xz, `terre3D(jour) = (−cos a, 0, sin a)` ; caméra à 32°
+  au-dessus du plan (`PHI`), distance 3,1 — le bas de l'écran est PRÈS, le
+  haut est LOIN, la Terre grossit devant et passe derrière le Soleil au fond.
+  Le Soleil se projette toujours PILE en (0,5 w ; 0,52 h) : la sonde de
+  pixels « Soleil fixe » tient. Équateur et anneaux sont de vrais cercles 3D
+  projetés (moitiés cachées non dessinées), la couture de l'équateur est
+  exacte.
+- **Le faisceau de lumière** vit dans le modèle (`forceFaisceau`,
+  `aplombLumiere`, testés) : plein autour des solstices, ÉTEINT autour des
+  équinoxes (quand la Terre est en haut/bas de l'orbite dessinée, la face
+  « éclairée » serait la région des pôles — le faisceau s'efface plutôt que de
+  raconter ça de travers) ; tache ramassée au solstice d'été, étalée au
+  solstice d'hiver, jamais de saut. Sa cible glisse sur le bord éclairé du
+  globe (rotation de versSoleil vers l'axe, bornée à 75°, adoucie aux
+  alignements) — jamais derrière. La légende fixe « Terre–Soleil : toujours
+  150 millions de km » ne bouge jamais.
 - `angleAnnee(jour) = (jour − 171) / 365 · τ` (0 = solstice d'été, 21 juin) ;
   `positionTerre(jour) = (−cos a, −sin a)` (sens trigonométrique). Solstice
   d'été : Terre à gauche du Soleil ; hiver : à droite ; l'automne passe par le
@@ -115,12 +133,24 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
 - **Rien ne se rapproche du Soleil dans le dessin** (retour utilisateur : une
   maison posée sur une face du globe semblait s'approcher du Soleil en été —
   la fausse explication que le site réfute). La maison et le kangourou sont
-  assis sur leurs **anneaux de latitude** (rubans teal/bleu à ~45°, courbés
-  vers l'équateur), au-devant du globe, sur l'axe de symétrie de leur anneau
-  (`positionLocaleMaison`/`positionLocaleKangourou`/`extremitesAnneau` dans le
-  modèle, verrouillés par tests) — un cran vers l'équateur au dessin pour ne
-  pas se coller au bâton de l'axe. Le kangourou reste aux antipodes exacts de
-  la maison, tête en bas.
+  assis sur leurs **anneaux de latitude** (rubans teal/bleu à ~45°), au point
+  de l'anneau **face à la caméra** — jamais sur la face qui regarde le Soleil
+  (le modèle garde `positionLocaleMaison`/`positionLocaleKangourou`/
+  `extremitesAnneau`, verrouillés par tests, qui actent l'esprit : l'habitant
+  est l'anneau, symétrique, à distance constante du Soleil). Le **kangourou
+  est une silhouette dessinée** (orange clair — jamais l'émoji, qui se
+  confondait avec le bâton de l'axe), tête en bas sur l'anneau sud.
+- **Le glisser suit le cercle** : `jourDepuisPointeur(x, y, jourActuel)`
+  cherche LOCALEMENT (fenêtre ±45 jours autour du jour courant) — sans quoi
+  la Terre saute entre le devant et l'arrière de l'orbite en perspective,
+  verticalement proches à l'écran.
+- **L'orbite porte sa profondeur** : pointillés nets et épais sur la moitié
+  avant, discrets sur la moitié arrière — chaque moitié tracée d'un seul
+  trait (des segments individuels casseraient la trame des pointillés).
+- L'étiquette « Terre » évite les collisions : au-dessus du globe derrière le
+  Soleil, sur le côté quand la Terre passe devant (jamais sur la légende du
+  bas), en dessous sinon. Mode compact (< 400 px de canvas) : étiquettes
+  Soleil/Terre masquées, légende de distance conservée.
 - **La fenêtre évolue continûment** (retour utilisateur : la vue semblait
   statique) : `jardinDuJour(jour)` livre quatre paramètres continus
   (feuilles, rousseur, fleurs, neige) — aucun saut de décor d'un jour à
@@ -163,7 +193,8 @@ enregistré, les textes du site restent libres — après, ils sont GELÉS.
 index.html           la page unique (socle SEO + og: dans le <head>)
 css/style.css        palette de la série astronomie + Baloo 2 (fond nuit)
 js/model.js          modèle pur + constantes du récit + textes oraux
-js/vue-orbite.js     la vue de l'espace (Soleil fixe, orbite, geste-signature)
+js/vue-orbite.js     la vue de l'espace en 3D (Soleil-boule fixe, perspective,
+                     faisceau de lumière, geste-signature)
 js/vue-fenetre.js    chez nous par la fenêtre (+ dessinerMiniFenetre, médaillon)
 js/main.js           câblage : boucle rAF, lecture auto, curseur, geste,
                      scénarios, jeu, conteur narrate(), médaillon

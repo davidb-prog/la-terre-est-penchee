@@ -20,6 +20,7 @@ import {
   LECTURE_JOURS_PAR_SEC, SCENARIOS, VOIX_TRANSITIONS,
   DEFIS, DEFI_ATTENTE_MS, DEFI_SORTIE_MARGE_JOURS,
   defiReussi, defiEncoreProche, coeurDeSaison,
+  forceFaisceau, aplombLumiere,
   EMOJI_RE, texteOral
 } from '../js/model.js';
 
@@ -291,6 +292,42 @@ test('le jardin raconte la bonne saison, en continu', function () {
   assert.ok(automne.rousseur > 0.5, 'l’automne roussit les feuilles');
   assert.ok(automne.feuilles < 0.9 && automne.feuilles > 0.1, 'les feuilles tombent');
   assert.ok(automne.rousseur * (1 - automne.feuilles) > 0.05, 'le tas de feuilles grossit');
+});
+
+/* ------------------------------------------------------------------ */
+/* Le faisceau de lumière de la vue de l'espace                        */
+/* ------------------------------------------------------------------ */
+
+test('le faisceau est plein aux solstices et éteint aux équinoxes', function () {
+  presque(forceFaisceau(JOUR_SOLSTICE_ETE), 1);
+  presque(forceFaisceau(JOUR_SOLSTICE_HIVER), 1, 1e-6);
+  assert.equal(forceFaisceau(JOUR_EQUINOXE_PRINTEMPS), 0);
+  assert.equal(forceFaisceau(JOUR_EQUINOXE_AUTOMNE), 0);
+  /* et il reste éteint un bon moment autour de chaque équinoxe */
+  assert.equal(forceFaisceau(JOUR_EQUINOXE_PRINTEMPS + 20), 0);
+  assert.equal(forceFaisceau(JOUR_EQUINOXE_AUTOMNE - 20), 0);
+});
+
+test('la tache est ramassée au solstice d’été, étalée au solstice d’hiver, moyenne aux équinoxes', function () {
+  presque(aplombLumiere(JOUR_SOLSTICE_ETE), 0.95);
+  presque(aplombLumiere(JOUR_SOLSTICE_HIVER), 0.12, 1e-6); /* plancher : jamais nulle */
+  presque(aplombLumiere(JOUR_EQUINOXE_PRINTEMPS), 0.5, 1e-6);
+  assert.ok(aplombLumiere(JOUR_SOLSTICE_ETE) > aplombLumiere(JOUR_EQUINOXE_AUTOMNE));
+  assert.ok(aplombLumiere(JOUR_EQUINOXE_AUTOMNE) > aplombLumiere(JOUR_SOLSTICE_HIVER));
+});
+
+test('la lumière ne saute jamais d’un jour à l’autre (force et aplomb continus)', function () {
+  var forcePrecedente = forceFaisceau(0);
+  var aplombPrecedent = aplombLumiere(0);
+  for (var j = 1; j <= ANNEE_JOURS; j += 1) {
+    var force = forceFaisceau(j);
+    var aplomb = aplombLumiere(j);
+    assert.ok(Math.abs(force - forcePrecedente) <= 0.08, 'la force saute au jour ' + j);
+    assert.ok(Math.abs(aplomb - aplombPrecedent) <= 0.02, 'l’aplomb saute au jour ' + j);
+    assert.ok(force >= 0 && force <= 1 && aplomb >= 0.12 && aplomb <= 0.95, 'hors bornes au jour ' + j);
+    forcePrecedente = force;
+    aplombPrecedent = aplomb;
+  }
 });
 
 /* ------------------------------------------------------------------ */

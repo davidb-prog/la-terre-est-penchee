@@ -166,7 +166,9 @@ function brancherGesteTerre(canvas, vue) {
   canvas.addEventListener('pointermove', function (e) {
     if (!etat.glisse) return;
     var c = coordonneesCanvas(canvas, e);
-    fixerJour(vue.jourDepuisPointeur(c.x, c.y));
+    /* le jour courant guide la recherche : la Terre suit le doigt le long
+     * du cercle, sans sauter entre le devant et l'arrière de l'orbite */
+    fixerJour(vue.jourDepuisPointeur(c.x, c.y, etat.jour));
     e.preventDefault();
   });
 
