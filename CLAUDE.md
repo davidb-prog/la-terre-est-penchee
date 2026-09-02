@@ -73,18 +73,22 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   **8 % de min(l, h)** — de l'air pour l'orbite et le faisceau —, et le
   modelé du globe (voile clair, bord assombri). La sonde de pixels « Soleil
   fixe » vise (0,5 l ; 0,52 h).
-- **Le faisceau de lumière** vit dans le modèle (`forceFaisceau`,
+- **Le faisceau de lumière est LARGE** (décision utilisateur — la version
+  fidèle) : il arrose TOUTE la face de la Terre, du pôle nord au pôle sud —
+  le Soleil ne vise personne, et le faisceau lui-même est identique en
+  toute saison. Ce sont les **taches d'arrivée** qui font la pédagogie, une
+  par moitié : cible à 15° du point face au Soleil pour la moitié bien en
+  face, 75° pour celle qui rase (rotation de versSoleil vers le haut de
+  l'axe pour chez nous, vers le bas pour l'Australie) ; l'aplomb du sud est
+  `aplombLumiere(jour + ANNEE_JOURS/2)` (miroir exact : cos(a+π) = −cos a).
+  Tache vive et ramassée quand la lumière frappe en face (demi-largeur
+  0,32/aplomb, cœur clair, bords en dégradé), **fondue dès qu'elle rase**
+  (aplomb < 0,45, disparue sous 0,25 — la lumière glisse sans chauffer,
+  pas de tache). Les lois vivent dans le modèle (`forceFaisceau`,
   `aplombLumiere`, testés) : plein autour des solstices, ÉTEINT autour des
-  équinoxes (quand la Terre est en haut/bas de l'orbite dessinée, la face
-  « éclairée » serait la région des pôles — le faisceau s'efface plutôt que de
-  raconter ça de travers) ; tache ramassée mais généreuse au solstice d'été
-  (le Soleil n'éclaire pas qu'un point : demi-largeur 0,28/aplomb, bords en
-  dégradé), **fondue dès que la lumière rase** (aplomb < 0,45 — plus
-  d'ellipse : le faisceau diffus raconte seul), jamais de saut. Sa cible
-  glisse sur le bord éclairé du globe (rotation de versSoleil vers le haut
-  de l'axe, 15° l'été → 75° l'hiver, adoucie aux alignements) — jamais
-  derrière. (La légende de distance a été retirée — décision utilisateur :
-  elle n'apportait rien ; la constance de la distance reste racontée dans
+  équinoxes (la perspective du dessin ne sait pas y montrer l'angle des
+  rayons sans tricher), jamais de saut. (La légende de distance a été
+  retirée — décision utilisateur ; la constance de la distance reste dans
   la note aux parents et verrouillée par test.)
 - `angleAnnee(jour) = (jour − 171) / 365 · τ` (0 = solstice d'été, 21 juin) ;
   `positionTerre(jour) = (−cos a, −sin a)` (sens trigonométrique). Solstice

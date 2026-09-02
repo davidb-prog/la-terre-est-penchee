@@ -23,8 +23,9 @@ L'idée centrale, celle que l'enfant doit retenir :
   La Terre montre ses deux moitiés et leurs **anneaux de latitude** : la
   maison et le kangourou sont assis sur leur ruban, au-devant — rien ne se
   « rapproche » du Soleil en été. Autour des solstices, un **faisceau de
-  lumière** montre le mécanisme : il frappe notre moitié bien en face l'été
-  (tache généreuse et vive), la rase l'hiver (faisceau diffus, sans tache).
+  lumière large** arrose toute la face de la Terre — comme en vrai — et les
+  taches d'arrivée montrent le mécanisme : vive là où la lumière frappe bien
+  en face (chez nous l'été, en Australie l'hiver), aucune là où elle rase.
 - **La fenêtre de chez nous**, toujours synchronisée et vivante : le Soleil de
   midi qui monte haut l'été et reste bas l'hiver, et un jardin qui change
   chaque jour à petits pas (`jardinDuJour`, continu — verrouillé par test) —

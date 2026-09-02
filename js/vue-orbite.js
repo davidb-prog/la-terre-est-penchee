@@ -37,62 +37,61 @@ var REPERES_SAISONS = [
   { emoji: '🌸', angle: (3 * TAU) / 4 }
 ];
 
-/* La lumière qui frappe : un faisceau doux du bord du Soleil vers la cible,
- * et la tache d'arrivée qui fait la pédagogie. Le sweet spot d'été est
- * généreux (le Soleil n'éclaire pas qu'un point), et quand la lumière rase
- * (hiver), la tache s'efface au profit du faisceau diffus — une ellipse
- * plate n'aurait pas de sens. `partie` : 'faisceau' (avant le globe,
- * découpé hors de son disque) ou 'tache' (après, posée sur la surface). */
-function dessinerLumiere(ctx, sx, sy, rS, tx, ty, gx, gy, rG, aplomb, partie, force) {
+/* La lumière : UN faisceau large qui arrose TOUTE la face de la Terre
+ * (comme en vrai — le Soleil ne vise personne), et des taches d'arrivée
+ * qui font la pédagogie : vive et ramassée là où la lumière frappe bien
+ * en face (chez nous l'été, l'Australie l'hiver), aucune là où elle rase
+ * (la lumière glisse sans chauffer). Le faisceau s'éteint autour des
+ * équinoxes (loi pure forceFaisceau). */
+function dessinerFaisceauLarge(ctx, g, p, force) {
   if (force < 0.05) return;
-  var lx = tx - sx, ly = ty - sy;
+  var lx = p.x - g.cx, ly = p.y - g.cy;
   var nl = Math.hypot(lx, ly) || 1; lx /= nl; ly /= nl;
   var px = -ly, py = lx;
+  ctx.save();
+  /* jamais par-dessus le globe : son disque est découpé du faisceau */
+  ctx.beginPath();
+  ctx.rect(-100000, -100000, 200000, 200000);
+  ctx.arc(p.x, p.y, g.rTerre - 0.5, 0, TAU, true);
+  ctx.clip('evenodd');
+  var degrade = ctx.createLinearGradient(g.cx + lx * g.rSoleil, g.cy + ly * g.rSoleil, p.x, p.y);
+  degrade.addColorStop(0, 'rgba(255, 224, 130, ' + (0.38 * force) + ')');
+  degrade.addColorStop(1, 'rgba(255, 207, 92, ' + (0.08 * force) + ')');
+  ctx.beginPath();
+  ctx.moveTo(g.cx + lx * g.rSoleil * 1.02 + px * g.rSoleil * 0.6, g.cy + ly * g.rSoleil * 1.02 + py * g.rSoleil * 0.6);
+  ctx.lineTo(p.x + px * g.rTerre * 0.98, p.y + py * g.rTerre * 0.98);
+  ctx.lineTo(p.x - px * g.rTerre * 0.98, p.y - py * g.rTerre * 0.98);
+  ctx.lineTo(g.cx + lx * g.rSoleil * 1.02 - px * g.rSoleil * 0.6, g.cy + ly * g.rSoleil * 1.02 - py * g.rSoleil * 0.6);
+  ctx.closePath();
+  ctx.fillStyle = degrade;
+  ctx.fill();
+  ctx.restore();
+}
+
+/* Une tache d'arrivée, posée sur le bord du globe, allongée le long de la
+ * surface. Cœur clair, bords en dégradé ; elle se fond dès que la lumière
+ * rase (aplomb < 0,45) et disparaît sous 0,25 — pas de tache pour une
+ * lumière qui glisse. */
+function dessinerTache(ctx, tx, ty, gx, gy, rG, aplomb, force) {
+  var fondu = Math.min(1, Math.max(0, (aplomb - 0.25) / 0.2));
+  var alpha = (0.35 + 0.6 * aplomb) * force * fondu;
+  if (alpha < 0.04) return;
   var nx = tx - gx, ny = ty - gy;
   var nn = Math.hypot(nx, ny) || 1; nx /= nn; ny /= nn;
-  var tanx = -ny, tany = nx;
-  if (tanx * px + tany * py < 0) { tanx = -tanx; tany = -tany; }
-  var demiTache = rG * Math.min(0.8, 0.28 / Math.max(0.16, aplomb));
-  if (partie === 'faisceau') {
-    ctx.save();
-    /* jamais par-dessus le globe : son disque est découpé du faisceau */
-    ctx.beginPath();
-    ctx.rect(-100000, -100000, 200000, 200000);
-    ctx.arc(gx, gy, rG - 0.5, 0, TAU, true);
-    ctx.clip('evenodd');
-    var degrade = ctx.createLinearGradient(sx + lx * rS, sy + ly * rS, tx, ty);
-    degrade.addColorStop(0, 'rgba(255, 224, 130, ' + (0.42 * force) + ')');
-    degrade.addColorStop(1, 'rgba(255, 207, 92, ' + (0.1 * force) + ')');
-    ctx.beginPath();
-    ctx.moveTo(sx + lx * rS * 1.02 + px * rS * 0.34, sy + ly * rS * 1.02 + py * rS * 0.34);
-    ctx.lineTo(tx + tanx * demiTache, ty + tany * demiTache);
-    ctx.lineTo(tx - tanx * demiTache, ty - tany * demiTache);
-    ctx.lineTo(sx + lx * rS * 1.02 - px * rS * 0.34, sy + ly * rS * 1.02 - py * rS * 0.34);
-    ctx.closePath();
-    ctx.fillStyle = degrade;
-    ctx.fill();
-    ctx.restore();
-  } else {
-    /* la tache s'efface quand la lumière rase (aplomb < 0,45) — en dessous
-     * de 0,25, plus d'ellipse du tout : le faisceau diffus raconte seul */
-    var fondu = Math.min(1, Math.max(0, (aplomb - 0.25) / 0.2));
-    var alpha = (0.2 + 0.55 * aplomb) * force * fondu;
-    if (alpha < 0.04) return;
-    ctx.save();
-    ctx.translate(tx, ty);
-    ctx.rotate(Math.atan2(tany, tanx));
-    ctx.scale(demiTache, Math.max(2, rG * 0.09));
-    /* bords doux : un dégradé radial plutôt qu'une ellipse franche */
-    var doux = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
-    doux.addColorStop(0, 'rgba(255, 240, 170, ' + alpha + ')');
-    doux.addColorStop(0.65, 'rgba(255, 240, 170, ' + (alpha * 0.55) + ')');
-    doux.addColorStop(1, 'rgba(255, 240, 170, 0)');
-    ctx.beginPath();
-    ctx.arc(0, 0, 1, 0, TAU);
-    ctx.fillStyle = doux;
-    ctx.fill();
-    ctx.restore();
-  }
+  var demiTache = rG * Math.min(0.8, 0.32 / Math.max(0.16, aplomb));
+  ctx.save();
+  ctx.translate(tx, ty);
+  ctx.rotate(Math.atan2(nx, -ny));
+  ctx.scale(demiTache, Math.max(2, rG * 0.13));
+  var doux = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
+  doux.addColorStop(0, 'rgba(255, 250, 215, ' + alpha + ')');
+  doux.addColorStop(0.55, 'rgba(255, 240, 170, ' + (alpha * 0.6) + ')');
+  doux.addColorStop(1, 'rgba(255, 240, 170, 0)');
+  ctx.beginPath();
+  ctx.arc(0, 0, 1, 0, TAU);
+  ctx.fillStyle = doux;
+  ctx.fill();
+  ctx.restore();
 }
 
 export function creerVueOrbite(canvas) {
@@ -336,30 +335,38 @@ export function creerVueOrbite(canvas) {
       }
       ctx.globalAlpha = 1;
       dessinerSoleil(ctx, g);
-      /* Le faisceau de lumière : sa cible vit sur le BORD ÉCLAIRÉ du globe —
-       * on part du point qui fait face au Soleil et on tourne vers le haut
-       * de l'axe, d'un angle qui suit la saison (15° l'été → 75° l'hiver)
-       * et s'adoucit aux alignements. Force et aplomb viennent du modèle
-       * (testés) : plein aux solstices, éteint aux équinoxes. */
+      /* Le faisceau large : la lumière arrose TOUTE la face de la Terre —
+       * elle ne vise personne (décision utilisateur : la version fidèle).
+       * Ce sont les taches d'arrivée qui racontent l'angle, une par moitié.
+       * On part du point qui fait face au Soleil et on tourne vers le haut
+       * de l'axe (chez nous) ou vers le bas (l'Australie), d'un angle qui
+       * suit la saison : 15° pour la moitié bien en face, 75° pour celle
+       * qui rase. L'aplomb du sud est celui du nord six mois plus tard
+       * (miroir exact du modèle : cos(a + pi) = -cos(a)). */
       var p = positionTerreCanvas(jour, g);
+      var force = forceFaisceau(jour);
+      dessinerFaisceauLarge(ctx, g, p, force);
       var versSoleil = { x: g.cx - p.x, y: g.cy - p.y };
       var nvs = Math.hypot(versSoleil.x, versSoleil.y) || 1;
       versSoleil.x /= nvs; versSoleil.y /= nvs;
       var axeEcran = { x: AXE_DIR.x, y: -AXE_DIR.y };
       var croix = versSoleil.x * axeEcran.y - versSoleil.y * axeEcran.x;
-      var gammaLumiere = ((45 - 30 * penchementNord(jour)) * Math.PI / 180) * croix;
-      var cosG = Math.cos(gammaLumiere), sinG = Math.sin(gammaLumiere);
-      var dirCible = { x: versSoleil.x * cosG - versSoleil.y * sinG,
-                       y: versSoleil.x * sinG + versSoleil.y * cosG };
-      var cibleX = p.x + dirCible.x * g.rTerre;
-      var cibleY = p.y + dirCible.y * g.rTerre;
-      var force = forceFaisceau(jour);
-      var aplomb = aplombLumiere(jour);
-      dessinerLumiere(ctx, g.cx, g.cy, g.rSoleil, cibleX, cibleY, p.x, p.y, g.rTerre, aplomb, 'faisceau', force);
+      var penchant = penchementNord(jour);
+      var thetaNord = ((45 - 30 * penchant) * Math.PI / 180) * croix;
+      var thetaSud = -((45 + 30 * penchant) * Math.PI / 180) * croix;
+      var cosN = Math.cos(thetaNord), sinN = Math.sin(thetaNord);
+      var cosS = Math.cos(thetaSud), sinS = Math.sin(thetaSud);
+      var cibleNord = { x: p.x + (versSoleil.x * cosN - versSoleil.y * sinN) * g.rTerre,
+                        y: p.y + (versSoleil.x * sinN + versSoleil.y * cosN) * g.rTerre };
+      var cibleSud = { x: p.x + (versSoleil.x * cosS - versSoleil.y * sinS) * g.rTerre,
+                       y: p.y + (versSoleil.x * sinS + versSoleil.y * cosS) * g.rTerre };
+      var aplombNord = aplombLumiere(jour);
+      var aplombSud = aplombLumiere(jour + ANNEE_JOURS / 2);
       dessinerTerre(ctx, g, jour, halo);
-      /* la tache de lumière : ramassée et vive quand le Soleil frappe en
-       * face (été), effacée quand il rase (le faisceau diffus suffit) */
-      dessinerLumiere(ctx, g.cx, g.cy, g.rSoleil, cibleX, cibleY, p.x, p.y, g.rTerre, aplomb, 'tache', force);
+      /* les taches d'arrivée : vive là où la lumière frappe en face,
+       * aucune là où elle rase */
+      dessinerTache(ctx, cibleNord.x, cibleNord.y, p.x, p.y, g.rTerre, aplombNord, force);
+      dessinerTache(ctx, cibleSud.x, cibleSud.y, p.x, p.y, g.rTerre, aplombSud, force);
       /* Les petites étiquettes (pas en mode compact). */
       if (!g.compact) {
         var taille = Math.round(Math.min(g.w, g.h) * 0.035);
