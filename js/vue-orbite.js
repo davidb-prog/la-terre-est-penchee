@@ -282,7 +282,9 @@ export function creerVueOrbite(canvas) {
     ctx.save();
     ctx.translate(p.x + dKangourou.x * r, p.y + dKangourou.y * r);
     ctx.rotate(angleAxe + Math.PI);
-    ctx.font = Math.round(r * 0.6) + 'px system-ui, sans-serif';
+    /* 0,78 rayon : assez gros pour se lire sur téléphone (l'émoji d'Apple
+     * est discret), sans déborder du globe */
+    ctx.font = Math.round(r * 0.78) + 'px system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'alphabetic';
     ctx.fillText('🦘', 0, 0);
