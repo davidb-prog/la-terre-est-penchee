@@ -282,12 +282,15 @@ export function creerVueOrbite(canvas) {
     ctx.save();
     ctx.translate(p.x + dKangourou.x * r, p.y + dKangourou.y * r);
     ctx.rotate(angleAxe + Math.PI);
-    /* 0,78 rayon : assez gros pour se lire sur téléphone (l'émoji d'Apple
-     * est discret), sans déborder du globe */
-    ctx.font = Math.round(r * 0.78) + 'px system-ui, sans-serif';
+    /* 0,78 rayon : assez gros pour se lire sur téléphone, sans déborder du
+     * globe. La police d'émojis est nommée EXPLICITEMENT et le glyphe porte
+     * le sélecteur de présentation émoji (VS16, U+FE0F) : sans ça, WebKit
+     * (iPhone) rendait le kangourou en glyphe monochrome gris — alors que
+     * les repères de saison, qui portent leur VS16, sortaient en couleur. */
+    ctx.font = Math.round(r * 0.78) + 'px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'alphabetic';
-    ctx.fillText('🦘', 0, 0);
+    ctx.fillText('🦘️', 0, 0);
     ctx.restore();
     return p;
   }
