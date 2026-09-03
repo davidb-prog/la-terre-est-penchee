@@ -1,5 +1,6 @@
 /*
- * La fenêtre de chez nous : le ciel du jour, l'arc du Soleil (haut l'été,
+ * La fenêtre de chez nous : le ciel du jour, l'arc du Soleil (haut et
+ * large l'été,
  * tout bas l'hiver), l'arbre du jardin et tout un petit monde qui change
  * CHAQUE JOUR, à petits pas (jardinDuJour, continu) : fleurs qui éclosent,
  * feuilles qui poussent puis roussissent et tombent, tas de feuilles, neige
@@ -242,10 +243,20 @@ export function creerVueFenetre(canvas) {
       }
 
       /* L'arc du Soleil : il se lève à gauche, culmine au milieu (midi),
-       * se couche à droite. Sa hauteur suit le modèle. */
+       * se couche à droite. Sa hauteur suit le modèle — et ses pieds aussi :
+       * ils tombent PILE sur les bouts du segment jaune de la barre du jour
+       * (la barre entière = 24 h, midi au centre). L'été, l'arc est haut ET
+       * large ; l'hiver, bas ET court — le même geste que la barre. */
       var hauteur = hauteurSoleilMidi(jour); /* ~19,5° à ~66,5° */
-      var gauche = g.w * 0.1;
-      var droite = g.w * 0.9;
+      var barre = {
+        x: g.w * 0.08, l: g.w * 0.84,
+        y: g.h * 0.88, h: Math.max(8, g.h * 0.055)
+      };
+      barre.partJour = dureeJourHeures(jour) / 24;
+      barre.jx = barre.x + barre.l * (0.5 - barre.partJour / 2);
+      barre.jl = barre.l * barre.partJour;
+      var gauche = barre.jx;
+      var droite = barre.jx + barre.jl;
       var sommetY = g.solY - (hauteur / 75) * (g.solY - g.h * 0.1);
       ctx.beginPath();
       /* le sommet d'une courbe quadratique est à mi-chemin du contrôle */
@@ -356,36 +367,92 @@ export function creerVueFenetre(canvas) {
         }
       }
 
-      /* La barre du jour : la part de la journée où il fait clair. */
-      var duree = dureeJourHeures(jour);
-      var bx = g.w * 0.08;
-      var bw = g.w * 0.84;
-      var by = g.h * 0.88;
-      var bh = Math.max(8, g.h * 0.055);
+      /* La barre du jour : une journée entière (24 h), peinte comme une
+       * mini-journée — nuit étoilée aux deux bouts, jour en dégradé
+       * aube → midi → crépuscule, petit soleil au centre. Le segment jaune
+       * est PILE sous l'arc : le jour, c'est le temps où le Soleil est
+       * au-dessus de l'horizon. */
+      var bx = barre.x, bw = barre.l, by = barre.y, bh = barre.h;
+      var jx = barre.jx, jw = barre.jl;
       var arrondi = bh / 2;
+      /* les deux fils en pointillés : des pieds de l'arc aux bouts du jaune */
+      ctx.strokeStyle = 'rgba(255, 159, 28, 0.3)';
+      ctx.lineWidth = Math.max(1, g.w * 0.003);
+      ctx.setLineDash([3, 6]);
+      [jx, jx + jw].forEach(function (fx) {
+        ctx.beginPath();
+        ctx.moveTo(fx, g.solY + g.h * 0.035);
+        ctx.lineTo(fx, by - g.h * 0.012);
+        ctx.stroke();
+      });
+      ctx.setLineDash([]);
+      /* la nuit : un fond bleu nuit profond */
       ctx.beginPath();
       if (ctx.roundRect) ctx.roundRect(bx, by, bw, bh, arrondi);
       else ctx.rect(bx, by, bw, bh);
-      ctx.fillStyle = 'rgba(11, 16, 32, 0.85)';
+      ctx.fillStyle = '#101832';
       ctx.fill();
-      var partJour = duree / 24;
-      var jx = bx + bw * (0.5 - partJour / 2);
-      var jw = bw * partJour;
+      /* chaque bout de nuit se remplit depuis son bord : la lune, le mot
+       * « nuit » (grand écran), puis les étoiles dans la place qui reste */
+      var tailleNuit = Math.round(g.h * 0.035);
+      ctx.font = '600 ' + tailleNuit + 'px system-ui, sans-serif';
+      ctx.textBaseline = 'middle';
+      /* sens = la direction qui va du bord vers le segment jaune */
+      [1, -1].forEach(function (sens) {
+        var bord = sens > 0 ? bx : bx + bw;
+        var versJaune = sens > 0 ? jx : jx + jw;
+        var lx = bord + sens * bh * 0.9;
+        ctx.beginPath();
+        ctx.arc(lx, by + bh / 2, bh * 0.3, 0, TAU);
+        ctx.fillStyle = '#e9edf8';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(lx + bh * 0.14, by + bh / 2 - bh * 0.08, bh * 0.26, 0, TAU);
+        ctx.fillStyle = '#101832';
+        ctx.fill();
+        var curseurX = bord + sens * bh * 1.6;
+        if (!g.compact && Math.abs(versJaune - curseurX) > tailleNuit * 2.6) {
+          ctx.fillStyle = 'rgba(233, 237, 248, 0.75)';
+          ctx.textAlign = sens > 0 ? 'left' : 'right';
+          ctx.fillText('nuit', curseurX, by + bh / 2);
+          curseurX += sens * (ctx.measureText('nuit').width + bh * 0.7);
+        }
+        /* les étoiles, entre le mot et le segment jaune */
+        ctx.fillStyle = 'rgba(233, 237, 248, 0.7)';
+        var place = (versJaune - curseurX) * sens - bh * 0.6;
+        [0.2, 0.55, 0.85].forEach(function (e, i) {
+          if (place < bh * (1 + i)) return;
+          ctx.beginPath();
+          ctx.arc(curseurX + sens * (bh * 0.3 + place * e),
+            by + bh * (0.3 + 0.4 * ((i * 7) % 3) / 2), Math.max(1, bh * 0.07), 0, TAU);
+          ctx.fill();
+        });
+      });
+      /* le jour : aube orangée, midi doré, crépuscule orangé */
+      var degradeJour = ctx.createLinearGradient(jx, 0, jx + jw, 0);
+      degradeJour.addColorStop(0, '#ff9f1c');
+      degradeJour.addColorStop(0.22, '#ffcf5c');
+      degradeJour.addColorStop(0.78, '#ffcf5c');
+      degradeJour.addColorStop(1, '#ff9f1c');
       ctx.beginPath();
       if (ctx.roundRect) ctx.roundRect(jx, by, jw, bh, arrondi);
       else ctx.rect(jx, by, jw, bh);
-      ctx.fillStyle = '#ffcf5c';
+      ctx.fillStyle = degradeJour;
+      ctx.fill();
+      /* le petit soleil de midi, au centre du jaune — sous le sommet de l'arc */
+      ctx.beginPath();
+      ctx.arc(bx + bw / 2, by + bh / 2, bh * 0.32, 0, TAU);
+      ctx.fillStyle = '#fff7d6';
       ctx.fill();
       if (!g.compact) {
         var taille = Math.round(g.h * 0.042);
         ctx.font = '600 ' + taille + 'px system-ui, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillStyle = 'rgba(233, 237, 248, 0.9)';
-        ctx.fillText('🌙', bx + bh * 0.9, by + bh / 2);
-        ctx.fillText('🌙', bx + bw - bh * 0.9, by + bh / 2);
+        /* la durée s'écrit dans le jour, décalée pour laisser le soleil */
         ctx.fillStyle = 'rgba(11, 16, 32, 0.9)';
-        ctx.fillText(Math.round(duree) + ' h de jour', bx + bw / 2, by + bh / 2);
+        ctx.fillText(Math.round(dureeJourHeures(jour)) + ' h de jour', bx + bw / 2, by - taille * 0.7);
+
       }
     }
   };

@@ -154,6 +154,15 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
 - L'étiquette « Terre » s'écrit sous le globe, décalée vers la droite (le
   bas-gauche porte le kangourou, le haut la maison). Mode compact (< 400 px
   de canvas) : étiquettes Soleil/Terre masquées.
+- **La barre du jour raconte une journée entière** (retour utilisateur : la
+  jauge jaune seule était illisible) : la barre = 24 h, midi au centre ;
+  bouts nuit étoilés avec lune dessinée (mot « nuit » si la place le permet,
+  grand écran seulement), segment jour en dégradé aube → midi → crépuscule
+  avec le petit disque de midi ; la durée s'écrit AU-DESSUS de la barre.
+  Les **pieds de l'arc du Soleil tombent PILE sur les bouts du segment
+  jaune** (deux fils en pointillés les relient) : l'été l'arc est haut ET
+  large, l'hiver bas ET court — le jour, c'est le temps où le Soleil est
+  au-dessus de l'horizon.
 - **La fenêtre évolue continûment** (retour utilisateur : la vue semblait
   statique) : `jardinDuJour(jour)` livre quatre paramètres continus
   (feuilles, rousseur, fleurs, neige) — aucun saut de décor d'un jour à

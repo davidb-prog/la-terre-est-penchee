@@ -32,7 +32,10 @@ L'idée centrale, celle que l'enfant doit retenir :
   fleurs qui éclosent une à une, feuilles qui poussent, roussissent et tombent,
   tas de feuilles, neige qui s'installe, bonhomme de neige qui se construit,
   nuages, oiseaux, flocons et pétales qui tombent pendant la lecture — plus la
-  barre du jour (8 h à 16 h de lumière) et la petite phrase du moment.
+  **barre de la journée** — 24 h d'un coup d'œil, nuit étoilée aux bouts,
+  ruban doré du jour calé pile sous l'arc du Soleil (le jour, c'est le temps
+  où le Soleil est levé : 8 h l'hiver, 16 h l'été) — et la petite phrase du
+  moment.
 - **La lecture automatique** : l'année avance toute seule (un tour en ~85 s),
   bouton ⏸/▶ — et tout geste de l'enfant la met en pause.
 - **Les quatre boutons-saisons** « 🎲 Joue avec les saisons » : l'année glisse
