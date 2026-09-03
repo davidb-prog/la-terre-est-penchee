@@ -334,18 +334,26 @@ export function aplombLumiere(jour) {
 export function phraseDuMoment(jour) {
   var mois = moisDuJour(jour).nom;
   var s = saison(jour, 'nord');
+  var p = penchementNord(jour);
   var heures = Math.round(dureeJourHeures(jour));
   var debut = 'En ' + mois + ', chez nous, c’est ' + SAISONS[s].nom + ' ! ' + SAISONS[s].emoji + ' ';
-  if (s === 'hiver') {
-    return debut + 'Le Soleil reste tout bas, et le jour est tout court : environ ' + heures + ' heures.';
+  /* La saison nomme le moment ; la suite décrit ce qui se passe VRAIMENT.
+   * Au cœur de l'été et de l'hiver (|penchement| > 0,75), les superlatifs
+   * sont mérités. Partout ailleurs — bords de saison compris — la phrase
+   * dit le mouvement : le jour qui grandit ou qui raccourcit. Sans ça,
+   * début mars disait « le jour est tout court : 12 heures » (le cliché du
+   * solstice plaqué sur toute la saison, en contradiction avec le dessin). */
+  if (p > 0.75) {
+    return debut + 'Le Soleil monte très haut dans le ciel, et le jour est très long : ' + heures + ' heures !';
   }
-  if (s === 'printemps') {
+  if (p < -0.75) {
+    return debut + 'Le Soleil reste tout bas, et le jour est tout court : ' + heures + ' heures.';
+  }
+  /* dureeJour = 12 + 4·cos(angleAnnee) : le jour grandit quand sin < 0. */
+  if (Math.sin(angleAnnee(jour)) < 0) {
     return debut + 'Le Soleil grimpe plus haut chaque jour, et le jour grandit : déjà ' + heures + ' heures.';
   }
-  if (s === 'ete') {
-    return debut + 'Le Soleil monte très haut dans le ciel, et le jour est très long : environ ' + heures + ' heures.';
-  }
-  return debut + 'Le Soleil redescend, et le jour raccourcit : plus que ' + heures + ' heures.';
+  return debut + 'Le Soleil descend un peu plus chaque jour, et le jour raccourcit : plus que ' + heures + ' heures.';
 }
 
 /* La phrase de la vue de l'espace : où penche notre moitié, en ce moment. */

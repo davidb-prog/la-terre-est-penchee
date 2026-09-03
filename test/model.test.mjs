@@ -218,6 +218,20 @@ test('la phrase du moment raconte le bon mois, la bonne saison et les bonnes heu
   assert.ok(phraseDuMoment(290).indexOf('l’automne') !== -1);
 });
 
+test('aux bords de saison, la phrase dit le mouvement vrai, pas le cliché du solstice', function () {
+  var debutMars = phraseDuMoment(59); /* encore l'hiver, mais 11 h et ça grimpe */
+  assert.ok(debutMars.indexOf('l’hiver') !== -1, debutMars);
+  assert.ok(debutMars.indexOf('tout court') === -1, 'pas de « tout court » début mars : ' + debutMars);
+  assert.ok(debutMars.indexOf('grandit') !== -1, debutMars);
+  var debutSeptembre = phraseDuMoment(243); /* encore l'été, mais 13 h et ça descend */
+  assert.ok(debutSeptembre.indexOf('l’été') !== -1, debutSeptembre);
+  assert.ok(debutSeptembre.indexOf('très long') === -1, 'pas de « très long » début septembre : ' + debutSeptembre);
+  assert.ok(debutSeptembre.indexOf('raccourcit') !== -1, debutSeptembre);
+  for (var j = 0; j < ANNEE_JOURS; j += 3) {
+    assert.ok(phraseDuMoment(j).indexOf('environ') === -1, '« environ » banni au jour ' + j);
+  }
+});
+
 test('la phrase du moment finit par une ponctuation et garde l’apostrophe typographique', function () {
   for (var j = 0; j < ANNEE_JOURS; j += 7) {
     var p = phraseDuMoment(j);
