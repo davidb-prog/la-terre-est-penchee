@@ -116,11 +116,21 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   orbite (dans les deux sens) ; le curseur maître fait la même chose. Les deux
   vues (espace + fenêtre) restent **synchronisées en permanence** sur le même
   `etat.jour`, chacune avec sa petite phrase (le même jour, deux regards).
-- **La lecture automatique** (un tour de l'année en ~85 s,
+- **La lecture automatique** (un tour de l'année en ~110 s — ralentie
+  après tests utilisateurs, personne n'avait le temps de lire à 85 s —,
   `LECTURE_JOURS_PAR_SEC`) se commande UNIQUEMENT par le bouton ⏸/▶ (libellés
   empilés, largeur stable) et la barre d'espace. Reprendre la main (glisser,
   curseur, scénario, ouvrir le jeu) met en pause ; `prefers-reduced-motion` la
   désactive au chargement.
+- **La phrase du moment ne défile pas plus vite qu'on ne lit** : hors du
+  cœur de l'été et de l'hiver (|penchement| > 0,75, seuls moments où le
+  chiffre d'heures s'écrit — avec son unité « heures de lumière »), elle dit
+  seulement le mouvement (« le jour s'allonge / raccourcit ») — les heures
+  vivent dans la barre du jour, pas de compteur qui tourne pendant la
+  lecture. Les ~12 jours avant chaque repère, la **bande de transition**
+  annonce « X se termine : Y arrive ! » — juin ne raconte plus le printemps
+  puis l'été en deux phrases contradictoires (retour test). La frise du
+  curseur porte les initiales des mois (`piste-mois`).
 - **Les scénarios vont au moment choisi en douceur, toujours vers l'avant**
   (le vrai sens de l'année) ; reprendre la main efface l'histoire et désarme
   le bouton. L'histoire s'écrit en deux lignes à puces : 🏡 chez nous /
@@ -150,9 +160,10 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   (le modèle garde `positionLocaleMaison`/`positionLocaleKangourou`/
   `extremitesAnneau`, verrouillés par tests, qui actent l'esprit : l'habitant
   est l'anneau, symétrique, à distance constante du Soleil). Le **kangourou
-  est l'émoji 🦘 d'origine**, tête en bas sur l'anneau sud (décision
-  utilisateur au retour à la vue hybride ; la silhouette dessinée de l'essai
-  3D reste dans l'historique git).
+  est une silhouette dessinée marron clair**, tête en bas sur l'anneau sud —
+  l'émoji sortait en glyphe GRIS sur iPhone (WebKit), même avec le sélecteur
+  VS16 et la police d'émojis explicite : seule la silhouette garantit sa
+  couleur partout (validée par l'utilisateur sur son téléphone).
 - **Le glisser lit l'angle sur l'ellipse** : `jourDepuisPointeur(x, y)`
   (l'argument `jourActuel` que passe `main.js` est ignoré, sans danger) ;
   `attrapeTerre` garde sa zone généreuse pour les petits doigts.

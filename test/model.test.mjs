@@ -222,7 +222,7 @@ test('aux bords de saison, la phrase dit le mouvement vrai, pas le cliché du so
   var debutMars = phraseDuMoment(59); /* encore l'hiver, mais 11 h et ça grimpe */
   assert.ok(debutMars.indexOf('l’hiver') !== -1, debutMars);
   assert.ok(debutMars.indexOf('tout court') === -1, 'pas de « tout court » début mars : ' + debutMars);
-  assert.ok(debutMars.indexOf('grandit') !== -1, debutMars);
+  assert.ok(debutMars.indexOf('s’allonge') !== -1, debutMars);
   var debutSeptembre = phraseDuMoment(243); /* encore l'été, mais 13 h et ça descend */
   assert.ok(debutSeptembre.indexOf('l’été') !== -1, debutSeptembre);
   assert.ok(debutSeptembre.indexOf('très long') === -1, 'pas de « très long » début septembre : ' + debutSeptembre);
@@ -230,6 +230,14 @@ test('aux bords de saison, la phrase dit le mouvement vrai, pas le cliché du so
   for (var j = 0; j < ANNEE_JOURS; j += 3) {
     assert.ok(phraseDuMoment(j).indexOf('environ') === -1, '« environ » banni au jour ' + j);
   }
+});
+
+test('juste avant un repère, la phrase annonce la saison qui arrive (bande de transition)', function () {
+  var finJuin = phraseDuMoment(165); /* 6 jours avant le solstice d'été */
+  assert.ok(finJuin.indexOf('le printemps se termine') !== -1, finJuin);
+  assert.ok(finJuin.indexOf('l’été arrive') !== -1, finJuin);
+  var finDecembre = phraseDuMoment(348); /* ~5 jours avant le solstice d'hiver */
+  assert.ok(finDecembre.indexOf('l’hiver arrive') !== -1, finDecembre);
 });
 
 test('la phrase du moment finit par une ponctuation et garde l’apostrophe typographique', function () {
@@ -351,9 +359,11 @@ test('la lumière ne saute jamais d’un jour à l’autre (force et aplomb cont
 /* La lecture automatique                                              */
 /* ------------------------------------------------------------------ */
 
-test('la lecture automatique fait le tour de l’année en 80 à 90 secondes', function () {
+test('la lecture automatique fait le tour de l’année en 100 à 120 secondes', function () {
+  /* ~85 s à l'origine — ralentie après les tests utilisateurs : à cette
+   * vitesse, personne n'avait le temps de lire les phrases. */
   var secondes = ANNEE_JOURS / LECTURE_JOURS_PAR_SEC;
-  assert.ok(secondes >= 80 && secondes <= 90, secondes + ' s');
+  assert.ok(secondes >= 100 && secondes <= 120, secondes + ' s');
 });
 
 /* ------------------------------------------------------------------ */
@@ -379,8 +389,8 @@ test('chaque scénario raconte la bonne saison, aux deux regards', function () {
   SCENARIOS.forEach(function (s) { scnParId[s.id] = s; });
   assert.equal(saison(scnParId.ete.jour, 'nord'), 'ete');
   assert.equal(saison(scnParId.hiver.jour, 'nord'), 'hiver');
-  assert.ok(scnParId.ete.fenetre.indexOf('seize heures') !== -1, 'l’été dit ses seize heures');
-  assert.ok(scnParId.hiver.fenetre.indexOf('huit heures') !== -1, 'l’hiver dit ses huit heures');
+  assert.ok(scnParId.ete.fenetre.indexOf('Il fait chaud') !== -1, 'l’été dit la chaleur (les heures vivent dans la barre du jour)');
+  assert.ok(scnParId.hiver.fenetre.indexOf('la nuit tombe avant le dîner') !== -1, 'l’hiver dit sa nuit précoce');
   assert.ok(scnParId.hiver.espace.indexOf('Australie') !== -1, 'Noël en Australie vit dans le scénario d’hiver');
   var teintes = {};
   SCENARIOS.forEach(function (s) {

@@ -233,24 +233,24 @@ export function jardinDuJour(jour) {
    * la teinte s'efface en douceur à la fin de l'hiver (l'arbre est nu, mais
    * aucun paramètre ne saute jamais — le décor bouge à petits pas). */
   var rousseur;
-  t = rampe(j, 250, 300);
+  t = rampe(j, 245, 280);
   if (t !== null) rousseur = t;
   else {
     t = rampe(j, 20, 60);
     if (t !== null) rousseur = 1 - t;
-    else rousseur = (j >= 300 || j < 20) ? 1 : 0;
+    else rousseur = (j >= 280 || j < 20) ? 1 : 0;
   }
 
   /* Les fleurs : les premières s'ouvrent dès l'équinoxe de printemps (le
    * scénario en montre une ou deux), tout est fleuri en mai, et elles
    * s'effacent au début de l'été. */
   var fleurs;
-  t = rampe(j, 70, 115);
+  t = rampe(j, 70, 95);
   if (t !== null) fleurs = t;
   else {
     t = rampe(j, 140, JOUR_SOLSTICE_ETE);
     if (t !== null) fleurs = 1 - t;
-    else fleurs = (j >= 115 && j < 140) ? 1 : 0;
+    else fleurs = (j >= 95 && j < 140) ? 1 : 0;
   }
 
   /* La neige : elle s'installe en décembre, fond en février-mars. */
@@ -332,28 +332,44 @@ export function aplombLumiere(jour) {
 /* ------------------------------------------------------------------ */
 
 export function phraseDuMoment(jour) {
+  var j = jourNormalise(jour);
   var mois = moisDuJour(jour).nom;
   var s = saison(jour, 'nord');
   var p = penchementNord(jour);
   var heures = Math.round(dureeJourHeures(jour));
+  /* Le jour s'allonge quand sin(angleAnnee) < 0 (durée = 12 + 4·cos). */
+  var mouvement = Math.sin(angleAnnee(jour)) < 0
+    ? 'Chaque jour, le Soleil grimpe un peu plus haut, et le jour s’allonge.'
+    : 'Chaque jour, le Soleil descend un peu, et le jour raccourcit.';
+  /* La bande de transition (les ~12 jours avant un repère) : la phrase
+   * annonce la saison qui arrive — sans elle, juin racontait le printemps
+   * puis l'été en deux phrases contradictoires (retour test). */
+  var reperes = [
+    { jour: JOUR_EQUINOXE_PRINTEMPS, saison: 'printemps' },
+    { jour: JOUR_SOLSTICE_ETE, saison: 'ete' },
+    { jour: JOUR_EQUINOXE_AUTOMNE, saison: 'automne' },
+    { jour: JOUR_SOLSTICE_HIVER, saison: 'hiver' }
+  ];
+  for (var i = 0; i < reperes.length; i++) {
+    var dans = jourNormalise(reperes[i].jour - j);
+    if (dans > 0 && dans <= 12) {
+      var suivante = SAISONS[reperes[i].saison];
+      return 'En ' + mois + ', chez nous, ' + SAISONS[s].nom + ' se termine : ' +
+        suivante.nom + ' arrive ! ' + suivante.emoji + ' ' + mouvement;
+    }
+  }
   var debut = 'En ' + mois + ', chez nous, c’est ' + SAISONS[s].nom + ' ! ' + SAISONS[s].emoji + ' ';
-  /* La saison nomme le moment ; la suite décrit ce qui se passe VRAIMENT.
-   * Au cœur de l'été et de l'hiver (|penchement| > 0,75), les superlatifs
-   * sont mérités. Partout ailleurs — bords de saison compris — la phrase
-   * dit le mouvement : le jour qui grandit ou qui raccourcit. Sans ça,
-   * début mars disait « le jour est tout court : 12 heures » (le cliché du
-   * solstice plaqué sur toute la saison, en contradiction avec le dessin). */
+  /* Au cœur de l'été et de l'hiver, les superlatifs sont mérités — et le
+   * chiffre dit son unité (retour test : « déjà 15 h » ne se comprenait
+   * pas). Partout ailleurs, pas de compteur qui défile pendant la
+   * lecture : la barre du jour montre déjà les heures. */
   if (p > 0.75) {
-    return debut + 'Le Soleil monte très haut dans le ciel, et le jour est très long : ' + heures + ' heures !';
+    return debut + 'Le Soleil monte très haut dans le ciel, et il fait jour très longtemps : ' + heures + ' heures de lumière !';
   }
   if (p < -0.75) {
-    return debut + 'Le Soleil reste tout bas, et le jour est très court : ' + heures + ' heures.';
+    return debut + 'Le Soleil reste tout bas, et la nuit tombe très tôt : ' + heures + ' heures de lumière seulement.';
   }
-  /* dureeJour = 12 + 4·cos(angleAnnee) : le jour grandit quand sin < 0. */
-  if (Math.sin(angleAnnee(jour)) < 0) {
-    return debut + 'Le Soleil grimpe plus haut chaque jour, et le jour grandit : déjà ' + heures + ' heures.';
-  }
-  return debut + 'Le Soleil descend un peu plus chaque jour, et le jour raccourcit : plus que ' + heures + ' heures.';
+  return debut + mouvement;
 }
 
 /* La phrase de la vue de l'espace : où penche notre moitié, en ce moment. */
@@ -370,8 +386,9 @@ export function phraseEspace(jour) {
 /* La lecture automatique                                              */
 /* ------------------------------------------------------------------ */
 
-/* Le phénomène avance tout seul : un tour de l'année en ~85 secondes. */
-export var LECTURE_JOURS_PAR_SEC = ANNEE_JOURS / 85;
+/* Le phénomène avance tout seul : un tour de l'année en ~110 secondes
+ * (retour test : à 85 s, pas le temps de lire les phrases). */
+export var LECTURE_JOURS_PAR_SEC = ANNEE_JOURS / 110;
 
 /* ------------------------------------------------------------------ */
 /* Les boutons-scénarios : « 🎲 Joue avec les saisons »                */
@@ -391,7 +408,7 @@ export var SCENARIOS = [
     label: 'Le printemps revient',
     sub: 'l’équinoxe de printemps',
     intro: 'Au mois de mars, le printemps revient…',
-    fenetre: 'Sur l’arbre du jardin, les premières fleurs s’ouvrent ! Le jour et la nuit durent pareil : douze heures chacun. Et chaque jour qui passe, le Soleil grimpe un peu plus haut.',
+    fenetre: 'Sur l’arbre du jardin, les premières fleurs s’ouvrent ! Le jour dure maintenant aussi longtemps que la nuit. Et chaque jour qui passe, le Soleil grimpe un peu plus haut.',
     espace: 'Les deux moitiés de la Terre sont à égalité : ni chez nous, ni l’Australie ne penche vers le Soleil. Mais la Terre avance… Et bientôt, c’est notre moitié qui penchera vers lui !'
   },
   {
@@ -402,7 +419,7 @@ export var SCENARIOS = [
     label: 'L’été est là',
     sub: 'le solstice d’été',
     intro: 'Fin juin, l’été commence…',
-    fenetre: 'Le Soleil monte très haut dans le ciel, et le soir, il fait encore jour très tard : seize heures de lumière ! L’arbre est vert, on mange dehors.',
+    fenetre: 'Le Soleil monte très haut dans le ciel et, le soir, il fait encore jour très tard. Il fait chaud : on joue dehors jusqu’au soir !',
     espace: 'Regarde la Terre : notre moitié penche à fond vers le Soleil. C’est le jour le plus long de toute l’année — et en Australie, c’est le jour le plus court.'
   },
   {
@@ -413,8 +430,8 @@ export var SCENARIOS = [
     label: 'L’automne arrive',
     sub: 'l’équinoxe d’automne',
     intro: 'Fin septembre, l’automne arrive…',
-    fenetre: 'Les feuilles de l’arbre deviennent rousses et s’envolent. Le jour et la nuit durent pareil : douze heures chacun. Mais maintenant, le Soleil descend un peu plus chaque jour.',
-    espace: 'Les deux moitiés de la Terre sont de nouveau à égalité : ni chez nous, ni l’Australie ne penche vers le Soleil. Elle continue son voyage… Et cette fois, c’est l’Australie qui va pencher vers lui.'
+    fenetre: 'Les feuilles de l’arbre deviennent rousses. Le jour dure aussi longtemps que la nuit… Mais maintenant, le Soleil descend un peu plus chaque jour.',
+    espace: 'Les deux moitiés de la Terre sont de nouveau à égalité : ni chez nous, ni l’Australie ne penche vers le Soleil. La Terre continue son voyage… Et cette fois, c’est l’Australie qui va pencher vers le Soleil !'
   },
   {
     id: 'hiver',
@@ -424,8 +441,8 @@ export var SCENARIOS = [
     label: 'L’hiver est là',
     sub: 'le solstice d’hiver',
     intro: 'Fin décembre, l’hiver commence…',
-    fenetre: 'Le Soleil reste tout bas, la nuit tombe avant le dîner : huit heures de jour, pas plus. L’arbre est tout nu, et parfois, il neige sur le jardin.',
-    espace: 'Notre moitié penche à fond à l’opposé du Soleil… Mais regarde le kangourou : l’Australie penche vers lui ! Là-bas, les enfants fêtent Noël en plein été, sur la plage.'
+    fenetre: 'Le Soleil reste tout bas, et la nuit tombe avant le dîner. L’arbre est tout nu, et parfois, il neige sur le jardin.',
+    espace: 'Notre moitié penche à fond à l’opposé du Soleil… Mais regarde le kangourou : c’est l’Australie qui penche vers le Soleil ! Là-bas, les enfants fêtent Noël en plein été, sur la plage.'
   }
 ];
 

@@ -36,7 +36,7 @@ L'idée centrale, celle que l'enfant doit retenir :
   ruban doré du jour calé pile sous l'arc du Soleil (le jour, c'est le temps
   où le Soleil est levé : 8 h l'hiver, 16 h l'été) — et la petite phrase du
   moment.
-- **La lecture automatique** : l'année avance toute seule (un tour en ~85 s),
+- **La lecture automatique** : l'année avance toute seule (un tour en ~110 s),
   bouton ⏸/▶ — et tout geste de l'enfant la met en pause.
 - **Les quatre boutons-saisons** « 🎲 Joue avec les saisons » : l'année glisse
   en douceur jusqu'au moment choisi, puis la micro-histoire raconte le même

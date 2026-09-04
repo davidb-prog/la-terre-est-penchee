@@ -94,6 +94,61 @@ function dessinerTache(ctx, tx, ty, gx, gy, rG, aplomb, force) {
   ctx.restore();
 }
 
+/* Le kangourou dessiné : une vraie silhouette marron clair (corps, tête,
+ * oreilles, queue, œil). L'émoji sortait en glyphe GRIS sur iPhone (WebKit,
+ * malgré le sélecteur VS16 et la police d'émojis explicite) — la silhouette
+ * garantit sa couleur partout. Coordonnées locales : les pieds en (0,0), le
+ * corps vers le haut, tête à gauche — la rotation le met tête en bas aux
+ * antipodes. */
+function dessinerKangourou(ctx, x, y, rotation, s) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rotation);
+  ctx.scale(s, s);
+  ctx.strokeStyle = '#e0975f';
+  ctx.lineWidth = 0.16;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(0.15, -0.32);
+  ctx.quadraticCurveTo(0.62, -0.35, 0.78, -0.06);
+  ctx.stroke();
+  ctx.fillStyle = '#e0975f';
+  ctx.beginPath();
+  ctx.ellipse(0, -0.5, 0.3, 0.42, -0.25, 0, TAU);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(0.05, -0.22, 0.24, 0.15, 0.35, 0, TAU);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(-0.08, -0.045, 0.22, 0.07, 0, 0, TAU);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(-0.3, -0.98, 0.17, 0.14, 0.3, 0, TAU);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(-0.46, -1.02, 0.1, 0.07, 0.25, 0, TAU);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(-0.2, -1.2, 0.055, 0.16, 0.35, 0, TAU);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(-0.32, -1.18, 0.055, 0.16, 0.1, 0, TAU);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(-0.22, -0.62, 0.06, 0.13, 0.5, 0, TAU);
+  ctx.fill();
+  ctx.fillStyle = '#0b1020';
+  ctx.beginPath();
+  ctx.arc(-0.34, -1.02, 0.035, 0, TAU);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(7, 11, 23, 0.55)';
+  ctx.lineWidth = 0.05;
+  ctx.beginPath();
+  ctx.ellipse(0, -0.5, 0.3, 0.42, -0.25, 0, TAU);
+  ctx.stroke();
+  ctx.restore();
+}
+
 export function creerVueOrbite(canvas) {
   var ctx = canvas.getContext('2d');
 
@@ -279,19 +334,7 @@ export function creerVueOrbite(canvas) {
     var dMaison = { x: m.x - AXE_DIR.x * versEquateur, y: -(m.y - AXE_DIR.y * versEquateur) };
     var dKangourou = { x: k.x + AXE_DIR.x * versEquateur, y: -(k.y + AXE_DIR.y * versEquateur) };
     dessinerMaison(ctx, p.x + dMaison.x * r, p.y + dMaison.y * r, angleAxe, r * 0.42);
-    ctx.save();
-    ctx.translate(p.x + dKangourou.x * r, p.y + dKangourou.y * r);
-    ctx.rotate(angleAxe + Math.PI);
-    /* 0,78 rayon : assez gros pour se lire sur téléphone, sans déborder du
-     * globe. La police d'émojis est nommée EXPLICITEMENT et le glyphe porte
-     * le sélecteur de présentation émoji (VS16, U+FE0F) : sans ça, WebKit
-     * (iPhone) rendait le kangourou en glyphe monochrome gris — alors que
-     * les repères de saison, qui portent leur VS16, sortaient en couleur. */
-    ctx.font = Math.round(r * 0.78) + 'px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", system-ui, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'alphabetic';
-    ctx.fillText('🦘️', 0, 0);
-    ctx.restore();
+    dessinerKangourou(ctx, p.x + dKangourou.x * r, p.y + dKangourou.y * r, angleAxe + Math.PI, r * 0.5);
     return p;
   }
 
