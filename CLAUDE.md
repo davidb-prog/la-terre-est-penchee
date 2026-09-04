@@ -128,8 +128,13 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
 - **Le jeu ne se gagne qu'en fabriquant soi-même** (jamais pendant un
   glissement animé) : fenêtre de victoire = la saison demandée, tempo de
   maintien `DEFI_ATTENTE_MS`, hystérésis de sortie `DEFI_SORTIE_MARGE_JOURS`
-  (le bravo ne clignote pas au bord et ne ment jamais). Recalage doux vers le
-  cœur de la saison à la première victoire seulement. Le défi du kangourou
+  (le bravo ne clignote pas au bord et ne ment jamais). Recalage doux, à la
+  première victoire seulement, vers le `jourBravo` du défi — toujours un
+  des quatre repères de l'année (solstices/équinoxes, comme les boutons) ;
+  les consignes des défis d'équinoxe promettent des débuts (« le printemps
+  revient », « l'automne arrive »), jamais plus que ce que le jardin y
+  montre. Le tirage est un panier SANS remise, anti-répétition compris
+  après remélange et réouverture du jeu (`dernierDefiId`). Le défi du kangourou
   (l'été australien) est la révélation du site.
 - **Les repères de saison (❄️🌸☀️🍂) autour de l'orbite s'effacent** quand la
   Terre est dessus (elle y est déjà — pas de doublon visuel).

@@ -739,10 +739,10 @@ function gagnerDefi(maintenant) {
   boutonEncore.hidden = false;
   if (premiere) {
     raconterDefi('bravo', defi.bravo);
-    /* Le recalage doux : l'année glisse jusqu'au jour d'ancrage du défi
-     * (solstice pour été/neige/Australie — les repères des boutons —,
-     * sommet du jardin pour fleurs/feuilles), par le chemin court. Rien
-     * n'est verrouillé : un glisser annule le glissement aussitôt. */
+    /* Le recalage doux : l'année glisse jusqu'au jour d'ancrage du défi —
+     * toujours un des quatre repères (solstices et équinoxes, comme les
+     * boutons-saisons), par le chemin court. Rien n'est verrouillé : un
+     * glisser annule le glissement aussitôt. */
     var cible = defi.jourBravo;
     var delta = jourNormalise(cible - etat.jour + ANNEE_JOURS / 2) - ANNEE_JOURS / 2;
     if (mouvementReduit || Math.abs(delta) < 0.25) {

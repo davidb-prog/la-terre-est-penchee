@@ -457,8 +457,13 @@ test('le bravo emmène chaque défi à son jour d’ancrage — et il y gagne en
   presque(parId.ete.jourBravo, JOUR_SOLSTICE_ETE);
   presque(parId.neige.jourBravo, JOUR_SOLSTICE_HIVER);
   presque(parId.australie.jourBravo, JOUR_SOLSTICE_HIVER);
-  assert.ok(jardinDuJour(parId.fleurs.jourBravo).fleurs === 1, 'arbre tout fleuri au bravo des fleurs');
-  assert.ok(jardinDuJour(parId.feuilles.jourBravo).rousseur === 1, 'rousseur pleine au bravo des feuilles');
+  presque(parId.fleurs.jourBravo, JOUR_EQUINOXE_PRINTEMPS);
+  presque(parId.feuilles.jourBravo, JOUR_EQUINOXE_AUTOMNE);
+  /* les consignes d'équinoxe promettent des débuts — le jardin les tient */
+  var fleursBravo = jardinDuJour(parId.fleurs.jourBravo).fleurs;
+  assert.ok(fleursBravo > 0.05 && fleursBravo < 0.5, 'les premières fleurs (pas toutes) au bravo du printemps');
+  var rousseurBravo = jardinDuJour(parId.feuilles.jourBravo).rousseur;
+  assert.ok(rousseurBravo > 0.1 && rousseurBravo < 0.6, 'la rousseur commence (sans plus) au bravo de l’automne');
 });
 
 /* ------------------------------------------------------------------ */

@@ -445,20 +445,20 @@ export var DEFI_ATTENTE_MS = 350;
 export var DEFI_SORTIE_MARGE_JOURS = 6;
 
 /* `jourBravo` : le jour où le recalage doux emmène la Terre après la
- * victoire. Les défis de lumière (été, neige, Australie) s'ancrent sur les
- * SOLSTICES — les mêmes repères que les boutons-saisons (décision
- * utilisateur : le milieu de saison était trompeur). Les défis de jardin
- * (fleurs, feuilles) s'ancrent là où le jardin fait VRAIMENT ce que la
- * consigne demande — à l'équinoxe, l'arbre n'aurait qu'une fleur. */
+ * victoire — TOUJOURS un des quatre repères de l'année (solstices et
+ * équinoxes), les mêmes que les boutons-saisons (décision utilisateur :
+ * tout autre jour brouillait la boussole). Les consignes des deux défis
+ * d'équinoxe promettent des DÉBUTS (« le printemps revient », « l'automne
+ * arrive ») — jamais plus que ce que le jardin y montre. */
 export var DEFIS = [
   {
     id: 'fleurs',
     emoji: '🌸',
     cible: 'printemps',
-    jourBravo: 125, /* l'arbre tout fleuri */
+    jourBravo: JOUR_EQUINOXE_PRINTEMPS,
     hemisphere: 'nord',
-    consigne: 'Fais fleurir l’arbre du jardin !',
-    bravo: 'Bravo ! Tu as fabriqué le printemps : l’arbre est tout fleuri !'
+    consigne: 'Fais revenir le printemps chez nous !',
+    bravo: 'Bravo ! Le printemps revient : l’arbre ouvre ses premières fleurs !'
   },
   {
     id: 'ete',
@@ -473,10 +473,10 @@ export var DEFIS = [
     id: 'feuilles',
     emoji: '🍂',
     cible: 'automne',
-    jourBravo: 308, /* rousseur pleine, les feuilles tombent */
+    jourBravo: JOUR_EQUINOXE_AUTOMNE,
     hemisphere: 'nord',
-    consigne: 'Fais tomber les feuilles de l’arbre !',
-    bravo: 'Bravo ! C’est l’automne : les feuilles roussissent et s’envolent !'
+    consigne: 'Fais venir l’automne dans le jardin !',
+    bravo: 'Bravo ! L’automne arrive : les feuilles commencent à roussir, et le jour raccourcit.'
   },
   {
     id: 'neige',
