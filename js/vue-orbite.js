@@ -347,8 +347,8 @@ export function creerVueOrbite(canvas) {
       p.x - nX * r * 0.18, p.y - nY * r * 0.18,
       p.x + nX * r * 0.72, p.y + nY * r * 0.72);
     ombre.addColorStop(0, 'rgba(7, 11, 23, 0)');
-    ombre.addColorStop(0.4, 'rgba(7, 11, 23, 0.34)');
-    ombre.addColorStop(1, 'rgba(7, 11, 23, 0.48)');
+    ombre.addColorStop(0.4, 'rgba(7, 11, 23, 0.48)');
+    ombre.addColorStop(1, 'rgba(7, 11, 23, 0.64)');
     ctx.save();
     ctx.beginPath();
     ctx.arc(p.x, p.y, r, 0, TAU);

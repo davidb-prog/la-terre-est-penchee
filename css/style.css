@@ -194,12 +194,21 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; }
 
 .commande-annee { margin-top: 12px; padding: 0 4px 2px; }
 
+/* chaque repère est calé sur SON jour de l'année (jour / 365 en %) —
+   avant, space-between les répartissait en 0/25/50/75/100 %, à côté des
+   vraies dates des solstices et équinoxes */
 .piste-emojis {
-  display: flex;
-  justify-content: space-between;
+  position: relative;
+  height: 1.5em;
   font-size: 1.25rem;
   padding: 0 2px;
 }
+.piste-emojis span { position: absolute; top: 0; transform: translateX(-50%); }
+.repere-janvier { left: 0; transform: none; }        /* le 1er janvier, plein hiver */
+.repere-printemps { left: 21.85%; }                  /* équinoxe, jour ~80  */
+.repere-ete { left: 46.85%; }                        /* solstice, jour 171  */
+.repere-automne { left: 72%; }                       /* équinoxe, jour ~263 */
+.repere-hiver { left: 96.85%; }                      /* solstice, jour ~354 */
 
 #curseur-jours {
   -webkit-appearance: none;
