@@ -163,11 +163,17 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; }
   min-height: 2.9em;
 }
 #phrase-moment { min-height: 4.35em; }
-/* le titre (mois + saison) en doré, le commentaire en clair : deux lignes
-   qui se distinguent d'un coup d'œil (retour test : tout en un bloc doré,
-   ça se lisait mal) */
-#phrase-moment .phrase-titre { display: block; font-weight: 800; color: var(--sun); }
+/* le titre (mois + saison) en blanc gras, le commentaire en clair : deux
+   lignes qui se distinguent d'un coup d'œil (retour test : tout en un bloc
+   doré, ça se lisait mal) */
+#phrase-moment .phrase-titre { display: block; font-weight: 800; color: var(--text); }
 #phrase-moment .phrase-texte { display: block; font-weight: 400; color: var(--text); margin-top: 2px; }
+/* le mot de la saison prend la teinte de SON bouton : la phrase et les
+   boutons parlent la même couleur */
+.phrase-saison-rose { color: #ffb3cd; }
+.phrase-saison-or { color: var(--sun); }
+.phrase-saison-violet { color: #cabcff; }
+.phrase-saison-bleu { color: #bcd9ff; }
 
 /* la bulle « attrape-moi », SOUS la vue de l'espace (transitoire) : rien ne
    recouvre jamais les canvas — elle s'efface ET se replie ensemble */

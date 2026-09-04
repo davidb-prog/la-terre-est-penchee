@@ -111,10 +111,10 @@ export function penchementVersSoleil(jour, hemisphere) {
 export var ORDRE_SAISONS = ['hiver', 'printemps', 'ete', 'automne'];
 
 export var SAISONS = {
-  hiver: { nom: 'l’hiver', emoji: '❄️' },
-  printemps: { nom: 'le printemps', emoji: '🌸' },
-  ete: { nom: 'l’été', emoji: '☀️' },
-  automne: { nom: 'l’automne', emoji: '🍂' }
+  hiver: { nom: 'l’hiver', emoji: '❄️', teinte: 'bleu' },
+  printemps: { nom: 'le printemps', emoji: '🌸', teinte: 'rose' },
+  ete: { nom: 'l’été', emoji: '☀️', teinte: 'or' },
+  automne: { nom: 'l’automne', emoji: '🍂', teinte: 'violet' }
 };
 
 var SAISON_OPPOSEE = {
@@ -324,6 +324,26 @@ export function extremitesAnneau(hemisphere) {
 /* Le faisceau de lumière de la vue de l'espace                        */
 /* ------------------------------------------------------------------ */
 
+/* La direction de la NUIT sur le globe (coords math, vecteur unitaire) :
+ * la moitié qui ne regarde pas le Soleil. Géométrique aux solstices (pile
+ * à l'opposé du Soleil — le pôle d'hiver plonge dans la nuit), elle pivote
+ * pour devenir PERPENDICULAIRE à l'axe aux équinoxes : le terminateur
+ * passe alors par les deux pôles et chaque moitié est mi-jour mi-nuit —
+ * l'image des manuels, l'égalité qui se voit (décision utilisateur,
+ * revirement assumé de « pas de jour/nuit » : l'ombre tourne avec
+ * l'ANNÉE, pas avec les jours). Construction vectorielle, sans
+ * interpolation d'angles : continue partout, même le jour où la Terre
+ * s'aligne avec l'axe (la norme reste >= 0,5, vérifié par test). */
+export function directionNuit(jour) {
+  var n0 = positionTerre(jour); /* unitaire : à l'opposé du Soleil */
+  var w = 1 - Math.abs(penchementNord(jour));
+  var d = AXE_DIR.x * n0.x + AXE_DIR.y * n0.y;
+  var x = n0.x - AXE_DIR.x * d * w;
+  var y = n0.y - AXE_DIR.y * d * w;
+  var norme = Math.hypot(x, y) || 1;
+  return { x: x / norme, y: y / norme };
+}
+
 /* La force du faisceau (0,55..1) : pleine aux solstices, creux DOUX aux
  * équinoxes — mais jamais éteinte. Depuis le faisceau LARGE (qui ne vise
  * personne, il peut rester allumé sans tricher), ce sont les taches
@@ -377,28 +397,37 @@ export function phraseDuMomentParties(jour) {
     if (dans > 0 && dans <= 12) {
       var suivante = SAISONS[reperes[i].saison];
       return {
-        titre: 'En ' + mois + ', chez nous, ' + SAISONS[s].nom + ' se termine : ' + suivante.nom + ' arrive ! ' + suivante.emoji,
+        titreAvant: 'En ' + mois + ', chez nous, ' + SAISONS[s].nom + ' se termine : ',
+        saisonNom: suivante.nom,
+        titreApres: ' arrive ! ' + suivante.emoji,
+        teinte: suivante.teinte,
         texte: mouvement
       };
     }
   }
-  var titre = 'En ' + mois + ', chez nous, c’est ' + SAISONS[s].nom + ' ! ' + SAISONS[s].emoji;
+  var parties = {
+    titreAvant: 'En ' + mois + ', chez nous, c’est ',
+    saisonNom: SAISONS[s].nom,
+    titreApres: ' ! ' + SAISONS[s].emoji,
+    teinte: SAISONS[s].teinte
+  };
   /* Au cœur de l'été et de l'hiver, les superlatifs sont mérités — et le
    * chiffre dit son unité (retour test : « déjà 15 h » ne se comprenait
    * pas). Partout ailleurs, pas de compteur qui défile pendant la
    * lecture : la barre du jour montre déjà les heures. */
   if (p > 0.75) {
-    return { titre: titre, texte: 'Le Soleil monte très haut dans le ciel, et il fait jour très longtemps : ' + heures + ' heures de lumière !' };
+    parties.texte = 'Le Soleil monte très haut dans le ciel, et il fait jour très longtemps : ' + heures + ' heures de lumière !';
+  } else if (p < -0.75) {
+    parties.texte = 'Le Soleil reste tout bas, et la nuit tombe très tôt : ' + heures + ' heures de lumière seulement.';
+  } else {
+    parties.texte = mouvement;
   }
-  if (p < -0.75) {
-    return { titre: titre, texte: 'Le Soleil reste tout bas, et la nuit tombe très tôt : ' + heures + ' heures de lumière seulement.' };
-  }
-  return { titre: titre, texte: mouvement };
+  return parties;
 }
 
 export function phraseDuMoment(jour) {
-  var parties = phraseDuMomentParties(jour);
-  return parties.titre + ' ' + parties.texte;
+  var p = phraseDuMomentParties(jour);
+  return p.titreAvant + p.saisonNom + p.titreApres + ' ' + p.texte;
 }
 
 /* La phrase de la vue de l'espace : où penche notre moitié, en ce moment. */

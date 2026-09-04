@@ -20,7 +20,7 @@ import {
   LECTURE_JOURS_PAR_SEC, SCENARIOS, VOIX_TRANSITIONS,
   DEFIS, DEFI_ATTENTE_MS, DEFI_SORTIE_MARGE_JOURS,
   defiReussi, defiEncoreProche, coeurDeSaison,
-  forceFaisceau, aplombLumiere,
+  forceFaisceau, aplombLumiere, directionNuit, AXE_DIR,
   EMOJI_RE, texteOral
 } from '../js/model.js';
 
@@ -337,6 +337,27 @@ test('le faisceau est plein aux solstices, en creux doux mais JAMAIS éteint aux
   presque(forceFaisceau(JOUR_EQUINOXE_AUTOMNE), 0.55, 1e-6);
   for (var j = 0; j < ANNEE_JOURS; j += 1) {
     assert.ok(forceFaisceau(j) >= 0.55, 'la lumière ne s’éteint jamais (jour ' + j + ')');
+  }
+});
+
+test('la nuit est à l’opposé du Soleil aux solstices, et passe par les deux pôles aux équinoxes', function () {
+  [JOUR_SOLSTICE_ETE, JOUR_SOLSTICE_HIVER].forEach(function (j) {
+    var n = directionNuit(j);
+    var pos = positionTerre(j);
+    presque(n.x, pos.x, 1e-6);
+    presque(n.y, pos.y, 1e-6);
+  });
+  [JOUR_EQUINOXE_PRINTEMPS, JOUR_EQUINOXE_AUTOMNE].forEach(function (j) {
+    var n = directionNuit(j);
+    presque(n.x * AXE_DIR.x + n.y * AXE_DIR.y, 0, 1e-6); /* terminateur ∥ axe */
+  });
+  var precedente = directionNuit(0);
+  for (var j = 1; j <= ANNEE_JOURS; j += 1) {
+    var d = directionNuit(j);
+    presque(Math.hypot(d.x, d.y), 1, 1e-9);
+    var ecart = Math.hypot(d.x - precedente.x, d.y - precedente.y);
+    assert.ok(ecart <= 0.06, 'la nuit saute au jour ' + j + ' (' + ecart.toFixed(3) + ')');
+    precedente = d;
   }
 });
 

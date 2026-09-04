@@ -7,7 +7,7 @@ import {
   TAU, ANNEE_JOURS, JOUR_SOLSTICE_ETE, AXE_DIR,
   positionTerre, axeDirection, angleAnnee, jourNormalise, penchementNord,
   positionLocaleMaison, positionLocaleKangourou, extremitesAnneau,
-  forceFaisceau, aplombLumiere
+  forceFaisceau, aplombLumiere, directionNuit
 } from './model.js';
 
 var CIEL = '#070b17';
@@ -335,6 +335,27 @@ export function creerVueOrbite(canvas) {
     var dKangourou = { x: k.x + AXE_DIR.x * versEquateur, y: -(k.y + AXE_DIR.y * versEquateur) };
     dessinerMaison(ctx, p.x + dMaison.x * r, p.y + dMaison.y * r, angleAxe, r * 0.42);
     dessinerKangourou(ctx, p.x + dKangourou.x * r, p.y + dKangourou.y * r, angleAxe + Math.PI, r * 0.5);
+
+    /* Le voile de nuit : la moitié qui ne regarde pas le Soleil, en
+     * translucide (maison et kangourou restent visibles dessous). La loi
+     * vit dans le modèle (directionNuit) : ombre géométrique aux
+     * solstices, terminateur par les deux pôles aux équinoxes — chaque
+     * moitié mi-jour mi-nuit, l'égalité qui se voit. */
+    var nuit = directionNuit(jour);
+    var nX = nuit.x, nY = -nuit.y; /* bascule math → canvas */
+    var ombre = ctx.createLinearGradient(
+      p.x - nX * r * 0.18, p.y - nY * r * 0.18,
+      p.x + nX * r * 0.72, p.y + nY * r * 0.72);
+    ombre.addColorStop(0, 'rgba(7, 11, 23, 0)');
+    ombre.addColorStop(0.4, 'rgba(7, 11, 23, 0.34)');
+    ombre.addColorStop(1, 'rgba(7, 11, 23, 0.48)');
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, r, 0, TAU);
+    ctx.clip();
+    ctx.fillStyle = ombre;
+    ctx.fillRect(p.x - r, p.y - r, r * 2, r * 2);
+    ctx.restore();
     return p;
   }
 

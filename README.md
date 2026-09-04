@@ -130,9 +130,11 @@ manifeste est vide (c'est le cas), tout passe à la synthèse. Marche à suivre 
   `forceFaisceau`/`aplombLumiere`, testées) : aux équinoxes, la perspective du
   dessin ne sait pas montrer l'angle des rayons sans tricher — le faisceau
   s'éteint en douceur plutôt que de raconter faux.
-- **La rotation quotidienne est ignorée** dans la vue de l'espace : ni rotation,
-  ni côté nuit dessinés — le jour et la nuit ont leur propre épisode
-  (ci-dessous).
+- **La rotation quotidienne est ignorée** dans la vue de l'espace : le voile
+  de nuit dessiné sur le globe est celui de l'ANNÉE (la moitié qui ne regarde
+  pas le Soleil — aux équinoxes il passe par les deux pôles, chaque moitié
+  mi-jour mi-nuit), il tourne avec les saisons, pas avec les jours. Le jour
+  et la nuit quotidiens ont leur propre épisode (ci-dessous).
 
 ## Structure
 

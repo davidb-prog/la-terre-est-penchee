@@ -134,9 +134,10 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   annonce « X se termine : Y arrive ! » — juin ne raconte plus le printemps
   puis l'été en deux phrases contradictoires (retour test). La frise du
   curseur porte les initiales des mois (`piste-mois`). La phrase s'affiche
-  en DEUX parties (`phraseDuMomentParties`) : le titre — mois + saison —
-  en doré, le commentaire en clair dessous (retour test : tout en un bloc
-  doré, ça se lisait mal).
+  en DEUX parties (`phraseDuMomentParties`) : le titre en blanc gras avec
+  **le mot de la saison dans la teinte de SON bouton** (rose/or/violet/
+  bleu — `SAISONS[*].teinte`), le commentaire en clair dessous (retour
+  test : tout en un bloc doré, ça se lisait mal).
 - **Les scénarios vont au moment choisi en douceur, toujours vers l'avant**
   (le vrai sens de l'année) ; reprendre la main efface l'histoire et désarme
   le bouton. L'histoire s'écrit en deux lignes à puces : 🏡 chez nous /
@@ -154,10 +155,17 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   (l'été australien) est la révélation du site.
 - **Les repères de saison (❄️🌸☀️🍂) autour de l'orbite s'effacent** quand la
   Terre est dessus (elle y est déjà — pas de doublon visuel).
-- **Pas de jour/nuit dans la vue de l'espace** : à l'échelle de l'année, un
-  côté nuit qui tourne embrouille (retour utilisateur). Seuls comptent le
-  penchant et les deux moitiés : nord vert lagon, sud bleu océan, équateur
-  doré bien marqué.
+- **Le voile de nuit de l'ANNÉE** (revirement assumé de « pas de
+  jour/nuit », décision utilisateur : l'égalité des équinoxes ne se voyait
+  toujours pas) : un voile translucide couvre la moitié du globe qui ne
+  regarde pas le Soleil — il tourne avec l'année, pas avec les jours (la
+  rotation quotidienne reste ignorée). La loi `directionNuit(jour)` vit
+  dans le modèle (testée) : ombre géométrique aux solstices (le pôle
+  d'hiver plonge dans la nuit), terminateur qui pivote pour passer PAR LES
+  DEUX PÔLES aux équinoxes — chaque moitié mi-jour mi-nuit, l'image des
+  manuels. Construction vectorielle continue (jamais d'interpolation
+  d'angles : elle sauterait le jour où la Terre s'aligne avec l'axe). Les
+  moitiés restent nord vert lagon, sud bleu océan, équateur doré.
 - **Rien ne se rapproche du Soleil dans le dessin** (retour utilisateur : une
   maison posée sur une face du globe semblait s'approcher du Soleil en été —
   la fausse explication que le site réfute). La maison et le kangourou sont
