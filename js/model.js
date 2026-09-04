@@ -325,23 +325,43 @@ export function extremitesAnneau(hemisphere) {
 /* ------------------------------------------------------------------ */
 
 /* La direction de la NUIT sur le globe (coords math, vecteur unitaire) :
- * la moitié qui ne regarde pas le Soleil. Géométrique aux solstices (pile
- * à l'opposé du Soleil — le pôle d'hiver plonge dans la nuit), elle pivote
- * pour devenir PERPENDICULAIRE à l'axe aux équinoxes : le terminateur
- * passe alors par les deux pôles et chaque moitié est mi-jour mi-nuit —
- * l'image des manuels, l'égalité qui se voit (décision utilisateur,
- * revirement assumé de « pas de jour/nuit » : l'ombre tourne avec
- * l'ANNÉE, pas avec les jours). Construction vectorielle, sans
- * interpolation d'angles : continue partout, même le jour où la Terre
- * s'aligne avec l'axe (la norme reste >= 0,5, vérifié par test). */
+ * la moitié qui ne regarde pas le Soleil. QUATRE ANCRES, une par repère de
+ * l'année : pile à l'opposé du Soleil aux solstices (le pôle d'hiver
+ * plonge dans la nuit), perpendiculaire à l'axe aux équinoxes (le
+ * terminateur passe par les deux pôles — l'image des manuels, l'égalité
+ * qui se voit). Entre deux ancres, l'angle est interpolé en douceur
+ * (smoothstep) et TOUJOURS dans le sens de l'année : l'ombre ne fait
+ * jamais marche arrière (la première construction — un rappel vers l'axe
+ * — reculait de ~15° après chaque équinoxe, retour utilisateur). L'écart
+ * avec l'ombre géométrique reste sous 65° : la nuit ne quitte jamais le
+ * côté opposé au Soleil (verrouillé par test, comme la monotonie et la
+ * continuité). */
 export function directionNuit(jour) {
-  var n0 = positionTerre(jour); /* unitaire : à l'opposé du Soleil */
-  var w = 1 - Math.abs(penchementNord(jour));
-  var d = AXE_DIR.x * n0.x + AXE_DIR.y * n0.y;
-  var x = n0.x - AXE_DIR.x * d * w;
-  var y = n0.y - AXE_DIR.y * d * w;
-  var norme = Math.hypot(x, y) || 1;
-  return { x: x / norme, y: y / norme };
+  var j = jourNormalise(jour);
+  var angleAxe = Math.atan2(AXE_DIR.y, AXE_DIR.x);
+  /* les ancres, dans l'ordre de l'année, angles croissants sur un tour */
+  var ancres = [
+    { jour: JOUR_EQUINOXE_PRINTEMPS, angle: angleAxe + Math.PI / 2 },
+    { jour: JOUR_SOLSTICE_ETE, angle: Math.PI },
+    { jour: JOUR_EQUINOXE_AUTOMNE, angle: angleAxe + 3 * Math.PI / 2 },
+    { jour: JOUR_SOLSTICE_HIVER, angle: TAU }
+  ];
+  for (var i = 0; i < ancres.length; i++) {
+    var deb = ancres[i];
+    var fin = ancres[(i + 1) % ancres.length];
+    var duree = jourNormalise(fin.jour - deb.jour);
+    var dans = jourNormalise(j - deb.jour);
+    if (dans < duree) {
+      var saut = fin.angle - deb.angle;
+      while (saut <= 0) saut += TAU; /* toujours vers l'avant */
+      var t = dans / duree;
+      var doux = t * t * (3 - 2 * t);
+      var angle = deb.angle + saut * doux;
+      return { x: Math.cos(angle), y: Math.sin(angle) };
+    }
+  }
+  /* jamais atteint : les segments couvrent toute l'année */
+  return { x: Math.cos(ancres[0].angle), y: Math.sin(ancres[0].angle) };
 }
 
 /* La force du faisceau (0,55..1) : pleine aux solstices, creux DOUX aux

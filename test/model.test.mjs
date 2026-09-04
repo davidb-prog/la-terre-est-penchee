@@ -20,7 +20,7 @@ import {
   LECTURE_JOURS_PAR_SEC, SCENARIOS, VOIX_TRANSITIONS,
   DEFIS, DEFI_ATTENTE_MS, DEFI_SORTIE_MARGE_JOURS,
   defiReussi, defiEncoreProche, coeurDeSaison,
-  forceFaisceau, aplombLumiere, directionNuit, AXE_DIR,
+  forceFaisceau, aplombLumiere, directionNuit,
   EMOJI_RE, texteOral
 } from '../js/model.js';
 
@@ -357,6 +357,13 @@ test('la nuit est à l’opposé du Soleil aux solstices, et passe par les deux 
     presque(Math.hypot(d.x, d.y), 1, 1e-9);
     var ecart = Math.hypot(d.x - precedente.x, d.y - precedente.y);
     assert.ok(ecart <= 0.06, 'la nuit saute au jour ' + j + ' (' + ecart.toFixed(3) + ')');
+    /* JAMAIS de marche arrière : l'ombre tourne toujours dans le sens de
+     * l'année (produit vectoriel jamais négatif) */
+    var croix = precedente.x * d.y - precedente.y * d.x;
+    assert.ok(croix >= -1e-9, 'l’ombre recule au jour ' + j);
+    /* et la nuit reste du côté opposé au Soleil, toute l'année */
+    var pos = positionTerre(j);
+    assert.ok(d.x * pos.x + d.y * pos.y > 0.3, 'la nuit quitte le côté opposé au Soleil au jour ' + j);
     precedente = d;
   }
 });
