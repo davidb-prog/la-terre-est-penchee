@@ -85,9 +85,12 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   0,32/aplomb, cœur clair, bords en dégradé), **fondue dès qu'elle rase**
   (aplomb < 0,45, disparue sous 0,25 — la lumière glisse sans chauffer,
   pas de tache). Les lois vivent dans le modèle (`forceFaisceau`,
-  `aplombLumiere`, testés) : plein autour des solstices, ÉTEINT autour des
-  équinoxes (la perspective du dessin ne sait pas y montrer l'angle des
-  rayons sans tricher), jamais de saut. (La légende de distance a été
+  `aplombLumiere`, testés) : force pleine aux solstices, creux doux (0,55)
+  mais JAMAIS éteinte aux équinoxes — le faisceau large ne vise personne,
+  il peut rester allumé sans tricher, et l'égalité se VOIT : **deux taches
+  jumelles**, une par moitié, aplomb 0,5 chacune (retour utilisateur :
+  l'extinction totale laissait l'égalité des équinoxes invisible) ; jamais
+  de saut. (La légende de distance a été
   retirée — décision utilisateur ; la constance de la distance reste dans
   la note aux parents et verrouillée par test.)
 - `angleAnnee(jour) = (jour − 171) / 365 · τ` (0 = solstice d'été, 21 juin) ;

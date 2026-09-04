@@ -307,16 +307,17 @@ export function extremitesAnneau(hemisphere) {
 /* Le faisceau de lumière de la vue de l'espace                        */
 /* ------------------------------------------------------------------ */
 
-/* La force du faisceau (0..1) : pleine autour des solstices — là où le
- * dessin raconte juste —, extinction rapide dès qu'on s'en éloigne, éteint
- * bien avant les équinoxes (quand la Terre est en haut ou en bas de
- * l'orbite dessinée, la face « éclairée » serait la région des pôles : le
- * faisceau s'efface plutôt que de raconter ça de travers). Continue,
- * jamais de saut. */
+/* La force du faisceau (0,55..1) : pleine aux solstices, creux DOUX aux
+ * équinoxes — mais jamais éteinte. Depuis le faisceau LARGE (qui ne vise
+ * personne, il peut rester allumé sans tricher), ce sont les taches
+ * d'arrivée qui racontent : aux équinoxes, l'aplomb du nord et du sud
+ * valent 0,5 chacun — DEUX TACHES JUMELLES, une par moitié, la lumière
+ * partagée à égalité (retour utilisateur : l'extinction totale laissait
+ * l'égalité des équinoxes invisible). Continue, jamais de saut. */
 export function forceFaisceau(jour) {
-  var p = Math.abs(penchementNord(jour));
-  var t = Math.min(1, Math.max(0, (p - 0.55) / 0.4));
-  return t * t * (3 - 2 * t);
+  var t = Math.abs(penchementNord(jour));
+  var s = t * t * (3 - 2 * t);
+  return 0.55 + 0.45 * s;
 }
 
 /* L'aplomb de la lumière sur chez nous (0..1) : la tache d'arrivée du

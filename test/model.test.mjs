@@ -323,14 +323,23 @@ test('le jardin raconte la bonne saison, en continu', function () {
 /* Le faisceau de lumière de la vue de l'espace                        */
 /* ------------------------------------------------------------------ */
 
-test('le faisceau est plein aux solstices et éteint aux équinoxes', function () {
+test('le faisceau est plein aux solstices, en creux doux mais JAMAIS éteint aux équinoxes', function () {
   presque(forceFaisceau(JOUR_SOLSTICE_ETE), 1);
   presque(forceFaisceau(JOUR_SOLSTICE_HIVER), 1, 1e-6);
-  assert.equal(forceFaisceau(JOUR_EQUINOXE_PRINTEMPS), 0);
-  assert.equal(forceFaisceau(JOUR_EQUINOXE_AUTOMNE), 0);
-  /* et il reste éteint un bon moment autour de chaque équinoxe */
-  assert.equal(forceFaisceau(JOUR_EQUINOXE_PRINTEMPS + 20), 0);
-  assert.equal(forceFaisceau(JOUR_EQUINOXE_AUTOMNE - 20), 0);
+  presque(forceFaisceau(JOUR_EQUINOXE_PRINTEMPS), 0.55, 1e-6);
+  presque(forceFaisceau(JOUR_EQUINOXE_AUTOMNE), 0.55, 1e-6);
+  for (var j = 0; j < ANNEE_JOURS; j += 1) {
+    assert.ok(forceFaisceau(j) >= 0.55, 'la lumière ne s’éteint jamais (jour ' + j + ')');
+  }
+});
+
+test('aux équinoxes, les deux moitiés reçoivent EXACTEMENT la même lumière (taches jumelles)', function () {
+  [JOUR_EQUINOXE_PRINTEMPS, JOUR_EQUINOXE_AUTOMNE].forEach(function (j) {
+    var nord = aplombLumiere(j);
+    var sud = aplombLumiere(j + ANNEE_JOURS / 2);
+    presque(nord, 0.5, 1e-6);
+    presque(nord, sud, 1e-6);
+  });
 });
 
 test('la tache est ramassée au solstice d’été, étalée au solstice d’hiver, moyenne aux équinoxes', function () {
@@ -349,7 +358,7 @@ test('la lumière ne saute jamais d’un jour à l’autre (force et aplomb cont
     var aplomb = aplombLumiere(j);
     assert.ok(Math.abs(force - forcePrecedente) <= 0.08, 'la force saute au jour ' + j);
     assert.ok(Math.abs(aplomb - aplombPrecedent) <= 0.02, 'l’aplomb saute au jour ' + j);
-    assert.ok(force >= 0 && force <= 1 && aplomb >= 0.12 && aplomb <= 0.95, 'hors bornes au jour ' + j);
+    assert.ok(force >= 0.55 && force <= 1 && aplomb >= 0.12 && aplomb <= 0.95, 'hors bornes au jour ' + j);
     forcePrecedente = force;
     aplombPrecedent = aplomb;
   }
