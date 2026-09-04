@@ -447,6 +447,20 @@ test('le cœur de chaque saison tombe bien au milieu de sa saison', function () 
   presque(coeurDeSaison('ete', 'nord'), JOUR_SOLSTICE_ETE + ANNEE_JOURS / 8);
 });
 
+test('le bravo emmène chaque défi à son jour d’ancrage — et il y gagne encore', function () {
+  DEFIS.forEach(function (d) {
+    assert.ok(typeof d.jourBravo === 'number', 'jourBravo manquant : ' + d.id);
+    assert.ok(defiReussi(d, d.jourBravo), 'le défi ' + d.id + ' doit rester gagné à son ancrage');
+  });
+  var parId = {};
+  DEFIS.forEach(function (d) { parId[d.id] = d; });
+  presque(parId.ete.jourBravo, JOUR_SOLSTICE_ETE);
+  presque(parId.neige.jourBravo, JOUR_SOLSTICE_HIVER);
+  presque(parId.australie.jourBravo, JOUR_SOLSTICE_HIVER);
+  assert.ok(jardinDuJour(parId.fleurs.jourBravo).fleurs === 1, 'arbre tout fleuri au bravo des fleurs');
+  assert.ok(jardinDuJour(parId.feuilles.jourBravo).rousseur === 1, 'rousseur pleine au bravo des feuilles');
+});
+
 /* ------------------------------------------------------------------ */
 /* Le texte oral                                                       */
 /* ------------------------------------------------------------------ */
@@ -474,7 +488,7 @@ test('tous les textes du conteur sont propres pour l’oral', function () {
 
 test('la phrase de l’espace suit le penchant, et nomme toujours qui penche', function () {
   assert.ok(phraseEspace(JOUR_SOLSTICE_ETE).indexOf('à fond vers le Soleil') !== -1);
-  assert.ok(phraseEspace(JOUR_SOLSTICE_HIVER).indexOf('loin du Soleil') !== -1);
+  assert.ok(phraseEspace(JOUR_SOLSTICE_HIVER).indexOf('à l’opposé du Soleil') !== -1);
   assert.ok(phraseEspace(JOUR_SOLSTICE_HIVER).indexOf('les plus courts') !== -1);
   assert.ok(phraseEspace(JOUR_EQUINOXE_PRINTEMPS).indexOf('égalité') !== -1);
   for (var j = 0; j < ANNEE_JOURS; j += 3) {

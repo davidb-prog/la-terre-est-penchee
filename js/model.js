@@ -347,7 +347,7 @@ export function phraseDuMoment(jour) {
     return debut + 'Le Soleil monte très haut dans le ciel, et le jour est très long : ' + heures + ' heures !';
   }
   if (p < -0.75) {
-    return debut + 'Le Soleil reste tout bas, et le jour est tout court : ' + heures + ' heures.';
+    return debut + 'Le Soleil reste tout bas, et le jour est très court : ' + heures + ' heures.';
   }
   /* dureeJour = 12 + 4·cos(angleAnnee) : le jour grandit quand sin < 0. */
   if (Math.sin(angleAnnee(jour)) < 0) {
@@ -361,8 +361,8 @@ export function phraseEspace(jour) {
   var p = penchementNord(jour);
   if (p > 0.7) return '🏡 Chez nous penche à fond vers le Soleil : les jours sont les plus longs de l’année !';
   if (p > 0.15) return '🏡 Chez nous penche vers le Soleil — et l’Australie, à l’opposé.';
-  if (p < -0.7) return '🏡 Chez nous penche à fond loin du Soleil : les jours sont les plus courts de l’année.';
-  if (p < -0.15) return '🏡 Chez nous penche loin du Soleil — l’Australie, elle, penche vers lui.';
+  if (p < -0.7) return '🏡 Chez nous penche à fond à l’opposé du Soleil : les jours sont les plus courts de l’année.';
+  if (p < -0.15) return '🏡 Chez nous penche à l’opposé du Soleil — l’Australie, elle, penche vers lui.';
   return '🏡 Personne ne penche vers le Soleil : chez nous et l’Australie sont à égalité.';
 }
 
@@ -425,7 +425,7 @@ export var SCENARIOS = [
     sub: 'le solstice d’hiver',
     intro: 'Fin décembre, l’hiver commence…',
     fenetre: 'Le Soleil reste tout bas, la nuit tombe avant le dîner : huit heures de jour, pas plus. L’arbre est tout nu, et parfois, il neige sur le jardin.',
-    espace: 'Notre moitié penche à fond loin du Soleil… Mais regarde le kangourou : l’Australie penche vers lui ! Là-bas, les enfants fêtent Noël en plein été, sur la plage.'
+    espace: 'Notre moitié penche à fond à l’opposé du Soleil… Mais regarde le kangourou : l’Australie penche vers lui ! Là-bas, les enfants fêtent Noël en plein été, sur la plage.'
   }
 ];
 
@@ -444,11 +444,18 @@ export var VOIX_TRANSITIONS = {
 export var DEFI_ATTENTE_MS = 350;
 export var DEFI_SORTIE_MARGE_JOURS = 6;
 
+/* `jourBravo` : le jour où le recalage doux emmène la Terre après la
+ * victoire. Les défis de lumière (été, neige, Australie) s'ancrent sur les
+ * SOLSTICES — les mêmes repères que les boutons-saisons (décision
+ * utilisateur : le milieu de saison était trompeur). Les défis de jardin
+ * (fleurs, feuilles) s'ancrent là où le jardin fait VRAIMENT ce que la
+ * consigne demande — à l'équinoxe, l'arbre n'aurait qu'une fleur. */
 export var DEFIS = [
   {
     id: 'fleurs',
     emoji: '🌸',
     cible: 'printemps',
+    jourBravo: 125, /* l'arbre tout fleuri */
     hemisphere: 'nord',
     consigne: 'Fais fleurir l’arbre du jardin !',
     bravo: 'Bravo ! Tu as fabriqué le printemps : l’arbre est tout fleuri !'
@@ -457,6 +464,7 @@ export var DEFIS = [
     id: 'ete',
     emoji: '☀️',
     cible: 'ete',
+    jourBravo: JOUR_SOLSTICE_ETE,
     hemisphere: 'nord',
     consigne: 'Fabrique l’été chez nous !',
     bravo: 'Bravo ! C’est l’été : le Soleil monte très haut et les jours n’en finissent plus !'
@@ -465,6 +473,7 @@ export var DEFIS = [
     id: 'feuilles',
     emoji: '🍂',
     cible: 'automne',
+    jourBravo: 308, /* rousseur pleine, les feuilles tombent */
     hemisphere: 'nord',
     consigne: 'Fais tomber les feuilles de l’arbre !',
     bravo: 'Bravo ! C’est l’automne : les feuilles roussissent et s’envolent !'
@@ -473,6 +482,7 @@ export var DEFIS = [
     id: 'neige',
     emoji: '❄️',
     cible: 'hiver',
+    jourBravo: JOUR_SOLSTICE_HIVER,
     hemisphere: 'nord',
     consigne: 'Fais tomber la neige sur le jardin !',
     bravo: 'Bravo ! C’est l’hiver : la neige est là et la nuit tombe tôt.'
@@ -481,6 +491,7 @@ export var DEFIS = [
     id: 'australie',
     emoji: '🦘',
     cible: 'ete',
+    jourBravo: JOUR_SOLSTICE_HIVER,
     hemisphere: 'sud',
     consigne: 'Offre l’été aux enfants d’Australie !',
     bravo: 'Bravo ! L’Australie penche vers le Soleil… Et pendant ce temps, chez nous, c’est l’hiver !'

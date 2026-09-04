@@ -8,7 +8,7 @@
 import {
   jourNormalise, phraseDuMoment, phraseEspace, JOUR_SOLSTICE_ETE, ANNEE_JOURS,
   LECTURE_JOURS_PAR_SEC, SCENARIOS, VOIX_TRANSITIONS,
-  DEFIS, DEFI_ATTENTE_MS, defiReussi, defiEncoreProche, coeurDeSaison,
+  DEFIS, DEFI_ATTENTE_MS, defiReussi, defiEncoreProche,
   texteOral
 } from './model.js';
 import { creerVueOrbite } from './vue-orbite.js';
@@ -702,20 +702,25 @@ function remplirPanierDefis() {
   }
 }
 
+var dernierDefiId = null; /* survit au rangement du jeu (anti-répétition) */
+
 function prochainDefi() {
   /* Tirage au panier, sans remise : tous les défis sortent avant qu'on
-   * remélange — et jamais deux fois le même d'affilée au remélange. */
+   * remélange. Deux filtres, appliqués ensemble : jamais deux fois le même
+   * d'affilée (même après un remélange ou une réouverture du jeu), et pas
+   * un défi que le jour actuel réussit déjà (gagné d'avance) — sauf s'il
+   * ne reste que ceux-là dans le panier. */
   if (!panierDefis.length) remplirPanierDefis();
-  if (defi && panierDefis.length > 1 && panierDefis[0].id === defi.id) {
-    panierDefis.push(panierDefis.shift());
-  }
-  /* Ne pas tirer un défi que le jour actuel réussit déjà (gagné d'avance) —
-   * sauf s'il ne reste que ceux-là dans le panier. */
-  var indice = 0;
+  var indice = -1;
+  var secours = -1;
   for (var i = 0; i < panierDefis.length; i++) {
+    if (panierDefis.length > 1 && panierDefis[i].id === dernierDefiId) continue;
+    if (secours < 0) secours = i;
     if (!defiReussi(panierDefis[i], etat.jour)) { indice = i; break; }
   }
+  if (indice < 0) indice = secours >= 0 ? secours : 0;
   defi = panierDefis.splice(indice, 1)[0];
+  dernierDefiId = defi.id;
   defiGagne = false;
   bravoVisible = false;
   defiEntreeMs = null;
@@ -734,10 +739,11 @@ function gagnerDefi(maintenant) {
   boutonEncore.hidden = false;
   if (premiere) {
     raconterDefi('bravo', defi.bravo);
-    /* Le recalage doux : l'année glisse jusqu'au cœur de la saison (l'image
-     * parfaite du bravo), par le chemin court. Rien n'est verrouillé : un
-     * glisser annule le glissement aussitôt. */
-    var cible = coeurDeSaison(defi.cible, defi.hemisphere);
+    /* Le recalage doux : l'année glisse jusqu'au jour d'ancrage du défi
+     * (solstice pour été/neige/Australie — les repères des boutons —,
+     * sommet du jardin pour fleurs/feuilles), par le chemin court. Rien
+     * n'est verrouillé : un glisser annule le glissement aussitôt. */
+    var cible = defi.jourBravo;
     var delta = jourNormalise(cible - etat.jour + ANNEE_JOURS / 2) - ANNEE_JOURS / 2;
     if (mouvementReduit || Math.abs(delta) < 0.25) {
       fixerJour(cible);
