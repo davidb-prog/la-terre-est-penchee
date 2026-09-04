@@ -343,12 +343,15 @@ export function creerVueOrbite(canvas) {
      * moitié mi-jour mi-nuit, l'égalité qui se voit. */
     var nuit = directionNuit(jour);
     var nX = nuit.x, nY = -nuit.y; /* bascule math → canvas */
+    /* la rampe est courte : la nuit est FRANCHE dès le milieu de sa
+     * moitié (retours utilisateur : « pas assez sombre », deux fois) */
     var ombre = ctx.createLinearGradient(
-      p.x - nX * r * 0.18, p.y - nY * r * 0.18,
-      p.x + nX * r * 0.72, p.y + nY * r * 0.72);
+      p.x - nX * r * 0.1, p.y - nY * r * 0.1,
+      p.x + nX * r * 0.55, p.y + nY * r * 0.55);
     ombre.addColorStop(0, 'rgba(7, 11, 23, 0)');
-    ombre.addColorStop(0.4, 'rgba(7, 11, 23, 0.48)');
-    ombre.addColorStop(1, 'rgba(7, 11, 23, 0.64)');
+    ombre.addColorStop(0.35, 'rgba(7, 11, 23, 0.62)');
+    ombre.addColorStop(0.75, 'rgba(7, 11, 23, 0.8)');
+    ombre.addColorStop(1, 'rgba(7, 11, 23, 0.85)');
     ctx.save();
     ctx.beginPath();
     ctx.arc(p.x, p.y, r, 0, TAU);
