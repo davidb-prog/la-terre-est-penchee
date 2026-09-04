@@ -158,7 +158,10 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
 - **Le voile de nuit de l'ANNÉE** (revirement assumé de « pas de
   jour/nuit », décision utilisateur : l'égalité des équinoxes ne se voyait
   toujours pas) : un voile translucide couvre la moitié du globe qui ne
-  regarde pas le Soleil — il tourne avec l'année, pas avec les jours (la
+  regarde pas le Soleil — maison et kangourou se dessinent PAR-DESSUS,
+  toujours nets (retour utilisateur : sous le voile, ils semblaient vivre
+  une nuit permanente — or chaque saison a ses journées ; ce sont des
+  repères, pas des points physiques) — il tourne avec l'année, pas avec les jours (la
   rotation quotidienne reste ignorée). La loi `directionNuit(jour)` vit
   dans le modèle (testée) : ombre géométrique aux solstices (le pôle
   d'hiver plonge dans la nuit), terminateur qui pivote pour passer PAR LES

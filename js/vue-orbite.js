@@ -333,14 +333,13 @@ export function creerVueOrbite(canvas) {
     var versEquateur = 0.18; /* en rayons de globe, le long de l'axe */
     var dMaison = { x: m.x - AXE_DIR.x * versEquateur, y: -(m.y - AXE_DIR.y * versEquateur) };
     var dKangourou = { x: k.x + AXE_DIR.x * versEquateur, y: -(k.y + AXE_DIR.y * versEquateur) };
-    dessinerMaison(ctx, p.x + dMaison.x * r, p.y + dMaison.y * r, angleAxe, r * 0.42);
-    dessinerKangourou(ctx, p.x + dKangourou.x * r, p.y + dKangourou.y * r, angleAxe + Math.PI, r * 0.5);
-
-    /* Le voile de nuit : la moitié qui ne regarde pas le Soleil, en
-     * translucide (maison et kangourou restent visibles dessous). La loi
+    /* Le voile de nuit : la moitié qui ne regarde pas le Soleil. La loi
      * vit dans le modèle (directionNuit) : ombre géométrique aux
      * solstices, terminateur par les deux pôles aux équinoxes — chaque
-     * moitié mi-jour mi-nuit, l'égalité qui se voit. */
+     * moitié mi-jour mi-nuit, l'égalité qui se voit. Maison et kangourou
+     * se dessinent PAR-DESSUS (retour utilisateur : sous le voile, ils
+     * semblaient plongés dans une nuit permanente — or l'hiver a aussi
+     * ses journées ; ce sont des repères, pas des points physiques). */
     var nuit = directionNuit(jour);
     var nX = nuit.x, nY = -nuit.y; /* bascule math → canvas */
     /* la rampe est courte : la nuit est FRANCHE dès le milieu de sa
@@ -359,6 +358,9 @@ export function creerVueOrbite(canvas) {
     ctx.fillStyle = ombre;
     ctx.fillRect(p.x - r, p.y - r, r * 2, r * 2);
     ctx.restore();
+
+    dessinerMaison(ctx, p.x + dMaison.x * r, p.y + dMaison.y * r, angleAxe, r * 0.42);
+    dessinerKangourou(ctx, p.x + dKangourou.x * r, p.y + dKangourou.y * r, angleAxe + Math.PI, r * 0.5);
     return p;
   }
 
