@@ -133,7 +133,10 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   lecture. Les ~12 jours avant chaque repère, la **bande de transition**
   annonce « X se termine : Y arrive ! » — juin ne raconte plus le printemps
   puis l'été en deux phrases contradictoires (retour test). La frise du
-  curseur porte les initiales des mois (`piste-mois`).
+  curseur porte les initiales des mois (`piste-mois`). La phrase s'affiche
+  en DEUX parties (`phraseDuMomentParties`) : le titre — mois + saison —
+  en doré, le commentaire en clair dessous (retour test : tout en un bloc
+  doré, ça se lisait mal).
 - **Les scénarios vont au moment choisi en douceur, toujours vers l'avant**
   (le vrai sens de l'année) ; reprendre la main efface l'histoire et désarme
   le bouton. L'histoire s'écrit en deux lignes à puces : 🏡 chez nous /
@@ -144,9 +147,9 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   (le bravo ne clignote pas au bord et ne ment jamais). Recalage doux, à la
   première victoire seulement, vers le `jourBravo` du défi — toujours un
   des quatre repères de l'année (solstices/équinoxes, comme les boutons) ;
-  les consignes des défis d'équinoxe promettent des débuts (« le printemps
-  revient », « l'automne arrive »), jamais plus que ce que le jardin y
-  montre. Le tirage est un panier SANS remise, anti-répétition compris
+  les consignes d'équinoxe font écho aux boutons (« le printemps
+  revient », « l'automne arrive ») et le jardin y tient leurs promesses
+  (arbre tout fleuri, feuilles qui tombent). Le tirage est un panier SANS remise, anti-répétition compris
   après remélange et réouverture du jeu (`dernierDefiId`). Le défi du kangourou
   (l'été australien) est la révélation du site.
 - **Les repères de saison (❄️🌸☀️🍂) autour de l'orbite s'effacent** quand la
@@ -183,10 +186,15 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   large, l'hiver bas ET court — le jour, c'est le temps où le Soleil est
   au-dessus de l'horizon.
 - **La fenêtre évolue continûment** (retour utilisateur : la vue semblait
-  statique) : `jardinDuJour(jour)` livre quatre paramètres continus
-  (feuilles, rousseur, fleurs, neige) — aucun saut de décor d'un jour à
-  l'autre, verrouillé par test. Le décor en découle : fleurs une à une, tas
-  de feuilles, bonhomme de neige progressif, nuages, oiseaux. Les chutes
+  statique) : `jardinDuJour(jour)` livre cinq paramètres continus
+  (feuilles, rousseur, fleurs, fruits, neige) — aucun saut de décor d'un
+  jour à l'autre, verrouillé par test. **Chaque décor atteint son PLEIN
+  dès l'entrée de sa saison** (retour test : les boutons doivent montrer
+  l'archétype — magnolia fleuri à l'équinoxe de printemps, fruits rouges
+  dès le solstice d'été, arbre roux et feuilles qui tombent à l'équinoxe
+  d'automne, neige installée au solstice d'hiver). Le décor en découle :
+  fleurs une à une, fruits, tas de feuilles, bonhomme de neige progressif,
+  nuages, oiseaux. Les chutes
   (flocons, feuilles, pétales) ne s'animent que pendant la lecture ou le
   glisser (`tempsMs`, null en pause et en mouvement réduit → scène figée,
   déterministe pour le jour affiché).

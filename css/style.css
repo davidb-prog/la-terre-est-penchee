@@ -162,7 +162,12 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; }
   line-height: 1.45;
   min-height: 2.9em;
 }
-#phrase-moment { font-weight: 700; color: var(--sun); min-height: 4.35em; }
+#phrase-moment { min-height: 4.35em; }
+/* le titre (mois + saison) en doré, le commentaire en clair : deux lignes
+   qui se distinguent d'un coup d'œil (retour test : tout en un bloc doré,
+   ça se lisait mal) */
+#phrase-moment .phrase-titre { display: block; font-weight: 800; color: var(--sun); }
+#phrase-moment .phrase-texte { display: block; font-weight: 400; color: var(--text); margin-top: 2px; }
 
 /* la bulle « attrape-moi », SOUS la vue de l'espace (transitoire) : rien ne
    recouvre jamais les canvas — elle s'efface ET se replie ensemble */

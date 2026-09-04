@@ -310,8 +310,15 @@ test('le jardin raconte la bonne saison, en continu', function () {
   var printemps = jardinDuJour(125);
   assert.equal(printemps.fleurs, 1, 'cœur du printemps : tout est fleuri');
   var equinoxe = jardinDuJour(80);
-  assert.ok(equinoxe.fleurs > 0.05 && equinoxe.fleurs < 0.5,
-    'équinoxe de printemps : les premières fleurs s’ouvrent (une ou deux), pas toutes');
+  assert.equal(equinoxe.fleurs, 1, 'équinoxe de printemps : l’arbre est tout fleuri (archétype au bouton)');
+  assert.equal(jardinDuJour(200).fruits, 1, 'plein été : les fruits sont là');
+  assert.ok(jardinDuJour(JOUR_SOLSTICE_ETE).fruits > 0.3, 'les premiers fruits dès l’entrée de l’été');
+  assert.equal(jardinDuJour(80).fruits, 0, 'pas de fruits au printemps');
+  assert.equal(jardinDuJour(290).fruits, 0, 'plus de fruits à l’automne');
+  var entreeAutomne = jardinDuJour(263);
+  assert.equal(entreeAutomne.rousseur, 1, 'équinoxe d’automne : l’arbre est tout roux');
+  assert.ok(entreeAutomne.feuilles < 1 && entreeAutomne.feuilles > 0.7,
+    'les feuilles commencent à tomber dès l’entrée de l’automne');
   assert.ok(printemps.feuilles > 0.2 && printemps.feuilles < 0.8, 'les feuilles poussent encore');
   var automne = jardinDuJour(290);
   assert.ok(automne.rousseur > 0.5, 'l’automne roussit les feuilles');
@@ -478,11 +485,10 @@ test('le bravo emmène chaque défi à son jour d’ancrage — et il y gagne en
   presque(parId.australie.jourBravo, JOUR_SOLSTICE_HIVER);
   presque(parId.fleurs.jourBravo, JOUR_EQUINOXE_PRINTEMPS);
   presque(parId.feuilles.jourBravo, JOUR_EQUINOXE_AUTOMNE);
-  /* les consignes d'équinoxe promettent des débuts — le jardin les tient */
-  var fleursBravo = jardinDuJour(parId.fleurs.jourBravo).fleurs;
-  assert.ok(fleursBravo > 0.05 && fleursBravo < 0.5, 'les premières fleurs (pas toutes) au bravo du printemps');
-  var rousseurBravo = jardinDuJour(parId.feuilles.jourBravo).rousseur;
-  assert.ok(rousseurBravo > 0.1 && rousseurBravo < 0.6, 'la rousseur commence (sans plus) au bravo de l’automne');
+  /* le jardin tient les promesses des bravos : archétypes dès l'entrée */
+  assert.equal(jardinDuJour(parId.fleurs.jourBravo).fleurs, 1, 'l’arbre est tout fleuri au bravo du printemps');
+  assert.equal(jardinDuJour(parId.feuilles.jourBravo).rousseur, 1, 'l’arbre est tout roux au bravo de l’automne');
+  assert.ok(jardinDuJour(parId.neige.jourBravo).neige === 1, 'la neige est installée au bravo de l’hiver');
 });
 
 /* ------------------------------------------------------------------ */

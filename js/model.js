@@ -210,6 +210,7 @@ function rampe(jour, debut, fin) {
  * - feuilles : la couronne de l'arbre, de 0 (nu) à 1 (pleine) ;
  * - rousseur : 0 = feuilles vertes, 1 = feuilles rousses ;
  * - fleurs   : les fleurs du printemps (arbre et jardin), 0 à 1 ;
+ * - fruits   : les fruits de l'été sur la couronne, 0 à 1 ;
  * - neige    : le manteau blanc de l'hiver (sol, flocons, bonhomme), 0 à 1.
  * Les rampes s'appuient sur les repères de l'année : les feuilles poussent
  * au printemps, roussissent puis tombent à l'automne, la neige s'installe
@@ -219,51 +220,67 @@ export function jardinDuJour(jour) {
   var j = jourNormalise(jour);
   var t;
 
-  /* Les feuilles : poussent d'avril à juin, tombent d'octobre à décembre. */
+  /* Chaque décor atteint son PLEIN dès l'entrée de sa saison (retour
+   * test : au bouton, l'image doit être l'archétype de la saison). */
+
+  /* Les feuilles : poussent au printemps, pleines avant l'été — et elles
+   * commencent à tomber juste avant l'équinoxe d'automne (les feuilles
+   * volantes s'animent dès l'entrée de l'automne). */
   var feuilles;
-  t = rampe(j, 90, JOUR_SOLSTICE_ETE);          /* elles poussent */
+  t = rampe(j, 90, 160);                        /* elles poussent */
   if (t !== null) feuilles = t;
   else {
-    t = rampe(j, 275, JOUR_SOLSTICE_HIVER);     /* elles tombent */
+    t = rampe(j, 255, 330);                     /* elles tombent */
     if (t !== null) feuilles = 1 - t;
-    else feuilles = (j >= JOUR_SOLSTICE_ETE && j < 275) ? 1 : 0;
+    else feuilles = (j >= 160 && j < 255) ? 1 : 0;
   }
 
-  /* La rousseur : les feuilles vertes roussissent en septembre-octobre, et
-   * la teinte s'efface en douceur à la fin de l'hiver (l'arbre est nu, mais
-   * aucun paramètre ne saute jamais — le décor bouge à petits pas). */
+  /* La rousseur : pleine dès l'équinoxe d'automne, et la teinte s'efface
+   * en douceur à la fin de l'hiver (l'arbre est nu, mais aucun paramètre
+   * ne saute jamais — le décor bouge à petits pas). */
   var rousseur;
-  t = rampe(j, 245, 280);
+  t = rampe(j, 235, 260);
   if (t !== null) rousseur = t;
   else {
     t = rampe(j, 20, 60);
     if (t !== null) rousseur = 1 - t;
-    else rousseur = (j >= 280 || j < 20) ? 1 : 0;
+    else rousseur = (j >= 260 || j < 20) ? 1 : 0;
   }
 
-  /* Les fleurs : les premières s'ouvrent dès l'équinoxe de printemps (le
-   * scénario en montre une ou deux), tout est fleuri en mai, et elles
-   * s'effacent au début de l'été. */
+  /* Les fleurs : l'arbre se couvre POUR l'équinoxe de printemps, et elles
+   * s'effacent fin mai — place aux fruits. */
   var fleurs;
-  t = rampe(j, 70, 95);
+  t = rampe(j, 60, 78);
   if (t !== null) fleurs = t;
   else {
-    t = rampe(j, 140, JOUR_SOLSTICE_ETE);
+    t = rampe(j, 135, 165);
     if (t !== null) fleurs = 1 - t;
-    else fleurs = (j >= 95 && j < 140) ? 1 : 0;
+    else fleurs = (j >= 78 && j < 135) ? 1 : 0;
   }
 
-  /* La neige : elle s'installe en décembre, fond en février-mars. */
+  /* Les fruits : les premiers poussent dès l'entrée de l'été (au
+   * printemps les fleurs, en été les fruits), cueillis à la fin de
+   * l'été — l'arbre est vide pour l'équinoxe d'automne. */
+  var fruits;
+  t = rampe(j, 155, 185);
+  if (t !== null) fruits = t;
+  else {
+    t = rampe(j, 240, 262);
+    if (t !== null) fruits = 1 - t;
+    else fruits = (j >= 185 && j < 240) ? 1 : 0;
+  }
+
+  /* La neige : installée POUR le solstice d'hiver, fond en février-mars. */
   var neige;
-  t = rampe(j, 330, 360);
+  t = rampe(j, 320, 350);
   if (t !== null) neige = t;
   else {
     t = rampe(j, 40, 75);
     if (t !== null) neige = 1 - t;
-    else neige = (j >= 360 || j < 40) ? 1 : 0;
+    else neige = (j >= 350 || j < 40) ? 1 : 0;
   }
 
-  return { feuilles: feuilles, rousseur: rousseur, fleurs: fleurs, neige: neige };
+  return { feuilles: feuilles, rousseur: rousseur, fleurs: fleurs, fruits: fruits, neige: neige };
 }
 
 /* ------------------------------------------------------------------ */
@@ -332,7 +349,11 @@ export function aplombLumiere(jour) {
 /* La petite phrase du moment, affichée sous la fenêtre                */
 /* ------------------------------------------------------------------ */
 
-export function phraseDuMoment(jour) {
+/* La phrase du moment, en deux parties : le TITRE (le mois et la saison —
+ * affiché en doré) et le TEXTE (le commentaire, en clair) — retour test :
+ * tout en un bloc, ça se lisait mal. phraseDuMoment les recolle pour les
+ * tests et le cache de main.js. */
+export function phraseDuMomentParties(jour) {
   var j = jourNormalise(jour);
   var mois = moisDuJour(jour).nom;
   var s = saison(jour, 'nord');
@@ -355,22 +376,29 @@ export function phraseDuMoment(jour) {
     var dans = jourNormalise(reperes[i].jour - j);
     if (dans > 0 && dans <= 12) {
       var suivante = SAISONS[reperes[i].saison];
-      return 'En ' + mois + ', chez nous, ' + SAISONS[s].nom + ' se termine : ' +
-        suivante.nom + ' arrive ! ' + suivante.emoji + ' ' + mouvement;
+      return {
+        titre: 'En ' + mois + ', chez nous, ' + SAISONS[s].nom + ' se termine : ' + suivante.nom + ' arrive ! ' + suivante.emoji,
+        texte: mouvement
+      };
     }
   }
-  var debut = 'En ' + mois + ', chez nous, c’est ' + SAISONS[s].nom + ' ! ' + SAISONS[s].emoji + ' ';
+  var titre = 'En ' + mois + ', chez nous, c’est ' + SAISONS[s].nom + ' ! ' + SAISONS[s].emoji;
   /* Au cœur de l'été et de l'hiver, les superlatifs sont mérités — et le
    * chiffre dit son unité (retour test : « déjà 15 h » ne se comprenait
    * pas). Partout ailleurs, pas de compteur qui défile pendant la
    * lecture : la barre du jour montre déjà les heures. */
   if (p > 0.75) {
-    return debut + 'Le Soleil monte très haut dans le ciel, et il fait jour très longtemps : ' + heures + ' heures de lumière !';
+    return { titre: titre, texte: 'Le Soleil monte très haut dans le ciel, et il fait jour très longtemps : ' + heures + ' heures de lumière !' };
   }
   if (p < -0.75) {
-    return debut + 'Le Soleil reste tout bas, et la nuit tombe très tôt : ' + heures + ' heures de lumière seulement.';
+    return { titre: titre, texte: 'Le Soleil reste tout bas, et la nuit tombe très tôt : ' + heures + ' heures de lumière seulement.' };
   }
-  return debut + mouvement;
+  return { titre: titre, texte: mouvement };
+}
+
+export function phraseDuMoment(jour) {
+  var parties = phraseDuMomentParties(jour);
+  return parties.titre + ' ' + parties.texte;
 }
 
 /* La phrase de la vue de l'espace : où penche notre moitié, en ce moment. */
@@ -409,7 +437,7 @@ export var SCENARIOS = [
     label: 'Le printemps revient',
     sub: 'l’équinoxe de printemps',
     intro: 'Au mois de mars, le printemps revient…',
-    fenetre: 'Sur l’arbre du jardin, les premières fleurs s’ouvrent ! Le jour dure maintenant aussi longtemps que la nuit. Et chaque jour qui passe, le Soleil grimpe un peu plus haut.',
+    fenetre: 'L’arbre du jardin se couvre de fleurs ! Le jour dure maintenant aussi longtemps que la nuit. Et chaque jour qui passe, le Soleil grimpe un peu plus haut.',
     espace: 'Les deux moitiés de la Terre sont à égalité : ni chez nous, ni l’Australie ne penche vers le Soleil. Mais la Terre avance… Et bientôt, c’est notre moitié qui penchera vers lui !'
   },
   {
@@ -420,7 +448,7 @@ export var SCENARIOS = [
     label: 'L’été est là',
     sub: 'le solstice d’été',
     intro: 'Fin juin, l’été commence…',
-    fenetre: 'Le Soleil monte très haut dans le ciel et, le soir, il fait encore jour très tard. Il fait chaud : on joue dehors jusqu’au soir !',
+    fenetre: 'Le Soleil monte très haut dans le ciel et, le soir, il fait encore jour très tard. Il fait chaud : les premiers fruits poussent dans l’arbre, et on joue dehors jusqu’au soir !',
     espace: 'Regarde la Terre : notre moitié penche à fond vers le Soleil. C’est le jour le plus long de toute l’année — et en Australie, c’est le jour le plus court.'
   },
   {
@@ -431,7 +459,7 @@ export var SCENARIOS = [
     label: 'L’automne arrive',
     sub: 'l’équinoxe d’automne',
     intro: 'Fin septembre, l’automne arrive…',
-    fenetre: 'Les feuilles de l’arbre deviennent rousses. Le jour dure aussi longtemps que la nuit… Mais maintenant, le Soleil descend un peu plus chaque jour.',
+    fenetre: 'Les feuilles de l’arbre deviennent rousses et commencent à tomber. Le jour dure aussi longtemps que la nuit… Mais maintenant, le Soleil descend un peu plus chaque jour.',
     espace: 'Les deux moitiés de la Terre sont de nouveau à égalité : ni chez nous, ni l’Australie ne penche vers le Soleil. La Terre continue son voyage… Et cette fois, c’est l’Australie qui va pencher vers le Soleil !'
   },
   {
@@ -476,7 +504,7 @@ export var DEFIS = [
     jourBravo: JOUR_EQUINOXE_PRINTEMPS,
     hemisphere: 'nord',
     consigne: 'Fais revenir le printemps chez nous !',
-    bravo: 'Bravo ! Le printemps revient : l’arbre ouvre ses premières fleurs !'
+    bravo: 'Bravo ! Le printemps revient : l’arbre est tout fleuri !'
   },
   {
     id: 'ete',
@@ -494,7 +522,7 @@ export var DEFIS = [
     jourBravo: JOUR_EQUINOXE_AUTOMNE,
     hemisphere: 'nord',
     consigne: 'Fais venir l’automne dans le jardin !',
-    bravo: 'Bravo ! L’automne arrive : les feuilles commencent à roussir, et le jour raccourcit.'
+    bravo: 'Bravo ! L’automne arrive : les feuilles roussissent et commencent à tomber.'
   },
   {
     id: 'neige',

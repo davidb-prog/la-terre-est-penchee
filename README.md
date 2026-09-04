@@ -29,7 +29,7 @@ L'idée centrale, celle que l'enfant doit retenir :
 - **La fenêtre de chez nous**, toujours synchronisée et vivante : le Soleil de
   midi qui monte haut l'été et reste bas l'hiver, et un jardin qui change
   chaque jour à petits pas (`jardinDuJour`, continu — verrouillé par test) —
-  fleurs qui éclosent une à une, feuilles qui poussent, roussissent et tombent,
+  fleurs qui éclosent une à une, fruits rouges de l'été, feuilles qui poussent, roussissent et tombent,
   tas de feuilles, neige qui s'installe, bonhomme de neige qui se construit,
   nuages, oiseaux, flocons et pétales qui tombent pendant la lecture — plus la
   **barre de la journée** — 24 h d'un coup d'œil, nuit étoilée aux bouts,

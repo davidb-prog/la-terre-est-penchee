@@ -6,7 +6,7 @@
  * ne fait que brancher.
  */
 import {
-  jourNormalise, phraseDuMoment, phraseEspace, JOUR_SOLSTICE_ETE, ANNEE_JOURS,
+  jourNormalise, phraseDuMoment, phraseDuMomentParties, phraseEspace, JOUR_SOLSTICE_ETE, ANNEE_JOURS,
   LECTURE_JOURS_PAR_SEC, SCENARIOS, VOIX_TRANSITIONS,
   DEFIS, DEFI_ATTENTE_MS, defiReussi, defiEncoreProche,
   texteOral
@@ -315,8 +315,27 @@ function fixerTexte(cle, el, valeur) {
   el.textContent = valeur;
 }
 
+/* La phrase du moment s'affiche en deux parties : le titre (mois + saison,
+ * doré) et le commentaire (en clair) — la clé de cache reste la phrase
+ * entière, rien ne se reconstruit tant qu'elle ne change pas. */
+function afficherPhraseMoment(jour) {
+  var entiere = phraseDuMoment(jour);
+  if (texteCache.moment === entiere) return;
+  texteCache.moment = entiere;
+  var parties = phraseDuMomentParties(jour);
+  phraseMoment.textContent = '';
+  var titre = document.createElement('span');
+  titre.className = 'phrase-titre';
+  titre.textContent = parties.titre;
+  var texte = document.createElement('span');
+  texte.className = 'phrase-texte';
+  texte.textContent = parties.texte;
+  phraseMoment.appendChild(titre);
+  phraseMoment.appendChild(texte);
+}
+
 function rafraichirTextes() {
-  fixerTexte('moment', phraseMoment, phraseDuMoment(etat.jour));
+  afficherPhraseMoment(etat.jour);
   fixerTexte('espace', phraseEspaceEl, phraseEspace(etat.jour));
   if (!curseurTenu) curseur.value = String(etat.jour);
 }

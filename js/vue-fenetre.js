@@ -152,6 +152,22 @@ function dessinerArbre(ctx, x, sol, taille, jardin) {
     }
   }
 
+  /* Les fruits de l'été, bien rouges sur la couronne (au printemps les
+   * fleurs, en été les fruits). */
+  if (jardin.fruits > 0.05 && jardin.feuilles > 0.3) {
+    var gonfleFr = 0.35 + 0.65 * jardin.feuilles;
+    var pointsFruits = [[0.3, -0.3], [-0.2, -0.36], [0.1, -0.12], [-0.33, -0.08], [0.37, -0.02], [-0.04, -0.5]];
+    var nbFruits = Math.round(jardin.fruits * pointsFruits.length);
+    for (var fu = 0; fu < nbFruits; fu++) {
+      ctx.fillStyle = '#e5533d';
+      ctx.beginPath();
+      ctx.arc(x + pointsFruits[fu][0] * taille * gonfleFr,
+        sol - tronc + pointsFruits[fu][1] * taille * gonfleFr - taille * 0.1,
+        taille * 0.06, 0, TAU);
+      ctx.fill();
+    }
+  }
+
   /* Les paquets de neige au bout des branches nues. */
   if (jardin.neige > 0.15 && jardin.feuilles < 0.3) {
     ctx.fillStyle = 'rgba(255, 255, 255, ' + (0.9 * jardin.neige) + ')';
