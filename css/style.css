@@ -457,6 +457,11 @@ button:focus-visible, input:focus-visible, a:focus-visible {
   .grille-vues .ratio-fenetre { aspect-ratio: auto; height: min(64vw, 34vh); }
   .grille-vues .ratio-espace { aspect-ratio: auto; height: min(70vw, 40vh); }
 
+  /* la place du PIRE cas (titre 2 lignes + commentaire 3 lignes, mesuré :
+     7,4 em au jour 120) est réservée : le nombre de lignes de la phrase ne
+     fait plus jamais sauter la page (retour test iPhone) */
+  #phrase-moment { min-height: 7.4em; }
+
   .boutons-scenarios { grid-template-columns: 1fr 1fr; }
   .scn { min-height: 64px; }
 

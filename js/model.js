@@ -227,7 +227,7 @@ export function jardinDuJour(jour) {
    * commencent à tomber juste avant l'équinoxe d'automne (les feuilles
    * volantes s'animent dès l'entrée de l'automne). */
   var feuilles;
-  t = rampe(j, 90, 160);                        /* elles poussent */
+  t = rampe(j, 70, 160);                        /* elles pointent dès fin mars */
   if (t !== null) feuilles = t;
   else {
     t = rampe(j, 255, 330);                     /* elles tombent */
@@ -395,55 +395,62 @@ export function aplombLumiere(jour) {
  * tests et le cache de main.js. */
 export function phraseDuMomentParties(jour) {
   var j = jourNormalise(jour);
-  var mois = moisDuJour(jour).nom;
+  var mois = moisDuJour(jour);
   var s = saison(jour, 'nord');
-  var p = penchementNord(jour);
-  var heures = Math.round(dureeJourHeures(jour));
-  /* Le jour s'allonge quand sin(angleAnnee) < 0 (durée = 12 + 4·cos). */
-  var mouvement = Math.sin(angleAnnee(jour)) < 0
-    ? 'Chaque jour, le Soleil grimpe un peu plus haut, et le jour s’allonge.'
-    : 'Chaque jour, le Soleil descend un peu, et le jour raccourcit.';
   /* La bande de transition (les ~12 jours avant un repère) : la phrase
-   * annonce la saison qui arrive — sans elle, juin racontait le printemps
-   * puis l'été en deux phrases contradictoires (retour test). */
+   * annonce la saison qui arrive, avec un commentaire STATIQUE et cohérent
+   * avec ses voisins (retour test : « le Soleil grimpe un peu plus haut »
+   * juste avant le solstice d'été jurait avec les phrases d'à côté). */
   var reperes = [
     { jour: JOUR_EQUINOXE_PRINTEMPS, saison: 'printemps' },
     { jour: JOUR_SOLSTICE_ETE, saison: 'ete' },
     { jour: JOUR_EQUINOXE_AUTOMNE, saison: 'automne' },
     { jour: JOUR_SOLSTICE_HIVER, saison: 'hiver' }
   ];
+  var TEXTES_BANDE = {
+    printemps: 'Le jour s’allonge : bientôt aussi long que la nuit !',
+    ete: 'Les jours sont bientôt les plus longs de l’année !',
+    automne: 'Le jour raccourcit : bientôt aussi long que la nuit.',
+    hiver: 'Les jours sont bientôt les plus courts de l’année.'
+  };
   for (var i = 0; i < reperes.length; i++) {
     var dans = jourNormalise(reperes[i].jour - j);
     if (dans > 0 && dans <= 12) {
       var suivante = SAISONS[reperes[i].saison];
       return {
-        titreAvant: 'En ' + mois + ', chez nous, ',
+        titreAvant: 'En ' + mois.nom + ', chez nous, ',
         avantSaisonNom: SAISONS[s].nom,
         avantTeinte: SAISONS[s].teinte,
         entre: ' se termine : ',
         saisonNom: suivante.nom,
         titreApres: ' arrive ! ' + suivante.emoji,
         teinte: suivante.teinte,
-        texte: mouvement
+        texte: TEXTES_BANDE[reperes[i].saison]
       };
     }
   }
   var parties = {
-    titreAvant: 'En ' + mois + ', chez nous, c’est ',
+    titreAvant: 'En ' + mois.nom + ', chez nous, c’est ',
     saisonNom: SAISONS[s].nom,
     titreApres: ' ! ' + SAISONS[s].emoji,
     teinte: SAISONS[s].teinte
   };
-  /* Au cœur de l'été et de l'hiver, les superlatifs sont mérités — et le
-   * chiffre dit son unité (retour test : « déjà 15 h » ne se comprenait
-   * pas). Partout ailleurs, pas de compteur qui défile pendant la
-   * lecture : la barre du jour montre déjà les heures. */
-  if (p > 0.75) {
+  /* Hors bande, le commentaire ne change JAMAIS en cours de mois (retour
+   * test : début mai et début novembre, la phrase basculait au milieu du
+   * mois). Les clauses sont ancrées sur des MOIS ENTIERS — superlatifs en
+   * mai-juin-juillet et novembre-décembre-janvier, mouvement ailleurs —
+   * et le chiffre d'heures est FIGÉ au milieu du mois affiché. */
+  var debutMois = 0;
+  for (var m = 0; m < mois.index; m++) debutMois += JOURS_PAR_MOIS[m];
+  var heures = Math.round(dureeJourHeures(debutMois + JOURS_PAR_MOIS[mois.index] / 2));
+  if (mois.index >= 4 && mois.index <= 6) { /* mai, juin, juillet */
     parties.texte = 'Le Soleil monte très haut dans le ciel, et il fait jour très longtemps : ' + heures + ' heures de lumière !';
-  } else if (p < -0.75) {
+  } else if (mois.index >= 10 || mois.index === 0) { /* novembre, décembre, janvier */
     parties.texte = 'Le Soleil reste tout bas, et la nuit tombe très tôt : ' + heures + ' heures de lumière seulement.';
+  } else if (Math.sin(angleAnnee(jour)) < 0) {
+    parties.texte = 'Chaque jour, le Soleil grimpe un peu plus haut, et le jour s’allonge.';
   } else {
-    parties.texte = mouvement;
+    parties.texte = 'Chaque jour, le Soleil descend un peu, et le jour raccourcit.';
   }
   return parties;
 }

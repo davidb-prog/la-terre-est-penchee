@@ -232,6 +232,16 @@ test('aux bords de saison, la phrase dit le mouvement vrai, pas le cliché du so
   }
 });
 
+test('hors mois de transition, la phrase ne change jamais en cours de mois', function () {
+  /* mai (jours 120-150) et novembre (304-333) basculaient en plein mois */
+  [[120, 150], [304, 333], [212, 242], [31, 58]].forEach(function (mois) {
+    var reference = phraseDuMoment(mois[0]);
+    for (var j = mois[0]; j <= mois[1]; j++) {
+      assert.equal(phraseDuMoment(j), reference, 'la phrase change au jour ' + j);
+    }
+  });
+});
+
 test('juste avant un repère, la phrase annonce la saison qui arrive (bande de transition)', function () {
   var finJuin = phraseDuMoment(165); /* 6 jours avant le solstice d'été */
   assert.ok(finJuin.indexOf('le printemps se termine') !== -1, finJuin);
