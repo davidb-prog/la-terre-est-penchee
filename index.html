@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <!-- zoom navigateur verrouillé : un enfant qui pince partout ne doit jamais se
+       retrouver avec une page minuscule — les zooms d'accessibilité du système
+       (triple-tap iOS, loupe Android, « forcer le zoom ») restent utilisables -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Pourquoi il y a des saisons ? — l’été, l’hiver et la Terre penchée expliqués aux enfants</title>
+  <meta name="description" content="La Terre est penchée, et elle garde son penchant toute l’année : voilà l’été et l’hiver ! Un petit site à toucher pour comprendre les saisons, dès 5 ans. Gratuit et sans publicité.">
+  <!-- socle SEO : adresse canonique (petit-labo.fr, sans www — le site est servi
+       comme un chemin du domaine du portail) -->
+  <link rel="canonical" href="https://petit-labo.fr/la-terre-est-penchee/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A6%98%3C/text%3E%3C/svg%3E">
+  <!-- carte de partage (WhatsApp, iMessage, réseaux) — docs/og.png, générée par
+       tools/build-og.mjs du dépôt du portail (davidb-prog.github.io) -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://petit-labo.fr/la-terre-est-penchee/">
+  <meta property="og:title" content="Pourquoi il y a des saisons ?">
+  <meta property="og:description" content="Pourquoi il y a des saisons ? De petits sites à toucher, à faire tourner, à écouter.">
+  <meta property="og:image" content="https://petit-labo.fr/la-terre-est-penchee/docs/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="fr_FR">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- carte d'identité pour les moteurs de recherche : une page éducative,
+       gratuite, en français — rien que des faits déjà affichés sur la page -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Pourquoi il y a des saisons ?",
+    "description": "La Terre est penchée, et elle garde son penchant toute l’année : voilà l’été et l’hiver ! Un petit site à toucher pour comprendre les saisons, dès 5 ans.",
+    "url": "https://petit-labo.fr/la-terre-est-penchee/",
+    "inLanguage": "fr",
+    "learningResourceType": "simulation interactive",
+    "typicalAgeRange": "5+",
+    "isAccessibleForFree": true,
+    "isPartOf": { "@type": "WebSite", "name": "Petit labo", "url": "https://petit-labo.fr/" }
+  }
+  </script>
+</head>
+<body>
+
+  <header class="entete">
+    <!-- la fiole de la série (l'étoile dedans) à côté du kicker — SVG repris du
+         portail (davidb-prog.github.io), règle de la charte -->
+    <p class="kicker">
+      <svg class="kicker-fiole" viewBox="0 0 100 100" aria-hidden="true">
+        <path d="M43 22 L43 42 L28 68 A9 9 0 0 0 36 81 L64 81 A9 9 0 0 0 72 68 L57 42 L57 22 Z"
+              fill="#0e1530" stroke="#ffcf5c" stroke-width="6" stroke-linejoin="round"/>
+        <path d="M50 51 L52 57 L58 59 L52 61 L50 67 L48 61 L42 59 L48 57 Z" fill="#ffcf5c"/>
+        <rect x="38" y="15" width="24" height="7" rx="3.5" fill="#ffcf5c"/>
+      </svg>
+      <span>Petit labo d’astronomie</span></p>
+    <h1>Pourquoi il y a des saisons&nbsp;?</h1>
+    <p class="tagline">
+      L’été, on mange des glaces dehors ; l’hiver, la nuit tombe avant le dîner…
+      Quel est le secret&nbsp;? <strong>C’est la Terre, qui penche&nbsp;!</strong> Attrape-la,
+      fais-lui faire le tour du Soleil, et regarde ce qui change chez nous.
+    </p>
+  </header>
+
+  <main>
+
+    <!-- Le cœur interactif : les deux vues, toujours synchronisées sur le même jour. -->
+    <section class="panneau panneau-scene" id="panneau-scene" aria-labelledby="titre-scene">
+      <div class="entete-scene">
+        <span class="titre-scene" id="titre-scene">Le même jour, deux regards</span>
+        <div class="actions-scene">
+          <!-- les deux libellés vivent empilés : largeur stable, rien ne se décale -->
+          <button id="bouton-lecture" class="bouton-lecture" aria-pressed="true"><span
+              class="lecture-on" aria-hidden="true">⏸ Pause</span><span
+              class="lecture-off" aria-hidden="true">▶ Lecture</span></button>
+        </div>
+      </div>
+
+      <div class="grille-vues">
+        <div class="bloc-vue">
+          <div class="entete-vue entete-vue-fenetre">🏡 Chez nous, par la fenêtre</div>
+          <div class="cadre-canvas ratio-fenetre">
+            <canvas id="canvas-fenetre"
+              aria-label="Chez nous, au fil de l’année : le Soleil de midi monte haut l’été et reste bas l’hiver, l’arbre du jardin change avec les saisons, et la barre dorée montre combien d’heures le jour dure. Utilise le curseur des mois pour changer de moment de l’année."></canvas>
+          </div>
+          <p class="phrase-vue" id="phrase-moment" aria-live="polite"></p>
+        </div>
+
+        <div class="bloc-vue">
+          <div class="entete-vue entete-vue-espace">🚀 Depuis l’espace
+            <span class="hint">la maison : chez nous · le kangourou : l’Australie</span></div>
+          <div class="cadre-canvas ratio-espace">
+            <canvas id="canvas-orbite"
+              aria-label="Le Soleil fixe au centre, la Terre penchée sur son orbite vue en perspective : elle passe devant le Soleil en bas de l’écran, derrière lui en haut. L’axe de la Terre penche toujours vers la même direction. La Terre est coupée en deux par son équateur doré : la maison est chez nous, sur la moitié nord ; le kangourou est en Australie, sur la moitié sud. Autour des solstices, un faisceau de lumière montre comment le Soleil frappe chez nous : bien en face l’été, de biais l’hiver — et la distance Terre-Soleil ne change jamais. Glisse la Terre avec le doigt ou la souris pour lui faire faire le tour du Soleil."></canvas>
+          </div>
+          <p class="phrase-vue" id="phrase-espace" aria-live="polite"></p>
+          <!-- la bulle « attrape-moi » vit SOUS le canvas : rien ne recouvre les vues -->
+          <div class="bulle-geste" id="bulle-geste"><span class="bulle-geste-pilule">✋ Attrape la Terre et fais-lui faire le tour !</span></div>
+        </div>
+      </div>
+
+      <!-- Le grand curseur maître : les mois de l'année. -->
+      <div class="commande-annee">
+        <div class="piste-emojis" aria-hidden="true">
+          <span class="repere-janvier">❄️</span><span class="repere-printemps">🌸</span><span class="repere-ete">☀️</span><span class="repere-automne">🍂</span><span class="repere-hiver">❄️</span>
+        </div>
+        <input type="range" id="curseur-jours" min="0" max="365" step="0.5" value="0"
+          aria-label="Choisis le jour de l’année, de janvier à décembre : la Terre avance sur son orbite et les saisons changent chez nous.">
+        <div class="piste-mois" aria-hidden="true">
+          <span>J</span><span>F</span><span>M</span><span>A</span><span>M</span><span>J</span><span>J</span><span>A</span><span>S</span><span>O</span><span>N</span><span>D</span>
+        </div>
+        <p class="legende-curseur">Fais glisser pour traverser l’année, mois après mois !</p>
+      </div>
+    </section>
+
+    <!-- Les boutons-scénarios : les quatre moments-clés de l'année. -->
+    <section class="panneau panneau-scenarios" aria-labelledby="titre-scenarios">
+      <div class="titre-scenarios" id="titre-scenarios">
+        <span>🎲 Joue avec les saisons</span>
+        <button id="bouton-voix-scn" class="bouton-voix" aria-pressed="false"
+          title="La voix du conteur raconte chaque moment choisi"><span
+            class="voix-on" aria-hidden="true">🔊 avec la voix</span><span
+            class="voix-off" aria-hidden="true">🔇 sans la voix</span></button>
+      </div>
+      <div class="boutons-scenarios" id="boutons-scenarios"></div>
+      <div class="histoire-scn" id="histoire-scn"></div>
+    </section>
+
+    <!-- La boîte d'explication : à lire… ou à écouter. Repliée sur mobile. -->
+    <details class="panneau panneau-explication" id="explication-pli" open>
+      <summary class="resume-explication"><h2>💡 Pourquoi il y a des saisons&nbsp;?</h2>
+        <span class="hint">(l’histoire complète, à lire ou à écouter)</span></summary>
+      <div class="entete-explication">
+        <h2>💡 Pourquoi il y a des saisons&nbsp;?</h2>
+        <button id="bouton-ecouter" class="bouton-ecouter" hidden aria-pressed="false">🔊 Écouter l’histoire</button>
+      </div>
+      <p class="conseil-voix" id="conseil-voix" hidden>
+        🗣 Pour une plus jolie voix, ouvre cette page dans Chrome ou Edge, ou installe une voix
+        française « améliorée » dans les réglages de l’appareil.
+      </p>
+      <div class="texte-explication" id="texte-explication">
+        <p>La Terre est comme une grosse toupie qui penche un peu sur le côté. Et elle garde toujours son penchant, sans jamais en changer.</p>
+        <p>Toute l’année, elle fait un grand voyage autour du Soleil. Un tour complet, c’est une année entière !</p>
+        <p>Quand notre moitié de la Terre penche vers le Soleil, elle le regarde bien en face. Alors le Soleil monte haut dans le ciel, il reste longtemps, et les jours sont très longs : c’est l’été.</p>
+        <p>Six mois plus tard, la Terre est de l’autre côté du Soleil. Notre moitié ne penche plus vers lui : elle ne le voit plus que de biais. Le Soleil reste tout bas, la nuit tombe vite… c’est l’hiver.</p>
+        <p>Essaie avec une lampe : si tu penches ton visage vers elle, elle t’éclaire en plein visage. Si tu te penches en arrière, sa lumière ne fait que glisser sur ta figure. La Terre fait pareil avec le Soleil !</p>
+        <p>Un Soleil bien en face, qui reste dans le ciel toute la journée, a tout le temps de chauffer le jardin, la mer et l’air. Un Soleil de biais, vite couché, n’a pas le temps de chauffer grand-chose. Voilà pourquoi il fait chaud l’été et froid l’hiver !</p>
+        <p>Le Soleil n’est pas plus près en été, ni plus loin en hiver : c’est le penchant qui fait tout ! D’ailleurs, quand c’est l’hiver chez nous, pour les enfants d’Australie, sur l’autre moitié de la Terre, c’est Noël en plein été, sur la plage…</p>
+      </div>
+    </details>
+
+    <!-- Le jeu : fabriquer la saison demandée en promenant la Terre. -->
+    <section class="panneau panneau-jeu" aria-labelledby="titre-jeu">
+      <div class="entete-jeu">
+        <h2 id="titre-jeu">🎯 Fabrique la saison !</h2>
+        <div class="actions-jeu">
+          <button id="bouton-voix-jeu" class="bouton-voix" hidden aria-pressed="false"
+            title="La voix du conteur lit les consignes et les bravos"><span
+              class="voix-on" aria-hidden="true">🔊 avec la voix</span><span
+              class="voix-off" aria-hidden="true">🔇 sans la voix</span></button>
+          <button id="bouton-jouer" class="bouton-jeu" aria-expanded="false">🎮 Jouer</button>
+        </div>
+      </div>
+      <div id="zone-jeu" hidden>
+        <p class="consigne-jeu">Promène la Terre autour du Soleil et fabrique…</p>
+        <p class="defi-jeu" id="defi-jeu" aria-live="polite"></p>
+        <div class="vues-jeu">
+          <div class="cadre-canvas ratio-espace cadre-jeu-espace">
+            <canvas id="canvas-orbite-jeu"
+              aria-label="La même vue de l’espace que plus haut, synchronisée : glisse la Terre ici pour lui faire faire le tour du Soleil et fabriquer la saison demandée."></canvas>
+          </div>
+          <div class="cadre-canvas ratio-fenetre cadre-jeu-fenetre">
+            <canvas id="canvas-fenetre-jeu"
+              aria-label="La même fenêtre de chez nous que plus haut, synchronisée : la saison que tu fabriques."></canvas>
+          </div>
+        </div>
+        <p class="bravo-jeu" id="bravo-jeu" aria-live="polite" hidden></p>
+        <button id="bouton-encore" class="bouton-jeu" hidden>🎲 Encore une !</button>
+      </div>
+    </section>
+
+    <!-- La note aux parents : mode d'emploi, puis les licences assumées. -->
+    <details class="panneau parents">
+      <summary>📝 La note aux parents <span class="hint">(mode d’emploi et petites simplifications)</span></summary>
+
+      <h3>Comment on s’en sert</h3>
+      <ul>
+        <li><strong>Le grand curseur des mois commande tout.</strong> Les deux vues montrent
+          toujours le même jour de l’année : chez nous par la fenêtre, et la Terre vue de
+          l’espace. L’année avance toute seule (un tour en une minute et demie) — le bouton ⏸
+          (ou la barre d’espace) la met en pause.</li>
+        <li><strong>Le geste préféré des enfants :</strong> attraper la Terre sur la vue de
+          l’espace et lui faire faire le tour du Soleil, dans un sens ou dans l’autre. Le
+          Soleil ne bouge jamais, et le penchant de la Terre non plus — c’est tout le
+          message.</li>
+        <li><strong>Les quatre boutons-saisons</strong> font glisser l’année en douceur jusqu’au
+          moment choisi, puis racontent le même instant des deux regards. Le bouton 🔇/🔊
+          allume la voix du conteur (les saisons, la grande histoire, les consignes du jeu) ;
+          le choix est retenu d’une visite à l’autre, et rien ne part sur Internet.</li>
+        <li><strong>Le jeu « Fabrique la saison ! »</strong> demande de fabriquer une saison en
+          promenant la Terre sur son orbite. Le défi du kangourou est la révélation du site :
+          pour offrir l’été aux enfants d’Australie, il faut plonger chez nous en plein
+          hiver.</li>
+        <li><strong>Sur téléphone,</strong> un médaillon en haut à droite montre la fenêtre de
+          chez nous dès qu’elle sort de l’écran — un tap y ramène.</li>
+      </ul>
+
+      <h3>Ce que le site simplifie</h3>
+      <ul>
+        <li><strong>Le penchant est exagéré sur le dessin.</strong> L’axe de la Terre est incliné de
+          23,44° — le site le dessine à 30° pour qu’il se voie bien. Sa direction reste quasi
+          fixe d’une année sur l’autre (elle dérive très lentement, sur 26 000 ans).</li>
+        <li><strong>Ce n’est vraiment pas la distance.</strong> L’orbite est quasi circulaire
+          (~150 millions de km) et, surprise : la Terre est même un peu <em>plus près</em> du
+          Soleil début janvier (147 millions de km) qu’en juillet (152 millions) — en plein
+          hiver chez nous. Ce sont le penchant, la hauteur du Soleil et la longueur des jours
+          qui font les saisons.</li>
+        <li><strong>Les repères de l’année sont espacés régulièrement.</strong> En vrai :
+          équinoxes vers les 20 mars et 22-23 septembre, solstices vers les 20-21 juin et
+          21-22 décembre — et les saisons n’ont pas exactement la même durée, car l’orbite est
+          légèrement elliptique. L’année du site fait 365 jours tout ronds.</li>
+        <li><strong>Les chiffres de la fenêtre sont ceux de chez nous, arrondis.</strong> Hauteur
+          du Soleil à midi (~20° à ~66°) et durée du jour (8 h à 16 h) correspondent à la
+          latitude de la France (~47° nord). À l’équateur, les jours durent presque toujours
+          12 h ; aux pôles, il y a le soleil de minuit et la nuit polaire !</li>
+        <li><strong>Le plus chaud arrive après le solstice.</strong> Le sol et les océans mettent
+          des semaines à se réchauffer et à se refroidir, comme une grande casserole : les
+          jours les plus chauds tombent fin juillet-août, les plus froids fin janvier. C’est
+          pourquoi le site n’affiche pas de températures : il montre les causes — la météo
+          suit, avec du retard et ses caprices.</li>
+        <li><strong>La maison ne se rapproche jamais du Soleil.</strong> Sans la rotation
+          quotidienne, une maison posée sur une face du globe semblerait s’approcher du Soleil
+          en été — la fausse explication classique. En vrai, la maison fait chaque jour le tour
+          de son <em>anneau de latitude</em> (le ruban dessiné sur le globe), qui reste à la
+          même distance du Soleil toute l’année : ce qui change, c’est l’angle des rayons et la
+          durée du jour, jamais la distance. C’est pourquoi maison et kangourou sont posés sur
+          leur anneau, face à nous.</li>
+        <li><strong>Le faisceau de lumière arrose toute la face de la Terre</strong> — comme en
+          vrai : le Soleil ne vise personne. Ce sont les taches d’arrivée qui racontent les
+          saisons : une tache vive là où la lumière frappe bien en face (chez nous l’été, en
+          Australie l’hiver), aucune là où elle rase — la lumière glisse sans chauffer. Aux
+          équinoxes, <strong>deux taches jumelles</strong>, une par moitié : la lumière se
+          partage exactement à égalité — personne ne penche vers le Soleil.</li>
+        <li><strong>Une maison, un kangourou.</strong> Ils marquent les deux moitiés de la Terre
+          (leurs anneaux, vers 45° nord et 45° sud), sans prétendre à la vraie géographie. Près
+          de l’équateur, on parle plutôt de saison sèche et de saison des pluies.</li>
+        <li><strong>La Terre tourne aussi sur elle-même</strong> (le jour et la nuit) — la vue de
+          l’espace ignore volontairement cette rotation quotidienne : le voile de nuit dessiné
+          sur le globe est celui de l’année (la moitié qui ne regarde pas le Soleil), il tourne
+          avec les saisons, pas avec les jours. Le jour et la nuit ont leur propre épisode :
+          <a href="https://petit-labo.fr/ou-va-le-soleil/">Où va le Soleil la nuit ?</a></li>
+        <li><strong>Pourquoi le jour dure-t-il plus longtemps l’été ?</strong> À cause de cette
+          même rotation quotidienne : chaque jour, la maison fait le tour complet de son anneau
+          de latitude. Regardez l’anneau traverser le voile de nuit sur le globe : l’été,
+          penchée vers le Soleil, notre moitié a presque tout son anneau dans la lumière — le
+          tour quotidien se passe presque tout entier du côté jour. L’hiver, c’est l’inverse.
+          Aux équinoxes, le voile coupe l’anneau exactement en deux : 12 h de jour, 12 h de
+          nuit.</li>
+      </ul>
+
+      <p class="parents-mot">Le mot savant à retenir : l’<strong>obliquité</strong> — le penchant
+        de l’axe de la Terre (23,44°), qui garde sa direction pendant que la Terre fait sa
+        <strong>révolution</strong> autour du Soleil en un an. C’est elle qui fabrique les
+        saisons.</p>
+    </details>
+
+  </main>
+
+  <!-- Le médaillon flottant (mobile) : chez nous en miniature, toujours
+       visible quand la fenêtre est sortie de l'écran. Un tap y ramène. -->
+  <button id="medaillon-fenetre" class="medaillon-fenetre" hidden
+    aria-label="Chez nous en ce moment — remonter à la fenêtre">
+    <canvas id="canvas-medaillon" aria-hidden="true"></canvas>
+  </button>
+
+  <!-- pied de page harmonisé de la famille : les autres épisodes en liens, puis
+       le bouton du menu vers le portail -->
+  <footer class="pied-site">
+    <p class="pied-serie">« Pourquoi il y a des saisons ? » — un épisode du <strong>Petit labo d’astronomie</strong> 🔭</p>
+    <!-- chaque épisode porte son médaillon SVG (repris de sa carte sur le portail),
+         et le bouton du menu porte la fiole maître au « ? » (version petites
+         tailles : éclats retirés, traits épaissis — règle de la charte) -->
+    <ul class="episodes-pied">
+      <li><a href="https://petit-labo.fr/ou-va-le-soleil/">
+        <span class="ep-medaillon" aria-hidden="true">
+          <svg viewBox="0 0 100 100">
+            <defs><clipPath id="med-soleil"><rect x="0" y="0" width="100" height="64"/></clipPath></defs>
+            <g clip-path="url(#med-soleil)">
+              <circle cx="50" cy="66" r="17" fill="#ffcf5c"/>
+              <path d="M50 39 L50 31" stroke="#ffcf5c" stroke-width="5" stroke-linecap="round"/>
+              <path d="M30 46 L24.5 40.5" stroke="#ffcf5c" stroke-width="5" stroke-linecap="round"/>
+              <path d="M70 46 L75.5 40.5" stroke="#ffcf5c" stroke-width="5" stroke-linecap="round"/>
+            </g>
+            <path d="M16 66 L84 66" stroke="#46c2a5" stroke-width="4.5" stroke-linecap="round"/>
+            <circle cx="24" cy="25" r="2" fill="#9aa5c3"/>
+            <circle cx="79" cy="21" r="2.4" fill="#e9edf8"/>
+          </svg>
+        </span>
+        <span class="ep-titre">Où va le Soleil la nuit ?</span></a></li>
+      <li><a href="https://petit-labo.fr/la-terre-tourne/">
+        <span class="ep-medaillon" aria-hidden="true">
+          <svg viewBox="0 0 100 100">
+            <circle cx="36" cy="44" r="16" fill="#ffe9b0"/>
+            <circle cx="36" cy="44" r="16" fill="none" stroke="#ffcf5c" stroke-width="4.5"/>
+            <path d="M36 44 L36 33.5" stroke="#070b17" stroke-width="3.5" stroke-linecap="round"/>
+            <path d="M36 44 L43.5 47" stroke="#070b17" stroke-width="3.5" stroke-linecap="round"/>
+            <circle cx="64" cy="62" r="16" fill="#0e1530"/>
+            <circle cx="64" cy="62" r="16" fill="none" stroke="#a98bff" stroke-width="4.5"/>
+            <path d="M64 62 L64 51.5" stroke="#a98bff" stroke-width="3.5" stroke-linecap="round"/>
+            <path d="M64 62 L56.5 65" stroke="#a98bff" stroke-width="3.5" stroke-linecap="round"/>
+            <circle cx="74" cy="28" r="2" fill="#e9edf8"/>
+            <circle cx="22" cy="76" r="1.7" fill="#ff6b9d"/>
+          </svg>
+        </span>
+        <span class="ep-titre">Quelle heure est-il là-bas ?</span></a></li>
+      <li><a href="https://petit-labo.fr/la-lune-change-de-forme/">
+        <span class="ep-medaillon" aria-hidden="true">
+          <svg viewBox="0 0 100 100">
+            <circle cx="48" cy="54" r="20" fill="#ffcf5c"/>
+            <circle cx="57" cy="48" r="17.5" fill="#070b17"/>
+            <circle cx="26" cy="26" r="2.2" fill="#a98bff"/>
+            <circle cx="76" cy="30" r="2" fill="#ff6b9d"/>
+            <circle cx="72" cy="74" r="1.8" fill="#9aa5c3"/>
+            <circle cx="22" cy="70" r="1.6" fill="#e9edf8"/>
+          </svg>
+        </span>
+        <span class="ep-titre">Pourquoi la Lune change de forme ?</span></a></li>
+    </ul>
+    <p class="menu-pied"><a class="bouton-menu-labo" href="https://petit-labo.fr/">
+      <svg class="fiole-labo" viewBox="0 0 100 100" aria-hidden="true">
+        <path d="M44 40 L44 54 L30 72 A8 8 0 0 0 37 84 L63 84 A8 8 0 0 0 70 72 L56 54 L56 40 Z"
+              fill="#0e1530" stroke="#ffcf5c" stroke-width="6.5" stroke-linejoin="round"/>
+        <rect x="39.5" y="34" width="21" height="6.5" rx="3.25" fill="#ffcf5c"/>
+        <g transform="rotate(10 53 17)">
+          <path d="M45.5 13 A7.5 7.5 0 1 1 53 20.5 L53 23"
+                fill="none" stroke="#ffcf5c" stroke-width="7" stroke-linecap="round"/>
+          <circle cx="53" cy="29.5" r="3.6" fill="#ffcf5c"/>
+        </g>
+      </svg>
+      Tous les épisodes du Petit labo</a></p>
+  </footer>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+node_modules/
+.DS_Store
+*.log
+tools/essais/
+tools/ecoute.html
+tools/controle.html
+tools/controle-cache.json
+.cle-elevenlabs
+
+# captures de travail de la suite navigateur (jamais commitées)
+capture-*.png
+docs/reduit-*.png
