@@ -464,11 +464,11 @@ export function phraseDuMoment(jour) {
 /* La phrase de la vue de l'espace : où penche notre moitié, en ce moment. */
 export function phraseEspace(jour) {
   var p = penchementNord(jour);
-  if (p > 0.7) return '🏡 Notre moitié de la Terre penche à fond vers le Soleil : les jours sont les plus longs de l’année !';
-  if (p > 0.15) return '🏡 Notre moitié penche vers le Soleil — et l’Australie, à l’opposé.';
-  if (p < -0.7) return '🏡 Notre moitié penche à fond à l’opposé du Soleil : les jours sont les plus courts de l’année.';
-  if (p < -0.15) return '🏡 Notre moitié penche à l’opposé du Soleil — l’Australie, elle, penche vers le Soleil.';
-  return '🏡 Aucune moitié ne penche vers le Soleil : chez nous et l’Australie sont à égalité.';
+  if (p > 0.7) return 'Notre moitié de la Terre penche à fond vers le Soleil : les jours sont les plus longs de l’année !';
+  if (p > 0.15) return 'Notre moitié penche vers le Soleil — et l’Australie, à l’opposé.';
+  if (p < -0.7) return 'Notre moitié penche à fond à l’opposé du Soleil : les jours sont les plus courts de l’année.';
+  if (p < -0.15) return 'Notre moitié penche à l’opposé du Soleil — l’Australie, elle, penche vers le Soleil.';
+  return 'Aucune moitié ne penche vers le Soleil : chez nous et l’Australie sont à égalité.';
 }
 
 /* ------------------------------------------------------------------ */
