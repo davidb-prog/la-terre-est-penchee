@@ -313,6 +313,13 @@ committent pas). La carte `docs/og.png` se régénère depuis le dépôt du port
 
 ## La série
 
+**L'emoji-signature de l'épisode : 🦘** (favicon et texte courant — choix
+utilisateur : le kangourou est la révélation du site, et il ne collisionne
+avec aucun voisin : 🌅 `ou-va-le-soleil`, 🌍 `la-terre-tourne`, 🌙
+`la-lune-change-de-forme` — le favicon 🌍 de départ doublonnait
+`la-terre-tourne`). Les illustrations restent des SVG maison (jamais
+d'emoji en grand, règle de la famille).
+
 Pied de page harmonisé : « Pourquoi il y a des saisons ? » — un épisode du
 Petit labo d'astronomie 🔭, liens vers `ou-va-le-soleil`, `la-terre-tourne`
 et `la-lune-change-de-forme` (médaillons SVG repris du portail — le pied ne
