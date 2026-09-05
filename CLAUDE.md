@@ -236,6 +236,11 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
 - **Le seuil mobile UNIQUE de l'épisode : 880 px.** La grille CSS, le
   médaillon, le repli de la boîte d'explication et la vue unique du jeu lisent
   tous ce chiffre.
+- **Sur mobile, les DEUX vues tiennent dans un écran de téléphone**
+  (retour utilisateur : l'espace était sous la ligne de flottaison) : du
+  titre de la fenêtre au bas du canvas de l'espace, ~660 px pour ~715 px
+  visibles sur iPhone — hauteurs `min(54vw, 28vh)` (fenêtre) et
+  `min(62vw, 33vh)` (espace), mesurées par script avant tout réglage.
 - **Sur mobile (< 880 px) seulement** : un médaillon flottant (haut droit,
   hors du chemin du pouce) montre la fenêtre de chez nous en miniature dès
   qu'elle sort de l'écran — un tap y ramène. Le jeu n'affiche qu'une vue

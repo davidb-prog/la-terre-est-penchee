@@ -459,8 +459,11 @@ button:focus-visible, input:focus-visible, a:focus-visible {
      appui-saison, fenêtre ET espace se partagent le viewport du téléphone.
      Hauteurs EXPLICITES, jamais aspect-ratio + max-height (WebKit réduirait
      la largeur de la boîte). */
-  .grille-vues .ratio-fenetre { aspect-ratio: auto; height: min(64vw, 34vh); }
-  .grille-vues .ratio-espace { aspect-ratio: auto; height: min(70vw, 40vh); }
+  /* les DEUX vues et la phrase de la fenêtre tiennent dans un écran de
+     téléphone (~715 px visibles) : mesuré, du titre de la fenêtre au bas
+     du canvas de l'espace, ~660 px */
+  .grille-vues .ratio-fenetre { aspect-ratio: auto; height: min(54vw, 28vh); }
+  .grille-vues .ratio-espace { aspect-ratio: auto; height: min(62vw, 33vh); }
 
   /* la place du PIRE cas (titre 2 lignes + commentaire 3 lignes, mesuré :
      7,4 em au jour 120) est réservée : le nombre de lignes de la phrase ne
