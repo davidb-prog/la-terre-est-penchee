@@ -13,13 +13,15 @@
 //   --essai id1,id2…   phrase-test avec chaque voix candidate, pour choisir :
 //                      écrit tools/essais/essai-<voiceId>.mp3 (non commité)
 //   --voice <id>       équivalent de ELEVENLABS_VOICE_ID
+//   --speed <n>        débit de parole (0,7-1,2). Omis par défaut : la charge
+//                      utile reste celle des épisodes déjà enregistrés.
 //
 // Idempotent : le manifeste (assets/audio/manifest.json) garde le hash du
 // texte de chaque bloc — on ne régénère que les textes nouveaux ou modifiés.
 // Après génération, réécouter tout d'une traite : tools/ecoute.html.
 // Zéro dépendance npm (Node ≥ 18 : fetch natif).
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync, unlinkSync, statSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, unlinkSync, statSync, copyFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { corpus, empreinteBloc } from './voix-lib.mjs';
 
@@ -27,6 +29,12 @@ const MODELE = 'eleven_multilingual_v2';
 // de la parole : 64 kb/s suffisent largement (moitié du poids de 128)
 const FORMAT_SORTIE = 'mp3_44100_64';
 const REGLAGES_VOIX = { stability: 0.5, similarity_boost: 0.75, style: 0.3 };
+// --speed : le débit de parole (0,7 à 1,2 ; 1,0 = naturel). ABSENT par défaut,
+// et c'est volontaire — la voix d'astronomie est publiée sans lui, ajouter
+// « speed: 1.0 » changerait la charge utile envoyée à ElevenLabs pour quatre
+// épisodes déjà enregistrés. Il sert aux voix qui parlent trop vite : la
+// candidate de la série physique tombe sur le tempo de la famille à 0,90
+// (voir references/voix-enregistree.md du skill petit-labo).
 // --calme : pour les clips qui « bloquent » prise après prise. Les clips
 // courts sans contexte sont le point faible du modèle (pauses dramatiques,
 // syllabes étirées) : on re-tire avec des réglages posés (style 0, stabilité
@@ -34,9 +42,18 @@ const REGLAGES_VOIX = { stability: 0.5, similarity_boost: 0.75, style: 0.3 };
 // bloc dans le récit — entendue par le modèle, jamais prononcée). Le texte ne
 // change pas : ni id ni manifeste ne bougent.
 const REGLAGES_CALMES = { stability: 0.75, similarity_boost: 0.75, style: 0 };
-// la phrase-test du mode --essai : expressive, avec suspens et exclamation
-const PHRASE_ESSAI = 'Quand tu prends ton petit-déjeuner, à Bali le soleil se couche déjà… '
-  + 'La Terre est ronde, et elle tourne — c’est pour ça qu’il n’est pas la même heure partout !';
+// La phrase-test du mode --essai se PRÉLÈVE dans le corpus de l'épisode : une
+// phrase écrite en dur se recopie d'un épisode à l'autre et finit par faire
+// juger une voix sur le texte d'un autre site (c'était le cas ici — la
+// phrase de « la Terre tourne » servait à essayer les voix des saisons).
+// On cherche un bloc assez long pour révéler le souffle, et expressif.
+function phraseEssai() {
+  const tous = corpus();
+  const taille = tous.filter((b) => b.texte.length >= 120 && b.texte.length <= 260);
+  const expressifs = taille.filter((b) => /[!?…]/.test(b.texte));
+  const panier = expressifs.length ? expressifs : (taille.length ? taille : tous);
+  return panier.slice().sort((a, b) => b.texte.length - a.texte.length)[0].texte;
+}
 
 const racine = fileURLToPath(new URL('..', import.meta.url));
 const dossierAudio = racine + 'assets/audio/';
@@ -49,6 +66,13 @@ const valeur = (nom) => {
   return i !== -1 && args[i + 1] ? args[i + 1] : null;
 };
 
+// --speed <n> : null tant que personne ne le demande (charge utile inchangée)
+const VITESSE = valeur('--speed') === null ? null : parseFloat(valeur('--speed'));
+if (VITESSE !== null && !(VITESSE >= 0.7 && VITESSE <= 1.2)) {
+  console.error('--speed doit tenir entre 0.7 et 1.2 (1.0 = naturel).');
+  process.exit(1);
+}
+
 const manifeste = lireManifeste();
 const cle = process.env.ELEVENLABS_API_KEY || '';
 // la voix : --voice, sinon la variable d'environnement, sinon celle déjà
@@ -58,8 +82,9 @@ const voix = valeur('--voice') || process.env.ELEVENLABS_VOICE_ID || manifeste.v
 async function genererMp3(texte, voiceId, precedent, calme) {
   const url = 'https://api.elevenlabs.io/v1/text-to-speech/' + voiceId
     + '?output_format=' + FORMAT_SORTIE;
-  const corps = { text: texte, model_id: MODELE,
-    voice_settings: calme ? REGLAGES_CALMES : REGLAGES_VOIX };
+  const reglages = Object.assign({}, calme ? REGLAGES_CALMES : REGLAGES_VOIX);
+  if (VITESSE !== null) reglages.speed = VITESSE;
+  const corps = { text: texte, model_id: MODELE, voice_settings: reglages };
   // le contexte de prosodie des fragments (« …et fabrique… ») : influence le
   // ton sans être prononcé
   if (precedent) corps.previous_text = precedent;
@@ -286,9 +311,11 @@ if (drapeau('--essai') || valeur('--essai')) {
     process.exit(1);
   }
   mkdirSync(racine + 'tools/essais', { recursive: true });
+  const phrase = phraseEssai();
+  console.log('phrase-test (prélevée dans le corpus de l’épisode) :\n  ' + phrase + '\n');
   for (const v of ids) {
     process.stdout.write('essai ' + v + ' … ');
-    const mp3 = await genererMp3(PHRASE_ESSAI, v);
+    const mp3 = await genererMp3(phrase, v);
     writeFileSync(racine + 'tools/essais/essai-' + v + '.mp3', mp3);
     console.log('ok (tools/essais/essai-' + v + '.mp3)');
   }
@@ -353,13 +380,31 @@ const diction = (t) => {
       return hh + ' heures' + (mn ? ' ' + (MOTS[parseInt(mn, 10)] || mn) : '');
     });
 };
+// Un re-tirage écrase la prise précédente, qui était peut-être la bonne : on
+// la range d'abord dans tools/essais/ (gitignoré), numérotée. L'utilisateur
+// choisit alors entre des candidats au lieu de subir la dernière sortie —
+// leçon payée sur cet épisode, où deux prises ont disparu sous les suivantes.
+function archiverPrise(id) {
+  const vif = dossierAudio + id + '.mp3';
+  if (!existsSync(vif)) return null;
+  const dossier = racine + 'tools/essais/';
+  mkdirSync(dossier, { recursive: true });
+  let n = 1;
+  while (existsSync(dossier + id + '--prise' + n + '.mp3')) n++;
+  const garde = dossier + id + '--prise' + n + '.mp3';
+  copyFileSync(vif, garde);
+  return 'prise' + n;
+}
+
 mkdirSync(dossierAudio, { recursive: true });
 for (const b of aFaire) {
   process.stdout.write(b.id + (calme ? ' (calme)' : '') + ' … ');
+  const garde = archiverPrise(b.id);
   const mp3 = await genererMp3(diction(b.texte), voix, b.precedent || (calme ? contexteDe(b) : null), calme);
   writeFileSync(dossierAudio + b.id + '.mp3', mp3);
   manifeste.blocs[b.id] = { texte: b.texte, hash: empreinteBloc(b), fichier: b.id + '.mp3' };
-  console.log('ok (' + Math.round(mp3.length / 1024) + ' ko)');
+  console.log('ok (' + Math.round(mp3.length / 1024) + ' ko)'
+    + (garde ? ' — l’ancienne est gardée en tools/essais/' + b.id + '--' + garde + '.mp3' : ''));
 }
 // les blocs disparus du site ne doivent pas hanter le manifeste — ni leurs
 // mp3 traîner sur le disque (quand un texte change, son id change avec lui)
@@ -372,7 +417,9 @@ for (const id of Object.keys(manifeste.blocs)) {
 manifeste.voix = voix;
 manifeste.modele = MODELE;
 manifeste.format = FORMAT_SORTIE;
-manifeste.reglages = REGLAGES_VOIX;
+manifeste.reglages = VITESSE === null
+  ? REGLAGES_VOIX
+  : Object.assign({}, REGLAGES_VOIX, { speed: VITESSE });
 writeFileSync(cheminManifeste, JSON.stringify(manifeste, null, 2) + '\n');
 ecrirePageEcoute(blocs);
 console.log('\nManifeste écrit. Réécouter SEULEMENT cette fournée (servir le dépôt, puis) :');
