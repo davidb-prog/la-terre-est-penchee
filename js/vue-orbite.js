@@ -94,58 +94,63 @@ function dessinerTache(ctx, tx, ty, gx, gy, rG, aplomb, force) {
   ctx.restore();
 }
 
-/* Le kangourou dessiné : une vraie silhouette marron clair (corps, tête,
- * oreilles, queue, œil). L'émoji sortait en glyphe GRIS sur iPhone (WebKit,
- * malgré le sélecteur VS16 et la police d'émojis explicite) — la silhouette
- * garantit sa couleur partout. Coordonnées locales : les pieds en (0,0), le
- * corps vers le haut, tête à gauche — la rotation le met tête en bas aux
- * antipodes. */
+/* Le kangourou dessiné : une vraie silhouette marron clair, d'un seul
+ * trait de profil (les cinq signes qui font « kangourou » : oreilles
+ * dressées, museau allongé, dos courbé sur la grosse cuisse, queue
+ * épaisse posée au sol, grand pied plat). L'émoji sortait en glyphe GRIS
+ * sur iPhone (WebKit, malgré le sélecteur VS16 et la police d'émojis
+ * explicite) — la silhouette garantit sa couleur partout. Coordonnées
+ * locales : les pieds en (0,0), le corps vers le haut, tête à gauche —
+ * la rotation le met tête en bas aux antipodes. */
 function dessinerKangourou(ctx, x, y, rotation, s) {
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(rotation);
-  ctx.scale(s, s);
-  ctx.strokeStyle = '#e0975f';
-  ctx.lineWidth = 0.16;
+  ctx.scale(s * 0.92, s * 0.92);
+  /* L'anatomie en formes franches ; l'union se contoure sans coutures :
+   * passe 1, chaque forme au trait sombre epais ; passe 2, chaque forme
+   * remplie — le remplissage mange la moitie interieure des traits, il ne
+   * reste que le contour exterieur de l'union. */
+  var formes = [
+    function () { ctx.ellipse(0.1, -0.32, 0.3, 0.27, 0.1, 0, TAU); },      /* cuisse   */
+    function () { ctx.ellipse(-0.08, -0.68, 0.16, 0.3, -0.25, 0, TAU); },  /* torse    */
+    function () { ctx.ellipse(-0.24, -0.97, 0.08, 0.16, -0.55, 0, TAU); }, /* cou      */
+    function () { ctx.ellipse(-0.38, -1.13, 0.25, 0.125, 0.18, 0, TAU); }, /* tete     */
+    function () { ctx.ellipse(-0.3, -1.36, 0.05, 0.17, -0.35, 0, TAU); },  /* oreille  */
+    function () { ctx.ellipse(-0.19, -1.35, 0.05, 0.17, 0.22, 0, TAU); },  /* oreille  */
+    function () { ctx.ellipse(-0.12, -0.06, 0.3, 0.06, 0, 0, TAU); },      /* pied     */
+    function () {                                                          /* queue    */
+      ctx.moveTo(0.2, -0.42);
+      ctx.quadraticCurveTo(0.66, -0.46, 0.9, -0.04);
+      ctx.quadraticCurveTo(0.55, -0.18, 0.18, -0.12);
+      ctx.closePath();
+    }
+  ];
+  var i;
+  ctx.strokeStyle = 'rgba(7, 11, 23, 0.55)';
+  ctx.lineWidth = 0.07;
+  ctx.lineJoin = 'round';
+  for (i = 0; i < formes.length; i++) { ctx.beginPath(); formes[i](); ctx.stroke(); }
+  ctx.fillStyle = '#e0975f';
+  for (i = 0; i < formes.length; i++) { ctx.beginPath(); formes[i](); ctx.fill(); }
+  /* Le pli de la patte : la grosse cuisse se lit d'un trait. */
+  ctx.strokeStyle = 'rgba(7, 11, 23, 0.3)';
+  ctx.lineWidth = 0.04;
   ctx.lineCap = 'round';
   ctx.beginPath();
-  ctx.moveTo(0.15, -0.32);
-  ctx.quadraticCurveTo(0.62, -0.35, 0.78, -0.06);
+  ctx.moveTo(0.3, -0.4);
+  ctx.quadraticCurveTo(0.34, -0.2, 0.14, -0.07);
   ctx.stroke();
-  ctx.fillStyle = '#e0975f';
+  /* Le petit bras replié sur le poitrail, dans un brun plus soutenu. */
+  ctx.fillStyle = '#c47f4a';
   ctx.beginPath();
-  ctx.ellipse(0, -0.5, 0.3, 0.42, -0.25, 0, TAU);
+  ctx.ellipse(-0.16, -0.62, 0.05, 0.1, -0.4, 0, TAU);
   ctx.fill();
-  ctx.beginPath();
-  ctx.ellipse(0.05, -0.22, 0.24, 0.15, 0.35, 0, TAU);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.ellipse(-0.08, -0.045, 0.22, 0.07, 0, 0, TAU);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.ellipse(-0.3, -0.98, 0.17, 0.14, 0.3, 0, TAU);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.ellipse(-0.46, -1.02, 0.1, 0.07, 0.25, 0, TAU);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.ellipse(-0.2, -1.2, 0.055, 0.16, 0.35, 0, TAU);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.ellipse(-0.32, -1.18, 0.055, 0.16, 0.1, 0, TAU);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.ellipse(-0.22, -0.62, 0.06, 0.13, 0.5, 0, TAU);
-  ctx.fill();
+  /* L'œil. */
   ctx.fillStyle = '#0b1020';
   ctx.beginPath();
-  ctx.arc(-0.34, -1.02, 0.035, 0, TAU);
+  ctx.arc(-0.47, -1.16, 0.035, 0, TAU);
   ctx.fill();
-  ctx.strokeStyle = 'rgba(7, 11, 23, 0.55)';
-  ctx.lineWidth = 0.05;
-  ctx.beginPath();
-  ctx.ellipse(0, -0.5, 0.3, 0.42, -0.25, 0, TAU);
-  ctx.stroke();
   ctx.restore();
 }
 

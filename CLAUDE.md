@@ -188,7 +188,14 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   est une silhouette dessinée marron clair**, tête en bas sur l'anneau sud —
   l'émoji sortait en glyphe GRIS sur iPhone (WebKit), même avec le sélecteur
   VS16 et la police d'émojis explicite : seule la silhouette garantit sa
-  couleur partout (validée par l'utilisateur sur son téléphone).
+  couleur partout (validée par l'utilisateur sur son téléphone). Le dessin
+  (retour utilisateur : la première silhouette en tas d'ellipses ne se
+  reconnaissait pas) tient aux cinq signes du kangourou — oreilles en V,
+  tête oblongue, grosse cuisse, queue épaisse posée au sol, grand pied
+  plat — en formes anatomiques franches UNIES par un contour sans
+  couture : toutes les formes tracées au trait sombre épais d'abord, puis
+  toutes remplies — le remplissage mange la moitié intérieure des traits,
+  ne laissant que le contour de l'union.
 - **Le glisser lit l'angle sur l'ellipse** : `jourDepuisPointeur(x, y)`
   (l'argument `jourActuel` que passe `main.js` est ignoré, sans danger) ;
   `attrapeTerre` garde sa zone généreuse pour les petits doigts.
