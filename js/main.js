@@ -327,6 +327,13 @@ function afficherPhraseMoment(jour) {
   var titre = document.createElement('span');
   titre.className = 'phrase-titre';
   titre.appendChild(document.createTextNode(parties.titreAvant));
+  if (parties.avantSaisonNom) {
+    var saisonAvant = document.createElement('span');
+    saisonAvant.className = 'phrase-saison phrase-saison-' + parties.avantTeinte;
+    saisonAvant.textContent = parties.avantSaisonNom;
+    titre.appendChild(saisonAvant);
+    titre.appendChild(document.createTextNode(parties.entre));
+  }
   var saisonMot = document.createElement('span');
   saisonMot.className = 'phrase-saison phrase-saison-' + parties.teinte;
   saisonMot.textContent = parties.saisonNom;

@@ -417,7 +417,10 @@ export function phraseDuMomentParties(jour) {
     if (dans > 0 && dans <= 12) {
       var suivante = SAISONS[reperes[i].saison];
       return {
-        titreAvant: 'En ' + mois + ', chez nous, ' + SAISONS[s].nom + ' se termine : ',
+        titreAvant: 'En ' + mois + ', chez nous, ',
+        avantSaisonNom: SAISONS[s].nom,
+        avantTeinte: SAISONS[s].teinte,
+        entre: ' se termine : ',
         saisonNom: suivante.nom,
         titreApres: ' arrive ! ' + suivante.emoji,
         teinte: suivante.teinte,
@@ -447,7 +450,8 @@ export function phraseDuMomentParties(jour) {
 
 export function phraseDuMoment(jour) {
   var p = phraseDuMomentParties(jour);
-  return p.titreAvant + p.saisonNom + p.titreApres + ' ' + p.texte;
+  var titre = p.titreAvant + (p.avantSaisonNom ? p.avantSaisonNom + p.entre : '') + p.saisonNom + p.titreApres;
+  return titre + ' ' + p.texte;
 }
 
 /* La phrase de la vue de l'espace : où penche notre moitié, en ce moment. */

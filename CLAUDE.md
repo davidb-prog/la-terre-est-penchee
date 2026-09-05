@@ -137,7 +137,9 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   en DEUX parties (`phraseDuMomentParties`) : le titre en blanc gras avec
   **le mot de la saison dans la teinte de SON bouton** (rose/or/violet/
   bleu — `SAISONS[*].teinte`), le commentaire en clair dessous (retour
-  test : tout en un bloc doré, ça se lisait mal).
+  test : tout en un bloc doré, ça se lisait mal). Dans la bande de
+  transition, LES DEUX saisons portent chacune leur teinte (« le
+  printemps se termine : l'été arrive ! » — la passation se voit).
 - **Les scénarios vont au moment choisi en douceur, toujours vers l'avant**
   (le vrai sens de l'année) ; reprendre la main efface l'histoire et désarme
   le bouton. L'histoire s'écrit en deux lignes à puces : 🏡 chez nous /
