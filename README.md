@@ -97,7 +97,7 @@ manifeste est vide (c'est le cas), tout passe à la synthèse. Marche à suivre 
 
 ## Ce que le site simplifie
 
-- **Le penchant est exagéré au dessin** : 30° à l'écran, 23,44° en vrai. Sa
+- **Le penchant est exagéré sur le dessin** : 30° à l'écran, 23,44° en vrai. Sa
   direction reste quasi fixe d'une année sur l'autre (précession sur ~26 000
   ans, ignorée).
 - **La distance ne fait pas les saisons** — et le site la garde constante.
