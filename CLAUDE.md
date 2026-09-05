@@ -68,7 +68,10 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
 - **La vue de l'espace est l'« hybride »** (choix utilisateur, après
   comparaison 2D / hybride / 3D en artefact — la 3D, restée trop petite sur
   téléphone, vit dans l'historique git) : l'orbite-ellipse en perspective à
-  plat (cx = 0,5 l ; cy = 0,52 h ; rx = min(0,38 l ; 0,62 h) ; ry = 0,52 rx),
+  plat (cx = 0,5 l ; cy = 0,52 h ; rx = min(0,38 l ; 0,62 h ; 0,5 l −
+  1,95 rTerre) — le dernier terme garantit que le globe et son anneau
+  « attrape-moi » (1,82 rTerre) tiennent EN ENTIER aux solstices, le jeu
+  coupait la Terre au bord droit ; ry = 0,52 rx),
   un **Soleil-boule** (dégradé radial + granules) fixe au centre, rayon
   **8 % de min(l, h)** — de l'air pour l'orbite et le faisceau —, et le
   modelé du globe (voile clair, bord assombri). La sonde de pixels « Soleil
@@ -159,7 +162,13 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   les consignes d'équinoxe font écho aux boutons (« le printemps
   revient », « l'automne arrive ») et le jardin y tient leurs promesses
   (arbre tout fleuri, feuilles qui tombent). Le tirage est un panier SANS remise, anti-répétition compris
-  après remélange et réouverture du jeu (`dernierDefiId`). Le défi du kangourou
+  après remélange et réouverture du jeu (`dernierDefiId`) — et il n'offre
+  JAMAIS un défi que le jour affiché réussit déjà : si le fond du panier
+  n'a plus que des défis gagnés d'avance (l'hiver en réussit deux — la
+  neige et l'été australien), on remélange un panier neuf au lieu de
+  laisser tomber un bravo gratuit (retour utilisateur ; verrouillé par la
+  suite navigateur). Les deux vues du jeu partagent la même hauteur
+  (colonnes 9fr/8fr = le rapport de leurs ratios). Le défi du kangourou
   (l'été australien) est la révélation du site.
 - **Les repères de saison (❄️🌸☀️🍂) autour de l'orbite s'effacent** quand la
   Terre est dessus (elle y est déjà — pas de doublon visuel).

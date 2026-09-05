@@ -164,9 +164,11 @@ export function creerVueOrbite(canvas) {
     var compact = Math.min(w, h) < 400 * (window.devicePixelRatio || 1);
     var cx = w * 0.5;                 /* le Soleil au centre : l'objet-repère fixe */
     var cy = h * 0.52;
-    var rx = Math.min(w * 0.38, h * 0.62);
-    var ry = rx * 0.52;
     var rTerre = Math.min(w, h) * (compact ? 0.105 : 0.095);
+    /* Le globe et son anneau « attrape-moi » (1,82 rTerre) doivent tenir en
+     * entier aux solstices : l'orbite se borne pour leur laisser la place. */
+    var rx = Math.min(w * 0.38, h * 0.62, w * 0.5 - rTerre * 1.95);
+    var ry = rx * 0.52;
     var rSoleil = Math.min(w, h) * 0.08; /* 8 % : de l'air pour l'orbite et le faisceau */
     return { w: w, h: h, cx: cx, cy: cy, rx: rx, ry: ry, rTerre: rTerre, rSoleil: rSoleil, compact: compact };
   }

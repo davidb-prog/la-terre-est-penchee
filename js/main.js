@@ -735,21 +735,27 @@ function remplirPanierDefis() {
 
 var dernierDefiId = null; /* survit au rangement du jeu (anti-répétition) */
 
+function indiceDefiValide() {
+  /* Un défi valide : pas le dernier tiré (anti-répétition), et pas un défi
+   * que le jour actuel réussit déjà (le bravo tomberait sans rien fabriquer). */
+  for (var i = 0; i < panierDefis.length; i++) {
+    if (panierDefis[i].id === dernierDefiId) continue;
+    if (!defiReussi(panierDefis[i], etat.jour)) return i;
+  }
+  return -1;
+}
+
 function prochainDefi() {
   /* Tirage au panier, sans remise : tous les défis sortent avant qu'on
-   * remélange. Deux filtres, appliqués ensemble : jamais deux fois le même
-   * d'affilée (même après un remélange ou une réouverture du jeu), et pas
-   * un défi que le jour actuel réussit déjà (gagné d'avance) — sauf s'il
-   * ne reste que ceux-là dans le panier. */
+   * remélange. Si le fond du panier ne contient plus que des défis gagnés
+   * d'avance (l'hiver en réussit deux : la neige et l'été australien) ou le
+   * dernier tiré, on remélange un panier neuf plutôt que de mentir — avec
+   * cinq défis pour quatre saisons, il reste toujours au moins deux
+   * candidats valides après remélange. */
   if (!panierDefis.length) remplirPanierDefis();
-  var indice = -1;
-  var secours = -1;
-  for (var i = 0; i < panierDefis.length; i++) {
-    if (panierDefis.length > 1 && panierDefis[i].id === dernierDefiId) continue;
-    if (secours < 0) secours = i;
-    if (!defiReussi(panierDefis[i], etat.jour)) { indice = i; break; }
-  }
-  if (indice < 0) indice = secours >= 0 ? secours : 0;
+  var indice = indiceDefiValide();
+  if (indice < 0) { remplirPanierDefis(); indice = indiceDefiValide(); }
+  if (indice < 0) indice = 0; /* filet théorique, inatteignable avec 5 défis */
   defi = panierDefis.splice(indice, 1)[0];
   dernierDefiId = defi.id;
   defiGagne = false;
