@@ -236,11 +236,18 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
 - **Le seuil mobile UNIQUE de l'épisode : 880 px.** La grille CSS, le
   médaillon, le repli de la boîte d'explication et la vue unique du jeu lisent
   tous ce chiffre.
-- **Sur mobile, les DEUX vues tiennent dans un écran de téléphone**
-  (retour utilisateur : l'espace était sous la ligne de flottaison) : du
-  titre de la fenêtre au bas du canvas de l'espace, ~660 px pour ~715 px
-  visibles sur iPhone — hauteurs `min(54vw, 28vh)` (fenêtre) et
-  `min(62vw, 33vh)` (espace), mesurées par script avant tout réglage.
+- **Sur mobile, les DEUX vues et leurs DEUX phrases tiennent dans un
+  écran de téléphone** (retour utilisateur, resserré deux fois) : du titre
+  de la fenêtre au bas de la phrase de l'espace, ~685 px pour ~715 px
+  visibles sur iPhone — hauteurs `min(50vw, 26vh)` (fenêtre) et
+  `min(58vw, 31vh)` (espace), gap 8 px, interligne 1,38, réserve de la
+  phrase re-mesurée à 7,05 em (pire cas : jour 121). Toujours MESURER au
+  script (balayage de l'année) avant de régler ces chiffres.
+- **La remontée d'écran des scénarios ne cache jamais le bouton pressé**
+  (retour utilisateur) : quand les vues sont hors écran, on remonte à la
+  position la plus BASSE entre « vues en haut d'écran » et « rangée des
+  boutons encore visible en bas » — l'enfant voit glisser l'année ET le
+  bouton qu'il vient de choisir.
 - **Sur mobile (< 880 px) seulement** : un médaillon flottant (haut droit,
   hors du chemin du pouce) montre la fenêtre de chez nous en miniature dès
   qu'elle sort de l'écran — un tap y ramène. Le jeu n'affiche qu'une vue

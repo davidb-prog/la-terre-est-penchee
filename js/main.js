@@ -275,7 +275,20 @@ function jouerScenario(scn) {
       }
     }
   } else if (cadre.bottom < 120 || cadre.top > window.innerHeight - 120) {
-    $('panneau-scene').scrollIntoView(mouvementReduit ? true : { behavior: 'smooth', block: 'start' });
+    /* Remonter juste assez pour voir les vues, SANS perdre de vue le bouton
+     * qu'on vient de presser (retour utilisateur) : entre « les vues en haut
+     * de l'écran » et « la rangée des boutons encore visible en bas », on
+     * choisit la position la plus basse — le bouton reste toujours là. */
+    var scene = $('panneau-scene').getBoundingClientRect();
+    var rangBoutons = document.querySelector('.boutons-scenarios').getBoundingClientRect();
+    var cibleVues = window.scrollY + scene.top - 8;
+    var cibleBoutons = window.scrollY + rangBoutons.bottom - window.innerHeight + 16;
+    var cibleScene = Math.max(0, Math.max(cibleVues, cibleBoutons));
+    if (!mouvementReduit && 'scrollBehavior' in document.documentElement.style) {
+      window.scrollTo({ top: cibleScene, behavior: 'smooth' });
+    } else {
+      window.scrollTo(0, cibleScene);
+    }
   }
   var delta = jourNormalise(scn.jour - etat.jour);
   if (mouvementReduit || delta < 0.25 || delta > ANNEE_JOURS - 0.25) {
