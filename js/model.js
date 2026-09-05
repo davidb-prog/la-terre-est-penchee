@@ -457,11 +457,11 @@ export function phraseDuMoment(jour) {
 /* La phrase de la vue de l'espace : où penche notre moitié, en ce moment. */
 export function phraseEspace(jour) {
   var p = penchementNord(jour);
-  if (p > 0.7) return '🏡 Chez nous penche à fond vers le Soleil : les jours sont les plus longs de l’année !';
-  if (p > 0.15) return '🏡 Chez nous penche vers le Soleil — et l’Australie, à l’opposé.';
-  if (p < -0.7) return '🏡 Chez nous penche à fond à l’opposé du Soleil : les jours sont les plus courts de l’année.';
-  if (p < -0.15) return '🏡 Chez nous penche à l’opposé du Soleil — l’Australie, elle, penche vers lui.';
-  return '🏡 Personne ne penche vers le Soleil : chez nous et l’Australie sont à égalité.';
+  if (p > 0.7) return '🏡 Notre moitié de la Terre penche à fond vers le Soleil : les jours sont les plus longs de l’année !';
+  if (p > 0.15) return '🏡 Notre moitié penche vers le Soleil — et l’Australie, à l’opposé.';
+  if (p < -0.7) return '🏡 Notre moitié penche à fond à l’opposé du Soleil : les jours sont les plus courts de l’année.';
+  if (p < -0.15) return '🏡 Notre moitié penche à l’opposé du Soleil — l’Australie, elle, penche vers le Soleil.';
+  return '🏡 Aucune moitié ne penche vers le Soleil : chez nous et l’Australie sont à égalité.';
 }
 
 /* ------------------------------------------------------------------ */
@@ -491,7 +491,7 @@ export var SCENARIOS = [
     sub: 'l’équinoxe de printemps',
     intro: 'Au mois de mars, le printemps revient…',
     fenetre: 'L’arbre du jardin se couvre de fleurs ! Le jour dure maintenant aussi longtemps que la nuit. Et chaque jour qui passe, le Soleil grimpe un peu plus haut.',
-    espace: 'Les deux moitiés de la Terre sont à égalité : ni chez nous, ni l’Australie ne penche vers le Soleil. Mais la Terre avance… Et bientôt, c’est notre moitié qui penchera vers lui !'
+    espace: 'Les deux moitiés de la Terre sont à égalité : ni notre moitié, ni l’Australie ne penche vers le Soleil. Mais la Terre avance… Et bientôt, c’est notre moitié qui penchera vers lui !'
   },
   {
     id: 'ete',
@@ -513,7 +513,7 @@ export var SCENARIOS = [
     sub: 'l’équinoxe d’automne',
     intro: 'Fin septembre, l’automne arrive…',
     fenetre: 'Les feuilles de l’arbre deviennent rousses et commencent à tomber. Le jour dure aussi longtemps que la nuit… Mais maintenant, le Soleil descend un peu plus chaque jour.',
-    espace: 'Les deux moitiés de la Terre sont de nouveau à égalité : ni chez nous, ni l’Australie ne penche vers le Soleil. La Terre continue son voyage… Et cette fois, c’est l’Australie qui va pencher vers le Soleil !'
+    espace: 'Les deux moitiés de la Terre sont de nouveau à égalité : ni notre moitié, ni l’Australie ne penche vers le Soleil. La Terre continue son voyage… Et cette fois, c’est l’Australie qui va pencher vers le Soleil !'
   },
   {
     id: 'hiver',

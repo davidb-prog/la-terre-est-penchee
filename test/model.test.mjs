@@ -550,8 +550,13 @@ test('la phrase de l’espace suit le penchant, et nomme toujours qui penche', f
   assert.ok(phraseEspace(JOUR_SOLSTICE_HIVER).indexOf('les plus courts') !== -1);
   assert.ok(phraseEspace(JOUR_EQUINOXE_PRINTEMPS).indexOf('égalité') !== -1);
   for (var j = 0; j < ANNEE_JOURS; j += 3) {
-    assert.ok(phraseEspace(j).indexOf('Chez nous') !== -1 || phraseEspace(j).indexOf('chez nous') !== -1,
-      'la phrase nomme chez nous au jour ' + j);
+    /* « notre moitié » est le sujet qui penche (décision utilisateur :
+     * « chez nous penche » sonnait bizarre) ; « chez nous » survit comme
+     * lieu dans la phrase d'égalité */
+    var ph = phraseEspace(j);
+    assert.ok(ph.indexOf('otre moitié') !== -1 || ph.indexOf('chez nous') !== -1,
+      'la phrase nomme notre moitié (ou chez nous) au jour ' + j);
+    assert.ok(ph.indexOf('Chez nous penche') === -1, '« chez nous » ne penche plus au jour ' + j);
   }
 });
 
