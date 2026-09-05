@@ -446,6 +446,12 @@ test('chaque scénario raconte la bonne saison, aux deux regards', function () {
   assert.ok(scnParId.ete.fenetre.indexOf('Il fait chaud') !== -1, 'l’été dit la chaleur (les heures vivent dans la barre du jour)');
   assert.ok(scnParId.hiver.fenetre.indexOf('la nuit tombe avant le dîner') !== -1, 'l’hiver dit sa nuit précoce');
   assert.ok(scnParId.hiver.espace.indexOf('Australie') !== -1, 'Noël en Australie vit dans le scénario d’hiver');
+  /* Le maillon causal de l'histoire (l'expérience de la lampe) se répète
+   * aux boutons été/hiver, avec les MÊMES mots — « bien en face » /
+   * « de biais » —, jamais de jargon (« rayons directs », « rasants »). */
+  assert.ok(scnParId.ete.espace.indexOf('bien en face') !== -1, 'l’été de l’espace dit la lumière bien en face');
+  assert.ok(scnParId.hiver.espace.indexOf('de biais') !== -1, 'l’hiver de l’espace dit la lumière de biais');
+  assert.ok(scnParId.hiver.espace.indexOf('bien en face') !== -1, 'la révélation australienne se raccorde à la cause');
   var teintes = {};
   SCENARIOS.forEach(function (s) {
     assert.ok(s.label && s.sub && s.intro && s.fenetre && s.espace, 'scénario complet : ' + s.id);

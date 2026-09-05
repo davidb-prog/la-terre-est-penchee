@@ -143,7 +143,13 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
 - **Les scénarios vont au moment choisi en douceur, toujours vers l'avant**
   (le vrai sens de l'année) ; reprendre la main efface l'histoire et désarme
   le bouton. L'histoire s'écrit en deux lignes à puces : 🏡 chez nous /
-  🚀 vu de l'espace.
+  🚀 vu de l'espace. Les puces 🚀 d'été et d'hiver répètent le maillon
+  causal de l'expérience de la lampe avec SES mots — « bien en face » /
+  « de biais », jamais « rayons directs » ni « rasants » (décision
+  utilisateur : « penche » seul n'explique pas la chaleur, et la tache
+  d'arrivée que l'enfant voit mérite d'être nommée) ; en hiver, c'est
+  l'Australie qui « reçoit la lumière bien en face » — la révélation se
+  raccorde à la cause. Verrouillé par test.
 - **Le jeu ne se gagne qu'en fabriquant soi-même** (jamais pendant un
   glissement animé) : fenêtre de victoire = la saison demandée, tempo de
   maintien `DEFI_ATTENTE_MS`, hystérésis de sortie `DEFI_SORTIE_MARGE_JOURS`

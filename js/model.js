@@ -509,7 +509,7 @@ export var SCENARIOS = [
     sub: 'le solstice d’été',
     intro: 'Fin juin, l’été commence…',
     fenetre: 'Le Soleil monte très haut dans le ciel et, le soir, il fait encore jour très tard. Il fait chaud : les premiers fruits poussent dans l’arbre, et on joue dehors jusqu’au soir !',
-    espace: 'Regarde la Terre : notre moitié penche à fond vers le Soleil. C’est le jour le plus long de toute l’année — et en Australie, c’est le jour le plus court.'
+    espace: 'Regarde la Terre : notre moitié penche vers le Soleil, et elle reçoit sa lumière bien en face — regarde la belle tache brillante sur nous ! Elle a tout le temps de chauffer : c’est l’été.'
   },
   {
     id: 'automne',
@@ -531,7 +531,7 @@ export var SCENARIOS = [
     sub: 'le solstice d’hiver',
     intro: 'Fin décembre, l’hiver commence…',
     fenetre: 'Le Soleil reste tout bas, et la nuit tombe avant le dîner. L’arbre est tout nu, et parfois, il neige sur le jardin.',
-    espace: 'Notre moitié penche à fond à l’opposé du Soleil… Mais regarde le kangourou : c’est l’Australie qui penche vers le Soleil ! Là-bas, les enfants fêtent Noël en plein été, sur la plage.'
+    espace: 'Notre moitié penche à l’opposé du Soleil : sa lumière ne nous arrive plus que de biais, elle glisse sans chauffer. Mais regarde le kangourou : c’est l’Australie qui reçoit la lumière bien en face ! Là-bas, les enfants fêtent Noël en plein été, sur la plage.'
   }
 ];
 
