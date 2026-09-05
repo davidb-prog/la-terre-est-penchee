@@ -1,1 +1,162 @@
-{ "voix": null, "modele": null, "blocs": {} }
+{
+  "voix": "GFj5Qf6cNQ3Lgp8VKBwc",
+  "modele": "eleven_multilingual_v2",
+  "blocs": {
+    "scn-printemps-intro": {
+      "texte": "Au mois de mars, le printemps revient…",
+      "hash": "ae9f65d782e3",
+      "fichier": "scn-printemps-intro.mp3"
+    },
+    "scn-printemps-fenetre": {
+      "texte": "L’arbre du jardin se couvre de fleurs ! Le jour dure maintenant aussi longtemps que la nuit. Et chaque jour qui passe, le Soleil grimpe un peu plus haut.",
+      "hash": "0f43da188775",
+      "fichier": "scn-printemps-fenetre.mp3"
+    },
+    "scn-printemps-espace": {
+      "texte": "Les deux moitiés de la Terre sont à égalité : ni notre moitié, ni l’Australie ne penche vers le Soleil. Mais la Terre avance… Et bientôt, c’est notre moitié qui penchera vers lui !",
+      "hash": "9e52ea3212b7",
+      "fichier": "scn-printemps-espace.mp3"
+    },
+    "scn-ete-intro": {
+      "texte": "Fin juin, l’été commence…",
+      "hash": "67e1103c94c7",
+      "fichier": "scn-ete-intro.mp3"
+    },
+    "scn-ete-fenetre": {
+      "texte": "Dans le ciel, le Soleil monte très haut, et le soir, il fait encore jour très tard. Il fait chaud : l’arbre donne ses premiers fruits, et on joue dehors jusqu’au soir !",
+      "hash": "6d76a3b33d73",
+      "fichier": "scn-ete-fenetre.mp3"
+    },
+    "scn-ete-espace": {
+      "texte": "Regarde la Terre : notre moitié penche vers le Soleil, et elle reçoit sa lumière bien en face, regarde la belle tache brillante sur nous ! Elle a tout le temps de chauffer : c’est l’été.",
+      "hash": "148cb8c584d4",
+      "fichier": "scn-ete-espace.mp3"
+    },
+    "scn-automne-intro": {
+      "texte": "Fin septembre, l’automne arrive…",
+      "hash": "10d0f68dcb9e",
+      "fichier": "scn-automne-intro.mp3"
+    },
+    "scn-automne-fenetre": {
+      "texte": "Les feuilles de l’arbre deviennent rousses et commencent à tomber. Le jour dure aussi longtemps que la nuit… Mais maintenant, le Soleil descend un peu plus chaque jour.",
+      "hash": "9ec973022fc4",
+      "fichier": "scn-automne-fenetre.mp3"
+    },
+    "scn-automne-espace": {
+      "texte": "Les deux moitiés de la Terre sont de nouveau à égalité : ni notre moitié, ni l’Australie ne penche vers le Soleil. La Terre continue son voyage… Et cette fois, c’est l’Australie qui va pencher vers le Soleil !",
+      "hash": "c7a13c3823a5",
+      "fichier": "scn-automne-espace.mp3"
+    },
+    "scn-hiver-intro": {
+      "texte": "Fin décembre, l’hiver commence…",
+      "hash": "34dc9fb1afd8",
+      "fichier": "scn-hiver-intro.mp3"
+    },
+    "scn-hiver-fenetre": {
+      "texte": "Le Soleil reste tout bas, et la nuit tombe avant le dîner. L’arbre est tout nu, et parfois, il neige sur le jardin.",
+      "hash": "2dca9064d687",
+      "fichier": "scn-hiver-fenetre.mp3"
+    },
+    "scn-hiver-espace": {
+      "texte": "Notre moitié penche à l’opposé du Soleil : sa lumière ne nous arrive plus que de biais, elle glisse sans chauffer. Mais regarde le kangourou : c’est l’Australie qui reçoit la lumière bien en face ! Là-bas, c’est Noël en plein été, sur la plage !",
+      "hash": "23a3ac8c61ca",
+      "fichier": "scn-hiver-espace.mp3"
+    },
+    "transition-espace": {
+      "texte": "Et maintenant, vu de l’espace…",
+      "hash": "883a1d3f63f6",
+      "fichier": "transition-espace.mp3"
+    },
+    "defi-fleurs-consigne": {
+      "texte": "Fais revenir le printemps chez nous !",
+      "hash": "9645dd8e0b51",
+      "fichier": "defi-fleurs-consigne.mp3"
+    },
+    "defi-fleurs-bravo": {
+      "texte": "Bravo ! Le printemps revient : l’arbre est tout fleuri !",
+      "hash": "322cfe725bfa",
+      "fichier": "defi-fleurs-bravo.mp3"
+    },
+    "defi-ete-consigne": {
+      "texte": "Fabrique l’été chez nous !",
+      "hash": "436d8070663b",
+      "fichier": "defi-ete-consigne.mp3"
+    },
+    "defi-ete-bravo": {
+      "texte": "Bravo ! C’est l’été : le Soleil monte haut dans le ciel et les jours n’en finissent plus !",
+      "hash": "d3ad442a3718",
+      "fichier": "defi-ete-bravo.mp3"
+    },
+    "defi-feuilles-consigne": {
+      "texte": "Fais venir l’automne dans le jardin !",
+      "hash": "9ec1f98b948d",
+      "fichier": "defi-feuilles-consigne.mp3"
+    },
+    "defi-feuilles-bravo": {
+      "texte": "Bravo ! L’automne arrive : les feuilles roussissent et commencent à tomber.",
+      "hash": "cccbcb63767f",
+      "fichier": "defi-feuilles-bravo.mp3"
+    },
+    "defi-neige-consigne": {
+      "texte": "Fais tomber la neige sur le jardin !",
+      "hash": "ad2d3f01b327",
+      "fichier": "defi-neige-consigne.mp3"
+    },
+    "defi-neige-bravo": {
+      "texte": "Bravo ! C’est l’hiver : la neige est là et la nuit tombe tôt.",
+      "hash": "9246ecc5fe1b",
+      "fichier": "defi-neige-bravo.mp3"
+    },
+    "defi-australie-consigne": {
+      "texte": "Offre l’été aux enfants d’Australie !",
+      "hash": "dd709a2cc239",
+      "fichier": "defi-australie-consigne.mp3"
+    },
+    "defi-australie-bravo": {
+      "texte": "Bravo ! L’Australie penche vers le Soleil… Et pendant ce temps, chez nous, c’est l’hiver !",
+      "hash": "fce5afbc9b53",
+      "fichier": "defi-australie-bravo.mp3"
+    },
+    "histoire-1": {
+      "texte": "La Terre est comme une grosse toupie qui penche un peu sur le côté. Et elle garde toujours son penchant, sans jamais en changer.",
+      "hash": "6ee5340825ef",
+      "fichier": "histoire-1.mp3"
+    },
+    "histoire-2": {
+      "texte": "Toute l’année, elle fait un grand voyage autour du Soleil. Un tour complet, c’est une année entière !",
+      "hash": "cdb46d519bd7",
+      "fichier": "histoire-2.mp3"
+    },
+    "histoire-3": {
+      "texte": "Quand notre moitié de la Terre penche vers le Soleil, elle le regarde bien en face. Alors le Soleil monte haut dans le ciel, il reste longtemps, et les jours sont très longs : c’est l’été.",
+      "hash": "92fe5e9f94e1",
+      "fichier": "histoire-3.mp3"
+    },
+    "histoire-4": {
+      "texte": "Six mois plus tard, la Terre est de l’autre côté du Soleil. Notre moitié ne penche plus vers lui : elle ne le voit plus que de biais. Le Soleil reste tout bas, la nuit tombe vite… c’est l’hiver.",
+      "hash": "019b145cf4d8",
+      "fichier": "histoire-4.mp3"
+    },
+    "histoire-5": {
+      "texte": "Essaie avec une lampe : si tu penches ton visage vers elle, elle t’éclaire en plein visage. Si tu te penches en arrière, sa lumière ne fait que glisser sur ta figure. La Terre fait pareil avec le Soleil !",
+      "hash": "f78440cea0d5",
+      "fichier": "histoire-5.mp3"
+    },
+    "histoire-6": {
+      "texte": "Un Soleil bien en face, qui reste dans le ciel toute la journée, a tout le temps de chauffer le jardin, la mer et l’air. Un Soleil de biais, vite couché, n’a pas le temps de chauffer grand-chose. Voilà pourquoi il fait chaud l’été et froid l’hiver !",
+      "hash": "405b96d9c76a",
+      "fichier": "histoire-6.mp3"
+    },
+    "histoire-7": {
+      "texte": "Le Soleil n’est pas plus près en été, ni plus loin en hiver : c’est le penchant qui fait tout ! D’ailleurs, quand c’est l’hiver chez nous, pour les enfants d’Australie, sur l’autre moitié de la Terre, c’est Noël en plein été, sur la plage…",
+      "hash": "b8634c619567",
+      "fichier": "histoire-7.mp3"
+    }
+  },
+  "format": "mp3_44100_64",
+  "reglages": {
+    "stability": 0.5,
+    "similarity_boost": 0.75,
+    "style": 0.3
+  }
+}
