@@ -67,6 +67,26 @@ check('aucun émoji dans les textes oraux',
 check('aucune heure en chiffres (« N h » ou « N heures ») : les nombres se disent en toutes lettres',
   blocs.every((b) => !/\d\s*h(eures?)?\b/.test(b.texte)),
   blocs.filter((b) => /\d\s*h(eures?)?\b/.test(b.texte)).map((b) => b.id).join(', '));
+// Les jonctions que le conteur ne sait pas dire. Leçon payée à la génération
+// de « la Terre est penchée » : un verbe en « -ent » suivi d'une consonne se
+// fait avaler ou bégayer, prise après prise — « poussent dans l'arbre » sortait
+// « poussent dans la dame du chri », « fêtent Noël » ratait dans les DEUX clips
+// qui partageaient la phrase. Aucun re-tirage ne guérit ça : seuls les mots.
+// La liste reste ÉTROITE à dessein — deux cas ne font pas une loi phonétique,
+// et interdire tout « -ent + consonne » condamnerait des phrases très bien
+// dites (« les feuilles roussissent et commencent à tomber » passe sans
+// broncher). On y ajoute une entrée quand une nouvelle jonction se paie.
+const JONCTIONS_FAUTIVES = [
+  { forme: /\bpoussent dans\b/i, note: 'dire « l’arbre donne ses fruits »' },
+  { forme: /\bfêtent Noël\b/i, note: 'dire « c’est Noël »' },
+];
+for (const j of JONCTIONS_FAUTIVES) {
+  const coupables = blocs.filter((b) => j.forme.test(b.texte));
+  check('jonction que le conteur bute : ' + j.forme.source + ' — ' + j.note,
+    coupables.length === 0,
+    coupables.map((b) => b.id).join(', '));
+}
+
 check('aucun guillemet ni tiret cadratin dans les textes oraux',
   blocs.every((b) => !/[«»—]/.test(b.texte)));
 check('apostrophes typographiques « ’ » partout (jamais le « \' » droit)',
