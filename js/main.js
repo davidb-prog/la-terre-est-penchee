@@ -432,8 +432,21 @@ function canvasHorsEcran(canvas) {
   return rect.bottom < 80 || rect.top > hauteur - 80;
 }
 
+/* La place d'origine du médaillon (avant le pied de page) : le jeu l'ancre
+ * dans son en-tête à l'ouverture, et l'y reprend au rangement. */
+var placeMedaillon = medaillon.parentNode;
+var suivantMedaillon = medaillon.nextSibling;
+var enteteJeu = document.querySelector('.entete-jeu');
+var panneauJeu = document.querySelector('.panneau-jeu');
+
+function medaillonAncre() {
+  return medaillon.parentNode === enteteJeu;
+}
+
 function gererMedaillon() {
-  var visible = estMobile && canvasHorsEcran(canvasFenetre);
+  /* ancré dans l'en-tête du jeu, il est un élément de la page : visible
+   * sur mobile quoi qu'il arrive au défilement */
+  var visible = estMobile && (medaillonAncre() || canvasHorsEcran(canvasFenetre));
   if (medaillon.hidden === !visible) return;
   medaillon.hidden = !visible;
   if (visible) dessinerMedaillon();
@@ -828,12 +841,18 @@ function surveillerDefi(maintenant) {
 boutonJouer.addEventListener('click', function () {
   if (!zoneJeu.hidden) {
     zoneJeu.hidden = true;
+    panneauJeu.classList.remove('jeu-ouvert');
+    placeMedaillon.insertBefore(medaillon, suivantMedaillon);
+    gererMedaillon();
     defi = null;
     boutonJouer.textContent = '🎮 Jouer';
     boutonJouer.setAttribute('aria-expanded', 'false');
     return;
   }
   zoneJeu.hidden = false;
+  panneauJeu.classList.add('jeu-ouvert');
+  enteteJeu.appendChild(medaillon);
+  gererMedaillon();
   boutonJouer.textContent = '📦 Ranger le jeu';
   boutonJouer.setAttribute('aria-expanded', 'true');
   reprendreLaMain(); /* l'enfant prend la main : rien ne doit gagner tout seul */

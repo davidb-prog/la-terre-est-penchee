@@ -348,7 +348,9 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; }
   background: rgba(255, 207, 92, .12); border: 1px solid rgba(255, 207, 92, .55);
   color: var(--sun); font-weight: 700; font-size: 1.05rem;
 }
-#bouton-encore { margin-top: 2px; }
+/* le médaillon ancré dans l'en-tête du jeu (mobile, jeu ouvert — voir le
+   bloc mobile) : sur grand écran il reste caché, où qu'il soit */
+.entete-jeu .medaillon-fenetre { display: none; }
 
 /* ---------- note aux parents (repliée) ---------- */
 
@@ -506,20 +508,32 @@ button:focus-visible, input:focus-visible, a:focus-visible {
   .bulle-geste { margin-top: 4px; font-size: .78rem; }
   .bulle-geste-pilule { padding: 4px 12px; }
 
-  /* le médaillon flottant (72 px, à 14 px du bord droit) survole les
-     en-têtes du jeu et des scénarios quand on y est : leurs boutons de
-     droite lui laissent la place, sinon il masque « Ranger le jeu »
-     (retour utilisateur, capture iPhone) */
-  .entete-jeu, .titre-scenarios { padding-right: 62px; }
-  /* « 📦 Ranger le jeu » + « 🔇 sans la voix » dépassent la largeur qui
-     reste : les boutons du jeu passent à la ligne au lieu de déborder
-     sous le médaillon */
-  .actions-jeu { flex-wrap: wrap; justify-content: flex-end; max-width: 100%; }
-  /* …et se serrent pour tenir à deux sur la ligne : 118 + 8 + 167 = 293 px
-     pour 270 disponibles à 16 px ; à .9rem et 10 px de marge intérieure,
-     264 px (mesuré, police de secours Linux — SF sur iPhone est plus
-     étroite). La cible tactile garde ses 44 px de haut. */
-  .actions-jeu .bouton-voix, .actions-jeu .bouton-jeu { padding-left: 10px; padding-right: 10px; font-size: .9rem; }
+  /* LE MÉDAILLON EST ANCRÉ DANS L'EN-TÊTE DU JEU pendant le jeu (main.js
+     l'y déplace à l'ouverture, le rend à sa place au rangement) : il
+     devient un élément de la mise en page — à droite du titre, 60 px —
+     et la rangée des actions prend toute la largeur dessous. Avant, il
+     flottait par-dessus les boutons, qu'on serrait et empilait pour le
+     fuir (retour utilisateur : « posés n'importe comment »). Hors du jeu
+     il redevient flottant. */
+  .panneau-jeu.jeu-ouvert .entete-jeu {
+    display: grid; grid-template-columns: 1fr auto;
+    grid-template-areas: "titre medaillon" "actions actions";
+    gap: 8px 12px; align-items: center;
+  }
+  .panneau-jeu.jeu-ouvert .entete-jeu h2 { grid-area: titre; }
+  .entete-jeu .medaillon-fenetre {
+    display: block; grid-area: medaillon; position: static;
+    width: 60px; height: 60px; box-shadow: none;
+  }
+  .panneau-jeu.jeu-ouvert .actions-jeu { grid-area: actions; margin: 0; }
+  /* la rangée des actions du jeu : [🔇] [Ranger le jeu] [Encore une !] —
+     la voix en icône seule (son libellé vit dans le jumeau des scénarios),
+     les deux autres se partagent le reste, sur UNE ligne, texte jamais
+     coupé */
+  .actions-jeu { display: flex; gap: 8px; max-width: 100%; }
+  .actions-jeu .bouton-voix { flex: none; padding-left: 12px; padding-right: 12px; }
+  .actions-jeu .bouton-voix .libelle { display: none; }
+  .actions-jeu .bouton-jeu { flex: 1 1 0; padding-left: 8px; padding-right: 8px; font-size: .9rem; white-space: nowrap; }
 
   /* le jeu sur mobile : une seule vue (l'espace, qu'on manipule) — c'est le
      médaillon flottant qui montre la fenêtre, il reste visible pendant le jeu */

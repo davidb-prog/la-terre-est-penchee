@@ -121,8 +121,8 @@
         <span>🎲 Joue avec les saisons</span>
         <button id="bouton-voix-scn" class="bouton-voix" aria-pressed="false"
           title="La voix du conteur raconte chaque moment choisi"><span
-            class="voix-on" aria-hidden="true">🔊 avec la voix</span><span
-            class="voix-off" aria-hidden="true">🔇 sans la voix</span></button>
+            class="voix-on" aria-hidden="true">🔊 <span class="libelle">avec la voix</span></span><span
+            class="voix-off" aria-hidden="true">🔇 <span class="libelle">sans la voix</span></span></button>
       </div>
       <div class="boutons-scenarios" id="boutons-scenarios"></div>
       <div class="histoire-scn" id="histoire-scn"></div>
@@ -156,11 +156,12 @@
       <div class="entete-jeu">
         <h2 id="titre-jeu">🎯 Fabrique la saison&#8239;!</h2>
         <div class="actions-jeu">
-          <button id="bouton-voix-jeu" class="bouton-voix" hidden aria-pressed="false"
+          <button id="bouton-voix-jeu" class="bouton-voix" hidden aria-pressed="false" aria-label="La voix du conteur dans le jeu"
             title="La voix du conteur lit les consignes et les bravos"><span
-              class="voix-on" aria-hidden="true">🔊 avec la voix</span><span
-              class="voix-off" aria-hidden="true">🔇 sans la voix</span></button>
+              class="voix-on" aria-hidden="true">🔊 <span class="libelle">avec la voix</span></span><span
+              class="voix-off" aria-hidden="true">🔇 <span class="libelle">sans la voix</span></span></button>
           <button id="bouton-jouer" class="bouton-jeu" aria-expanded="false">🎮 Jouer</button>
+          <button id="bouton-encore" class="bouton-jeu" hidden>🎲 Encore une&#8239;!</button>
         </div>
       </div>
       <div id="zone-jeu" hidden>
@@ -177,7 +178,6 @@
           </div>
         </div>
         <p class="bravo-jeu" id="bravo-jeu" aria-live="polite" hidden></p>
-        <button id="bouton-encore" class="bouton-jeu" hidden>🎲 Encore une&#8239;!</button>
       </div>
     </section>
 

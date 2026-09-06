@@ -345,11 +345,20 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   bouton qu'il vient de choisir.
 - **Sur mobile (< 880 px) seulement** : un médaillon flottant (haut droit,
   hors du chemin du pouce) montre la fenêtre de chez nous en miniature dès
-  qu'elle sort de l'écran — un tap y ramène. **Il ne recouvre jamais un
-  bouton** : les en-têtes du jeu et des scénarios gardent 62 px à droite
-  (`padding-right`), et les boutons du jeu passent à la ligne plutôt que de
-  déborder sous lui (retour utilisateur : « Ranger le jeu » était masqué —
-  vérifié par sonde de chevauchement dans les deux panneaux). Le jeu n'affiche qu'une vue
+  qu'elle sort de l'écran — un tap y ramène. **Pendant le jeu, il est
+  ANCRÉ dans l'en-tête du jeu** (`main.js` le déplace à l'ouverture, le
+  rend à sa place au rangement ; classe `jeu-ouvert` sur le panneau) : à
+  droite du titre, 60 px, élément de la mise en page — visible quoi
+  qu'il arrive au défilement — et la rangée des actions prend toute la
+  largeur dessous : **[🔇] [Ranger le jeu] [Encore une !]** sur UNE
+  ligne, la voix en icône seule (son libellé, `.libelle`, vit dans le
+  jumeau des scénarios), « Encore une ! » est monté dans cette rangée
+  (retour utilisateur : le médaillon flottait par-dessus les boutons,
+  qu'on serrait et empilait pour le fuir — « posés n'importe comment »).
+  Dans les scénarios, le bouton 🔊/🔇 est à droite du titre, sans
+  réserve pour le médaillon (décision utilisateur : le chevauchement
+  n'est que transitoire, le temps que l'en-tête passe sous lui en
+  défilant). Le jeu n'affiche qu'une vue
   (l'espace) : c'est le médaillon qui montre le résultat. Rien de tel sur
   grand écran, et rien n'est incrusté dans le canvas qu'on manipule.
 
