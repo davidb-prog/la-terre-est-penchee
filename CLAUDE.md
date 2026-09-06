@@ -105,8 +105,15 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   d'été : Terre à gauche du Soleil ; hiver : à droite ; l'automne passe par le
   bas de l'écran, le printemps par le haut.
 - Rayon du globe : `0,095 × min(l, h)` sur grand écran, **`min(0,08 l ;
-  (0,48 h − rSoleil − 6 px) / 2,73)` en mode compact** (< 400 px de
-  canvas) — le plafond est DÉRIVÉ : aux équinoxes la Terre passe par
+  0,123 h ; (0,48 h − rSoleil − 6 px) / 2,73)` en mode compact** (< 400 px
+  de canvas). `0,123 h` est le rapport globe/orbite de l'iPhone 13 (0,24) :
+  sur un canvas bas (iframe de l'artefact, navigateur intégré d'Instagram —
+  200 px au lieu de 222), la garde verticale resserrait l'orbite de 17 %
+  pendant que le globe, mesuré à la largeur, ne bougeait pas — il
+  paraissait plus gros (retour utilisateur, captures prod / artefact) ;
+  avec ce plafond, globe et orbite rétrécissent ensemble (200 px : globe
+  49 px, orbite 102 px ; iPhone 13 plein écran : rien ne change). Le
+  troisième terme est DÉRIVÉ : aux équinoxes la Terre passe par
   cy ± ry, l'anneau (1,73 rTerre) au-delà, le Soleil en deçà ; sans lui,
   la garde verticale resserre l'orbite jusqu'à mettre la Terre dans le
   Soleil (iPhone SE, canvas de 170 px : globe ramené à 45 px, écart 6 px).
