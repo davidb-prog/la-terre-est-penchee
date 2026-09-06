@@ -167,15 +167,28 @@ export function creerVueOrbite(canvas) {
     /* En mode compact (téléphone), le globe se mesure à la LARGEUR : c'est
      * la hauteur qui manque sur un téléphone, et chaque resserrage en vh
      * rognait le globe (57 → 43 px de diamètre en une semaine — retour
-     * utilisateur : « très petit »). 8,5 % de la largeur = la Terre du jeu
-     * (56 px) dans la scène aussi, quelle que soit la hauteur ; plafond
-     * 0,16 h pour qu'elle reste entière dans un canvas en paysage. */
-    var rTerre = compact ? Math.min(w * 0.085, h * 0.16) : Math.min(w, h) * 0.095;
-    /* Le globe et son anneau « attrape-moi » (1,82 rTerre) doivent tenir en
-     * entier aux solstices : l'orbite se borne pour leur laisser la place. */
-    var rx = Math.min(w * 0.38, h * 0.62, w * 0.5 - rTerre * 1.95);
-    var ry = rx * 0.52;
+     * utilisateur : « très petit »). 8 % de la largeur = la Terre du jeu
+     * (54 px) dans la scène aussi, quelle que soit la hauteur ; plafond
+     * plafond dérivé de la hauteur : aux équinoxes la Terre passe par
+     * cy ± ry, avec son anneau (1,73 rTerre) au-delà et le Soleil en deçà
+     * — il faut 0,48 h ≥ rSoleil + 6 px + rTerre + 1,73 rTerre, sinon la
+     * garde verticale resserre l'orbite jusqu'à mettre la Terre dans le
+     * Soleil (iPhone SE : canvas de 170 px de haut). (0,085 l donnait 57 px,
+     * mais la Terre tenue au doigt reposait alors sur le Soleil aux
+     * équinoxes — 9 px entre les disques ; à 0,08, 14 px.) */
+    var dpr = window.devicePixelRatio || 1;
     var rSoleil = Math.min(w, h) * 0.08; /* 8 % : de l'air pour l'orbite et le faisceau */
+    var rTerre = compact
+      ? Math.min(w * 0.08, (h * 0.48 - rSoleil - 6 * dpr) / (1 + 1.73))
+      : Math.min(w, h) * 0.095;
+    /* Le globe et son anneau « attrape-moi » (jusqu'à 1,6 rTerre) doivent
+     * tenir en entier : aux solstices (bord gauche/droit) ET aux équinoxes
+     * (bord haut/bas — la Terre passe par cy ± ry, l'anneau au-dessus et
+     * au-dessous). L'orbite se borne des deux côtés, même marge (0,13
+     * rTerre) ; sans la garde verticale, l'anneau dépassait de 5 px sous
+     * le canvas de la scène mobile à l'automne. */
+    var rx = Math.min(w * 0.38, h * 0.62, w * 0.5 - rTerre * 1.73, (h * 0.48 - rTerre * 1.73) / 0.52);
+    var ry = rx * 0.52;
     return { w: w, h: h, cx: cx, cy: cy, rx: rx, ry: ry, rTerre: rTerre, rSoleil: rSoleil, compact: compact };
   }
 
@@ -255,7 +268,9 @@ export function creerVueOrbite(canvas) {
     /* L'anneau « attrape-moi ». */
     if (halo > 0) {
       ctx.beginPath();
-      ctx.arc(p.x, p.y, r * (1.6 + 0.22 * halo), 0, TAU);
+      /* 1,4 rTerre au repos, 1,6 tenue (avant : 1,6 → 1,82 — l'anneau
+       * plein débordait du canvas de la scène mobile aux équinoxes) */
+      ctx.arc(p.x, p.y, r * (1.4 + 0.2 * halo), 0, TAU);
       ctx.strokeStyle = 'rgba(169, 139, 255, ' + (0.35 + 0.4 * halo) + ')';
       ctx.lineWidth = Math.max(2, r * 0.12);
       ctx.stroke();

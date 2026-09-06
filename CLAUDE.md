@@ -69,9 +69,12 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   comparaison 2D / hybride / 3D en artefact — la 3D, restée trop petite sur
   téléphone, vit dans l'historique git) : l'orbite-ellipse en perspective à
   plat (cx = 0,5 l ; cy = 0,52 h ; rx = min(0,38 l ; 0,62 h ; 0,5 l −
-  1,95 rTerre) — le dernier terme garantit que le globe et son anneau
-  « attrape-moi » (1,82 rTerre) tiennent EN ENTIER aux solstices, le jeu
-  coupait la Terre au bord droit ; ry = 0,52 rx),
+  1,73 rTerre ; (0,48 h − 1,73 rTerre) / 0,52) — les deux derniers termes
+  garantissent que le globe et son anneau « attrape-moi » (1,4 rTerre au
+  repos, 1,6 tenu) tiennent EN ENTIER aux solstices (bords gauche/droit —
+  le jeu coupait la Terre au bord droit) ET aux équinoxes (bords haut/bas —
+  l'anneau plein dépassait de 5 px sous la scène mobile à l'automne ;
+  retour utilisateur) ; ry = 0,52 rx),
   un **Soleil-boule** (dégradé radial + granules) fixe au centre, rayon
   **8 % de min(l, h)** — de l'air pour l'orbite et le faisceau —, et le
   modelé du globe (voile clair, bord assombri). La sonde de pixels « Soleil
@@ -100,9 +103,21 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   `positionTerre(jour) = (−cos a, −sin a)` (sens trigonométrique). Solstice
   d'été : Terre à gauche du Soleil ; hiver : à droite ; l'automne passe par le
   bas de l'écran, le printemps par le haut.
-- Rayon du globe : `0,095 × min(l, h)` sur grand écran, **`min(0,085 l ;
-  0,16 h)` en mode compact** (< 400 px de canvas) — voir le bloc mobile
-  des invariants.
+- Rayon du globe : `0,095 × min(l, h)` sur grand écran, **`min(0,08 l ;
+  (0,48 h − rSoleil − 6 px) / 2,73)` en mode compact** (< 400 px de
+  canvas) — le plafond est DÉRIVÉ : aux équinoxes la Terre passe par
+  cy ± ry, l'anneau (1,73 rTerre) au-delà, le Soleil en deçà ; sans lui,
+  la garde verticale resserre l'orbite jusqu'à mettre la Terre dans le
+  Soleil (iPhone SE, canvas de 170 px : globe ramené à 45 px, écart 6 px).
+  Voir le bloc mobile des invariants. Sur 220 px de haut, trois choses se disputent la
+  hauteur : l'anneau doit tenir dans le canvas, la Terre doit rester à
+  distance du Soleil aux équinoxes (elle passe par cy ± ry), et l'ellipse
+  est plate. Budget mesuré (scène iPhone 13, 338 × 220) : globe 54 px,
+  orbite 113 px, 14 px entre les disques Terre et Soleil, 4 px sous
+  l'anneau tenu. À 0,085 l (57 px) la Terre tenue reposait sur le Soleil
+  (9 px) ; resserrer l'orbite seule (garde à 1,95) la mettait DANS le
+  Soleil. Toute retouche de ces trois chiffres se re-mesure aux quatre
+  repères, Terre tenue (halo = 1).
 - L'axe penche vers **+x** (`AXE_DIR`, constant), dessiné à 30°
   (`INCLINAISON_DESSIN_DEGRES`, exagéré — les 23,5° réels servent aux chiffres).
 - `penchementNord(jour) = cos(angleAnnee) = −positionTerre.x` : +1 au solstice
@@ -288,11 +303,12 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   utilisateur, iPhone) ; les 65 restants se prennent sur le JARDIN
   (24,5 → 22,5vh), jamais sur l'espace — la vue qu'on manipule est revenue
   à 31vh, sa hauteur d'avant la frise. **Le globe ne dépend plus de la
-  hauteur** : en mode compact, `rTerre = min(0,085 l ; 0,16 h)` (retour
+  hauteur** : en mode compact, `rTerre = min(0,08 l ; plafond dérivé de
+  h)` (retour
   utilisateur : quatre resserrages en vh l'avaient fait passer de 57 à
-  43 px de diamètre en une semaine — « très petit ») ; à 0,085 l, la scène
-  (57 px) et le jeu (56 px, ratio 9/7) portent la MÊME Terre, et le
-  prochain réglage de hauteur ne la touchera pas ; la zone de saisie
+  43 px de diamètre en une semaine — « très petit ») ; à 0,08 l, la scène
+  et le jeu (ratio 9/7) portent la MÊME Terre (54 px), et le prochain
+  réglage de hauteur ne la touchera pas ; la zone de saisie
   `max(rTerre × 2,6 ; 44 px)` suit. Raccourcir les textes ne
   rendrait RIEN à ce corps (mesuré : le pire cas n'est plus le commentaire
   d'été mais la bande de transition). Toujours MESURER au script (balayage
