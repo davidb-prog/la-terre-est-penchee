@@ -266,7 +266,15 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   n'a plus que des défis gagnés d'avance (l'hiver en réussit deux — la
   neige et l'été australien), on remélange un panier neuf au lieu de
   laisser tomber un bravo gratuit (retour utilisateur ; verrouillé par la
-  suite navigateur). Les deux vues du jeu partagent la même hauteur
+  suite navigateur). **Le point d'arrivée d'un scénario ne gagne pas non
+  plus** (`etat.jourFabrique`) : jeu ouvert, un bouton de saison glissait
+  la Terre pile sur le repère, qui est aussi le `jourBravo` — bravo sans
+  rien fabriquer (bug trouvé en remontant vers les scénarios sans ranger
+  le jeu) ; le drapeau tombe à l'ouverture d'un scénario et se relève au
+  premier geste de l'enfant (Terre ou curseur), vérifié au navigateur. Le
+  jeu ne se range jamais tout seul (ni au défilement, ni au choix d'un
+  scénario — décision utilisateur : ranger à la place de l'enfant, c'est
+  décider pour lui). Les deux vues du jeu partagent la même hauteur
   (colonnes 9fr/8fr = le rapport de leurs ratios). Le défi du kangourou
   (l'été australien) est la révélation du site.
 - **Les repères de saison (❄️🌸☀️🍂) autour de l'orbite s'effacent** quand la
@@ -387,9 +395,14 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   qu'elle sort de l'écran — un tap y ramène. **Pendant le jeu, il est
   ANCRÉ dans l'en-tête du jeu** (`main.js` le déplace à l'ouverture, le
   rend à sa place au rangement ; classe `jeu-ouvert` sur le panneau) : à
-  droite du titre, 60 px, élément de la mise en page — visible quoi
-  qu'il arrive au défilement — et la rangée des actions prend toute la
-  largeur dessous : **[🔇] [Encore une !] [Ranger le jeu]** sur UNE
+  droite du titre, 60 px, élément de la mise en page — et l'ancrage ne
+  vaut que **tant que l'en-tête du jeu est à l'écran** (`placerMedaillon`,
+  à chaque image) : jeu ouvert, si l'enfant remonte vers les scénarios
+  sans le ranger, le médaillon redevient flottant dès que l'en-tête sort
+  par le bas et se ré-ancre quand il revient (retour utilisateur :
+  « coincé en haut du jeu ») — le saut se fait à l'instant où la copie
+  ancrée disparaît, jamais deux médaillons à la fois. La rangée des
+  actions prend toute la largeur dessous : **[🔇] [Encore une !] [Ranger le jeu]** sur UNE
   ligne, la voix en icône seule (son libellé, `.libelle`, vit dans le
   jumeau des scénarios), « Encore une ! » est monté dans cette rangée (et
   se range avec le jeu)

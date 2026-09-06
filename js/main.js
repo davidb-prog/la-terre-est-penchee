@@ -40,7 +40,8 @@ var etat = {
   lecture: !mouvementReduit, /* l'année avance toute seule (un tour en ~85 s) */
   glissement: null,          /* { depart, delta, cible, t0, duree } pendant un scénario */
   scenarioActif: null,
-  glisse: false
+  glisse: false,
+  jourFabrique: true         /* faux après un scénario, jusqu'au prochain geste de l'enfant */
 };
 
 /* ------------------------------------------------------------------ */
@@ -100,6 +101,7 @@ function reprendreLaMain() {
  * saison qu'on a quittée (retour utilisateur). */
 function reprendreLaMainDoucement() {
   etat.glissement = null;
+  etat.jourFabrique = true; /* la main de l'enfant : le jeu peut se gagner */
   if (etat.lecture) fixerLecture(false);
   /* (surveillerHistoire se fait APRÈS fixerJour, chez l'appelant : ici le
    * jour peut être celui d'un glissement interrompu à mi-chemin) */
@@ -291,6 +293,10 @@ function afficherHistoire(scn) {
  * le vrai sens du voyage de la Terre. */
 function jouerScenario(scn) {
   fixerLecture(false);
+  /* le scénario finit pile sur un repère, qui est aussi le jourBravo des
+   * défis : jeu ouvert, il gagnait le défi sans que l'enfant fabrique
+   * rien. Le jeu ne se regagne qu'après un geste de l'enfant. */
+  etat.jourFabrique = false;
   etat.scenarioActif = scn.id;
   rafraichirBoutonsScenarios();
   afficherHistoire(scn);
@@ -480,7 +486,26 @@ function medaillonAncre() {
   return medaillon.parentNode === enteteJeu;
 }
 
+/* L'ancrage ne vaut que tant que l'en-tête du jeu est à l'écran : jeu
+ * ouvert, si l'enfant remonte vers les scénarios sans le ranger, le
+ * médaillon redevient flottant dès que l'en-tête sort par le bas (retour
+ * utilisateur : « coincé en haut du jeu »), et se ré-ancre quand l'en-tête
+ * revient. Le saut se fait à l'instant où sa copie ancrée disparaît —
+ * jamais deux médaillons à la fois. Appelé à chaque image : un seul
+ * getBoundingClientRect, un déplacement DOM aux transitions seulement. */
+function placerMedaillon() {
+  var ancrer = false;
+  if (!zoneJeu.hidden) {
+    var rect = enteteJeu.getBoundingClientRect();
+    var hauteur = window.innerHeight || document.documentElement.clientHeight;
+    ancrer = rect.bottom > 0 && rect.top < hauteur;
+  }
+  if (ancrer && !medaillonAncre()) enteteJeu.appendChild(medaillon);
+  else if (!ancrer && medaillonAncre()) placeMedaillon.insertBefore(medaillon, suivantMedaillon);
+}
+
 function gererMedaillon() {
+  placerMedaillon();
   /* ancré dans l'en-tête du jeu, il est un élément de la page : visible
    * sur mobile quoi qu'il arrive au défilement */
   var visible = estMobile && (medaillonAncre() || canvasHorsEcran(canvasFenetre));
@@ -917,6 +942,7 @@ function surveillerDefi(maintenant) {
     return;
   }
   if (etat.glissement) return; /* rien ne se gagne pendant une animation */
+  if (!etat.jourFabrique) return; /* ni sur le point d'arrivée d'un scénario */
   if (defiReussi(defi, etat.jour)) {
     if (defiEntreeMs === null) defiEntreeMs = maintenant;
     else if (maintenant - defiEntreeMs >= DEFI_ATTENTE_MS) gagnerDefi(maintenant);
@@ -929,8 +955,7 @@ boutonJouer.addEventListener('click', function () {
   if (!zoneJeu.hidden) {
     zoneJeu.hidden = true;
     panneauJeu.classList.remove('jeu-ouvert');
-    placeMedaillon.insertBefore(medaillon, suivantMedaillon);
-    gererMedaillon();
+    gererMedaillon(); /* rend le médaillon à sa place flottante */
     defi = null;
     boutonEncore.hidden = true;
     boutonJouer.textContent = '🎮 Jouer';
@@ -939,8 +964,7 @@ boutonJouer.addEventListener('click', function () {
   }
   zoneJeu.hidden = false;
   panneauJeu.classList.add('jeu-ouvert');
-  enteteJeu.appendChild(medaillon);
-  gererMedaillon();
+  gererMedaillon(); /* ancre le médaillon dans l'en-tête */
   boutonJouer.textContent = '📦 Ranger le jeu';
   boutonJouer.setAttribute('aria-expanded', 'true');
   reprendreLaMain(); /* l'enfant prend la main : rien ne doit gagner tout seul */
