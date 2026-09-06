@@ -143,6 +143,14 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   test : tout en un bloc doré, ça se lisait mal). Dans la bande de
   transition, LES DEUX saisons portent chacune leur teinte (« le
   printemps se termine : l'été arrive ! » — la passation se voit).
+  **Deux phrases d'affilée ne s'ouvrent jamais sur les mêmes mots**
+  (`momentDuMois`, verrouillé par test) : un mois qui ne porte qu'une
+  phrase dit « En janvier », un mois de repère (mars, juin, septembre,
+  décembre) en porte trois et les nomme « Début / Mi- / Fin décembre »
+  — les tranches sont pilées sur les bornes de la bande de transition,
+  le mot ne change donc jamais sans que la phrase change aussi (retour
+  utilisateur : trois « En décembre, chez nous, » de suite, pendant la
+  lecture, passaient pour un affichage bloqué).
 - **Les scénarios vont au moment choisi en douceur, toujours vers l'avant**
   (le vrai sens de l'année) ; reprendre la main efface l'histoire et désarme
   le bouton. L'histoire s'écrit en deux lignes à puces : 🏡 chez nous /

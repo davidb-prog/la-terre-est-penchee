@@ -143,6 +143,13 @@ export var MOIS = [
 
 export var JOURS_PAR_MOIS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
+/* Le premier jour de l'année d'un mois (index 0 = janvier). */
+export function debutDuMois(index) {
+  var debut = 0;
+  for (var m = 0; m < index; m++) debut += JOURS_PAR_MOIS[m];
+  return debut;
+}
+
 /* Le mois d'un jour de l'année : { index, nom }. */
 export function moisDuJour(jour) {
   var j = jourNormalise(jour);
@@ -389,6 +396,50 @@ export function aplombLumiere(jour) {
 /* La petite phrase du moment, affichée sous la fenêtre                */
 /* ------------------------------------------------------------------ */
 
+/* La bande de transition : les 12 derniers jours avant un repère de
+ * l'année, pendant lesquels la phrase annonce la saison qui arrive. */
+export var BANDE_TRANSITION_JOURS = 12;
+
+/* Les quatre repères de l'année, dans l'ordre. */
+export var JOURS_REPERES = [
+  JOUR_EQUINOXE_PRINTEMPS, JOUR_SOLSTICE_ETE,
+  JOUR_EQUINOXE_AUTOMNE, JOUR_SOLSTICE_HIVER
+];
+
+/* Le mot d'ouverture de la phrase du moment : « En janvier », mais
+ * « Début / Mi- / Fin décembre » quand le mois porte PLUSIEURS phrases
+ * (retour utilisateur : en mars, juin, septembre et décembre, trois
+ * phrases d'affilée commençaient par « En décembre, chez nous, » — pendant
+ * la lecture, on croyait que l'affichage était bloqué).
+ *
+ * Le mois se coupe aux mêmes jours que la phrase : l'entrée et la sortie
+ * de la bande de transition. Une seule tranche → « En » ; deux → début et
+ * fin ; trois → début, milieu et fin. Les tranches suivent donc toujours
+ * le texte qu'elles ouvrent : le mot ne change jamais sans que la phrase
+ * change aussi. */
+export function momentDuMois(jour) {
+  var j = jourNormalise(jour);
+  var mois = moisDuJour(j);
+  var debut = debutDuMois(mois.index);
+  var fin = debut + JOURS_PAR_MOIS[mois.index];
+  /* les coupures du mois : premier jour ENTIER de chaque tranche */
+  var coupures = [];
+  for (var i = 0; i < JOURS_REPERES.length; i++) {
+    var bornes = [JOURS_REPERES[i] - BANDE_TRANSITION_JOURS, JOURS_REPERES[i]];
+    for (var b = 0; b < bornes.length; b++) {
+      var d = Math.ceil(bornes[b]);
+      if (d > debut && d < fin && coupures.indexOf(d) === -1) coupures.push(d);
+    }
+  }
+  coupures.sort(function (a, z) { return a - z; });
+  if (coupures.length === 0) return 'En ' + mois.nom;
+  var rang = 0;
+  for (var k = 0; k < coupures.length; k++) if (j >= coupures[k]) rang = k + 1;
+  if (rang === 0) return 'Début ' + mois.nom;
+  if (rang === coupures.length) return 'Fin ' + mois.nom;
+  return 'Mi-' + mois.nom;
+}
+
 /* La phrase du moment, en deux parties : le TITRE (le mois et la saison —
  * affiché en doré) et le TEXTE (le commentaire, en clair) — retour test :
  * tout en un bloc, ça se lisait mal. phraseDuMoment les recolle pour les
@@ -415,10 +466,10 @@ export function phraseDuMomentParties(jour) {
   };
   for (var i = 0; i < reperes.length; i++) {
     var dans = jourNormalise(reperes[i].jour - j);
-    if (dans > 0 && dans <= 12) {
+    if (dans > 0 && dans <= BANDE_TRANSITION_JOURS) {
       var suivante = SAISONS[reperes[i].saison];
       return {
-        titreAvant: 'En ' + mois.nom + ', chez nous, ',
+        titreAvant: momentDuMois(j) + ', chez nous, ',
         avantSaisonNom: SAISONS[s].nom,
         avantTeinte: SAISONS[s].teinte,
         entre: ' se termine : ',
@@ -430,7 +481,7 @@ export function phraseDuMomentParties(jour) {
     }
   }
   var parties = {
-    titreAvant: 'En ' + mois.nom + ', chez nous, c’est ',
+    titreAvant: momentDuMois(j) + ', chez nous, c’est ',
     saisonNom: SAISONS[s].nom,
     titreApres: ' ! ' + SAISONS[s].emoji,
     teinte: SAISONS[s].teinte
@@ -440,8 +491,7 @@ export function phraseDuMomentParties(jour) {
    * mois). Les clauses sont ancrées sur des MOIS ENTIERS — superlatifs en
    * mai-juin-juillet et novembre-décembre-janvier, mouvement ailleurs —
    * et le chiffre d'heures est FIGÉ au milieu du mois affiché. */
-  var debutMois = 0;
-  for (var m = 0; m < mois.index; m++) debutMois += JOURS_PAR_MOIS[m];
+  var debutMois = debutDuMois(mois.index);
   var heures = Math.round(dureeJourHeures(debutMois + JOURS_PAR_MOIS[mois.index] / 2));
   if (mois.index >= 4 && mois.index <= 6) { /* mai, juin, juillet */
     parties.texte = 'Le Soleil monte très haut dans le ciel, et il fait jour très longtemps : ' + heures + ' heures de lumière !';

@@ -16,7 +16,7 @@ import {
   hauteurSoleilMidi, dureeJourHeures, heureLever, heureCoucher,
   ARBRES, arbreDuJour, jardinDuJour,
   LATITUDE_REPERES_DEGRES, positionLocaleMaison, positionLocaleKangourou, extremitesAnneau,
-  phraseDuMoment, phraseEspace,
+  phraseDuMoment, phraseEspace, momentDuMois,
   LECTURE_JOURS_PAR_SEC, SCENARIOS, VOIX_TRANSITIONS,
   DEFIS, DEFI_ATTENTE_MS, DEFI_SORTIE_MARGE_JOURS,
   defiReussi, defiEncoreProche, coeurDeSaison,
@@ -248,6 +248,46 @@ test('juste avant un repère, la phrase annonce la saison qui arrive (bande de t
   assert.ok(finJuin.indexOf('l’été arrive') !== -1, finJuin);
   var finDecembre = phraseDuMoment(348); /* ~5 jours avant le solstice d'hiver */
   assert.ok(finDecembre.indexOf('l’hiver arrive') !== -1, finDecembre);
+});
+
+test('deux phrases d’affilée ne commencent jamais par les mêmes mots', function () {
+  /* retour utilisateur : en mars, juin, septembre et décembre, TROIS phrases
+   * de suite s'ouvraient sur « En décembre, chez nous, » — pendant la
+   * lecture, on croyait l'affichage bloqué. Chaque tranche de mois porte
+   * maintenant son propre mot : « Début / Mi- / Fin décembre ». */
+  var vues = [];
+  var precedente = null;
+  for (var j = 0; j < ANNEE_JOURS; j++) {
+    var p = phraseDuMoment(j);
+    if (p === precedente) continue;
+    precedente = p;
+    var ouverture = p.slice(0, p.indexOf(', chez nous'));
+    assert.ok(ouverture.length > 0, 'ouverture introuvable au jour ' + j + ' : ' + p);
+    assert.ok(vues.indexOf(ouverture) === -1,
+      'ouverture répétée au jour ' + j + ' : « ' + ouverture + ' »');
+    vues.push(ouverture);
+  }
+  assert.equal(vues.length, 20, 'vingt phrases dans l’année : ' + vues.length);
+});
+
+test('le mot du mois suit les tranches de la phrase, jamais un jour de plus', function () {
+  /* un mois d'une seule phrase garde « En … » ; un mois qui en porte trois
+   * (les quatre mois de repère) les nomme début, milieu et fin */
+  assert.equal(momentDuMois(0), 'En janvier');
+  assert.equal(momentDuMois(130), 'En mai');
+  assert.equal(momentDuMois(334), 'Début décembre');
+  assert.equal(momentDuMois(341), 'Début décembre');
+  assert.equal(momentDuMois(342), 'Mi-décembre');
+  assert.equal(momentDuMois(353), 'Mi-décembre');
+  assert.equal(momentDuMois(354), 'Fin décembre');
+  assert.equal(momentDuMois(364), 'Fin décembre');
+  /* le mot ne bouge que quand la phrase bouge : même découpage des deux côtés */
+  for (var j = 1; j < ANNEE_JOURS; j++) {
+    if (momentDuMois(j) !== momentDuMois(j - 1)) {
+      assert.notEqual(phraseDuMoment(j), phraseDuMoment(j - 1),
+        'le mot du mois change seul au jour ' + j);
+    }
+  }
 });
 
 test('la phrase du moment finit par une ponctuation et garde l’apostrophe typographique', function () {
