@@ -95,7 +95,9 @@ function reprendreLaMain() {
  * voix finit toujours ce qu'elle dit (retour utilisateur : le texte qui
  * s'effaçait et la voix coupée au premier doigt ressemblaient à un bug —
  * l'enfant écoute ET joue). L'histoire ne s'efface que si la Terre quitte
- * la saison (à la marge d'entrée du jeu près), sans couper la voix. */
+ * la saison (à la marge d'entrée du jeu près) ; la voix finit alors sa
+ * phrase et se tait — elle ne raconte pas le jardin PUIS l'espace d'une
+ * saison qu'on a quittée (retour utilisateur). */
 function reprendreLaMainDoucement() {
   etat.glissement = null;
   if (etat.lecture) fixerLecture(false);
@@ -108,7 +110,8 @@ function effacerHistoire(couperLaVoix) {
   etat.scenarioActif = null;
   rafraichirBoutonsScenarios();
   afficherInvite();
-  if (couperLaVoix && narrateur) narrateur.stop();
+  if (!narrateur) return;
+  if (couperLaVoix) narrateur.stop(); else narrateur.finirDoucement('scn-');
 }
 
 function surveillerHistoire() {
@@ -596,8 +599,23 @@ if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
     return lecteur;
   };
   var prevenirFin = function () { var f = finEnCours; finEnCours = null; if (f) f(); };
+  /* « finis ta phrase, puis tais-toi » : le bloc en cours (clip ou phrase
+   * de synthèse) va au bout, les suivants ne partent pas (la Terre sort de
+   * la saison du scénario : l'histoire s'efface, la voix ne se coupe pas
+   * net — mais elle ne raconte pas non plus le jardin PUIS l'espace d'une
+   * saison que l'enfant a quittée ; retour utilisateur) */
+  var finirApresLeBloc = false;
+  var blocsEnCours = null;
+  /* ne vise que la narration dont le premier bloc porte ce préfixe d'id
+   * (« scn- » : l'histoire d'un scénario) — la grande histoire du bouton
+   * « Écouter », lancée par-dessus un scénario, n'a pas à se taire */
+  var finirDoucement = function (prefixe) {
+    if (!blocsEnCours || blocsEnCours[0].id.indexOf(prefixe) !== 0) return;
+    finirApresLeBloc = true;
+  };
   var toutArreter = function () {
     generation++;
+    finirApresLeBloc = false;
     window.speechSynthesis.cancel();
     if (lecteur) {
       try { lecteur.pause(); } catch (e) { /* déjà arrêté */ }
@@ -613,7 +631,7 @@ if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
     var indice = 0;
     var suivante = function () {
       if (maGen !== generation) return;
-      if (indice >= morceaux.length) { fini(); return; }
+      if (indice >= morceaux.length || finirApresLeBloc) { fini(); return; }
       var m = morceaux[indice++];
       var u = new SpeechSynthesisUtterance(m.texte);
       u.lang = voix ? voix.lang : 'fr-FR';
@@ -666,6 +684,7 @@ if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
     toutArreter();
     rafraichirVoix(); /* certaines listes de voix n'arrivent qu'après le chargement */
     var maGen = generation;
+    blocsEnCours = blocs;
     finEnCours = quandFini || null;
     var indice = 0;
     /* tous les clips de la narration partent ensemble */
@@ -677,7 +696,7 @@ if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
     }
     var suivant = function () {
       if (maGen !== generation) return;
-      if (indice >= blocs.length) { prevenirFin(); return; }
+      if (indice >= blocs.length || finirApresLeBloc) { prevenirFin(); return; }
       var premier = indice === 0;
       var bloc = blocs[indice++];
       var apres = function () { if (maGen === generation) window.setTimeout(suivant, 0); };
@@ -693,6 +712,7 @@ if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
       var pause = typeof bloc.pause === 'number' ? bloc.pause : 620;
       var jouer = function (url) {
         if (maGen !== generation) return;
+        if (finirApresLeBloc) { prevenirFin(); return; } /* demandé pendant le chargement */
         a.onended = function () { if (maGen === generation) window.setTimeout(apres, pause); };
         a.onerror = repli;
         a.src = url;
@@ -704,7 +724,7 @@ if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
     };
     suivant();
   };
-  narrateur = { narrate: narrate, stop: toutArreter };
+  narrateur = { narrate: narrate, stop: toutArreter, finirDoucement: finirDoucement };
 
   /* -- « 🔊 Écouter l'histoire » : la boîte d'explication, bloc par bloc -- */
   boutonEcouter.hidden = false;

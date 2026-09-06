@@ -205,17 +205,22 @@ test('les douze mois font ensemble 365 jours, et chaque jour retrouve son mois',
 /* La phrase du moment                                                 */
 /* ------------------------------------------------------------------ */
 
-test('la phrase du moment raconte le bon mois, la bonne saison et les bonnes heures', function () {
+test('la phrase du moment raconte le bon mois et la bonne saison, sans chiffre d’heures', function () {
   var hiver = phraseDuMoment(JOUR_SOLSTICE_HIVER);
   assert.ok(hiver.indexOf('décembre') !== -1, 'décembre attendu : ' + hiver);
   assert.ok(hiver.indexOf('l’hiver') !== -1);
-  assert.ok(hiver.indexOf('8\u00a0heures') !== -1, hiver); /* insécable : le chiffre ne quitte pas son unité */
+  assert.ok(hiver.indexOf('tout bas') !== -1, hiver);
   var ete = phraseDuMoment(JOUR_SOLSTICE_ETE);
   assert.ok(ete.indexOf('juin') !== -1);
   assert.ok(ete.indexOf('l’été') !== -1);
-  assert.ok(ete.indexOf('16\u00a0heures') !== -1, ete);
+  assert.ok(ete.indexOf('très longtemps') !== -1, ete);
   assert.ok(phraseDuMoment(100).indexOf('le printemps') !== -1);
   assert.ok(phraseDuMoment(290).indexOf('l’automne') !== -1);
+  /* les heures vivent dans la barre du jour, juste au-dessus : aucun
+   * chiffre dans le commentaire (retour utilisateur : doublon) */
+  for (var j = 0; j < ANNEE_JOURS; j += 0.5) {
+    assert.ok(!/\d/.test(phraseDuMomentParties(j).texte), 'chiffre dans le commentaire au jour ' + j + ' : ' + phraseDuMomentParties(j).texte);
+  }
 });
 
 test('aux bords de saison, la phrase dit le mouvement vrai, pas le cliché du solstice', function () {

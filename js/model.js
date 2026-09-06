@@ -530,14 +530,13 @@ export function phraseDuMomentParties(jour) {
   /* Hors bande, le commentaire ne change JAMAIS en cours de mois (retour
    * test : début mai et début novembre, la phrase basculait au milieu du
    * mois). Les clauses sont ancrées sur des MOIS ENTIERS — superlatifs en
-   * mai-juin-juillet et novembre-décembre-janvier, mouvement ailleurs —
-   * et le chiffre d'heures est FIGÉ au milieu du mois affiché. */
-  var debutMois = debutDuMois(mois.index);
-  var heures = Math.round(dureeJourHeures(debutMois + JOURS_PAR_MOIS[mois.index] / 2));
+   * mai-juin-juillet et novembre-décembre-janvier, mouvement ailleurs.
+   * Aucun chiffre d'heures : la barre du jour, juste au-dessus, écrit
+   * déjà « X h de jour » (retour utilisateur : doublon). */
   if (mois.index >= 4 && mois.index <= 6) { /* mai, juin, juillet */
-    parties.texte = 'Le Soleil monte très haut dans le ciel, et il fait jour très longtemps : ' + heures + ' heures de lumière !';
+    parties.texte = 'Le Soleil monte très haut dans le ciel, et il fait jour très longtemps !';
   } else if (mois.index >= 10 || mois.index === 0) { /* novembre, décembre, janvier */
-    parties.texte = 'Le Soleil reste tout bas, et la nuit tombe très tôt : ' + heures + ' heures de lumière seulement.';
+    parties.texte = 'Le Soleil reste tout bas, et la nuit tombe très tôt.';
   } else if (Math.sin(angleAnnee(jour)) < 0) {
     parties.texte = 'Chaque jour, le Soleil grimpe un peu plus haut, et le jour s’allonge.';
   } else {

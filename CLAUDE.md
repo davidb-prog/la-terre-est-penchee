@@ -162,12 +162,15 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   la ligne du titre grandirait de 16 px (compromis validé, budget
   re-mesuré). Reprendre la main (glisser, curseur, scénario, ouvrir le
   jeu) met en pause ; `prefers-reduced-motion` la désactive au chargement.
-- **La phrase du moment ne défile pas plus vite qu'on ne lit** : hors du
-  cœur de l'été et de l'hiver (|penchement| > 0,75, seuls moments où le
-  chiffre d'heures s'écrit — avec son unité « heures de lumière »), elle dit
-  seulement le mouvement (« le jour s'allonge / raccourcit ») — les heures
-  vivent dans la barre du jour, pas de compteur qui tourne pendant la
-  lecture. Les ~12 jours avant chaque repère, la **bande de transition**
+- **La phrase du moment ne défile pas plus vite qu'on ne lit** : au cœur
+  de l'été et de l'hiver (mai-juin-juillet, novembre-décembre-janvier)
+  elle dit le superlatif (« il fait jour très longtemps ! », « la nuit
+  tombe très tôt. »), ailleurs seulement le mouvement (« le jour
+  s'allonge / raccourcit ») — **aucun chiffre d'heures dans le
+  commentaire** (verrouillé par test) : les heures vivent dans la barre du
+  jour, juste au-dessus, qui écrit « X h de jour » (retour utilisateur :
+  « 16 heures de lumière » sous « 16 h de jour » faisait doublon), et pas
+  de compteur qui tourne pendant la lecture. Les ~12 jours avant chaque repère, la **bande de transition**
   annonce « X se termine : Y arrive ! » DANS LE TITRE SEULEMENT — juin ne
   raconte plus le printemps puis l'été en deux phrases contradictoires
   (retour test) ; le commentaire, lui, reste celui du mois, et la phrase de
@@ -219,8 +222,8 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   seuils physiques de penchant (±0,15, ±0,70) — retour utilisateur : un
   seul jour de bascule commun sur 28, pendant la lecture l'une changeait
   puis l'autre quatre jours plus tard. Ses paliers : « à fond » sur les
-  mois de cœur (mai-juin-juillet, novembre-décembre-janvier, ceux où le
-  jardin écrit les heures) ; « à égalité » sur la tranche qui suit chaque
+  mois de cœur (mai-juin-juillet, novembre-décembre-janvier, ceux du
+  superlatif du jardin) ; « à égalité » sur la tranche qui suit chaque
   équinoxe ; « penche vers / à l'opposé » ailleurs — rien de propre à la
   bande de transition. Aux coupes, le penchant vaut ±0,2 au plus (testé :
   « à fond » ⇒ |p| > 0,55, « à égalité » ⇒ |p| < 0,25).
@@ -229,9 +232,13 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   coupe ni l'histoire ni la voix** (`reprendreLaMainDoucement`) : le texte
   reste tant que la Terre reste dans la saison du scénario, à la marge
   d'entrée du jeu près (8 jours — `procheDeSaison`), et s'efface quand elle
-  en sort, SANS couper la voix, qui finit toujours ce qu'elle dit (retour
-  utilisateur : le texte effacé et la voix coupée au premier doigt
-  ressemblaient à un bug — l'enfant écoute et joue). Le bouton ▶, un autre
+  en sort, SANS couper la voix net : elle **finit le bloc en cours puis se
+  tait** (`narrateur.finirDoucement('scn-')` — le clip, ou la phrase de
+  synthèse, va au bout ; les blocs suivants ne partent pas). Retour
+  utilisateur en deux temps : le texte effacé et la voix coupée au premier
+  doigt ressemblaient à un bug — l'enfant écoute et joue ; puis la voix
+  qui racontait quand même le jardin PUIS l'espace d'une saison quittée.
+  La grande histoire du bouton « Écouter », elle, n'est jamais visée. Le bouton ▶, un autre
   scénario ou l'ouverture du jeu, eux, effacent et coupent (`reprendreLaMain`).
   L'histoire s'écrit en deux lignes à puces : 🏡 chez nous /
   🚀 vu de l'espace. Les puces 🚀 d'été et d'hiver répètent le maillon
