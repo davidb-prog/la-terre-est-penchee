@@ -47,7 +47,12 @@ export function corpus() {
   if (!zone) throw new Error('texte-explication introuvable dans index.html');
   const paras = zone[1].match(/<p>[\s\S]*?<\/p>/g) || [];
   paras.forEach((p, i) => {
-    ajouter('histoire-' + (i + 1), p.replace(/<[^>]+>/g, ' '));
+    /* les entités d'espaces insécables (&nbsp;, &#8239; — typographie
+       française de l'affichage) redeviennent des espaces : la voix lit le
+       même texte qu'avant, texteOral ramène tout à l'espace simple */
+    const texte = p.replace(/<[^>]+>/g, ' ')
+      .replace(/&nbsp;/g, ' ').replace(/&#(\d+);/g, (m, c) => String.fromCharCode(Number(c))).replace(/&amp;/g, '&');
+    ajouter('histoire-' + (i + 1), texte);
   });
 
   return blocs;

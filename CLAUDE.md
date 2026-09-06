@@ -171,7 +171,13 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   les textes du corpus vocal (histoires des scénarios, consignes et bravos)
   la reçoivent À L'AFFICHAGE seulement, dans `main.js` — le corpus reste
   gelé au caractère près, et `texteOral` ramène de toute façon ces espaces
-  à des espaces simples.
+  à des espaces simples. Les textes STATIQUES d'`index.html` (la grande
+  histoire, la note aux parents, l'accroche) portent les entités
+  `&#8239;` / `&nbsp;` dans le HTML même ; `tools/voix-lib.mjs` les décode
+  avant `texteOral`, donc les sept clips `histoire-N` jouent toujours
+  (vérifié : `test/voix.test.mjs` + balayage navigateur des paragraphes,
+  des histoires de scénarios et des consignes, 320 à 1200 px, zéro ligne
+  orpheline).
 - **Les scénarios vont au moment choisi en douceur, toujours vers l'avant**
   (le vrai sens de l'année) ; reprendre la main efface l'histoire et désarme
   le bouton. L'histoire s'écrit en deux lignes à puces : 🏡 chez nous /
@@ -299,7 +305,11 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   bouton qu'il vient de choisir.
 - **Sur mobile (< 880 px) seulement** : un médaillon flottant (haut droit,
   hors du chemin du pouce) montre la fenêtre de chez nous en miniature dès
-  qu'elle sort de l'écran — un tap y ramène. Le jeu n'affiche qu'une vue
+  qu'elle sort de l'écran — un tap y ramène. **Il ne recouvre jamais un
+  bouton** : les en-têtes du jeu et des scénarios gardent 62 px à droite
+  (`padding-right`), et les boutons du jeu passent à la ligne plutôt que de
+  déborder sous lui (retour utilisateur : « Ranger le jeu » était masqué —
+  vérifié par sonde de chevauchement dans les deux panneaux). Le jeu n'affiche qu'une vue
   (l'espace) : c'est le médaillon qui montre le résultat. Rien de tel sur
   grand écran, et rien n'est incrusté dans le canvas qu'on manipule.
 

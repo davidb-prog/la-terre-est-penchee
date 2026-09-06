@@ -499,6 +499,21 @@ button:focus-visible, input:focus-visible, a:focus-visible {
   .bulle-geste { margin-top: 4px; font-size: .78rem; }
   .bulle-geste-pilule { padding: 4px 12px; }
 
+  /* le médaillon flottant (72 px, à 14 px du bord droit) survole les
+     en-têtes du jeu et des scénarios quand on y est : leurs boutons de
+     droite lui laissent la place, sinon il masque « Ranger le jeu »
+     (retour utilisateur, capture iPhone) */
+  .entete-jeu, .titre-scenarios { padding-right: 62px; }
+  /* « 📦 Ranger le jeu » + « 🔇 sans la voix » dépassent la largeur qui
+     reste : les boutons du jeu passent à la ligne au lieu de déborder
+     sous le médaillon */
+  .actions-jeu { flex-wrap: wrap; justify-content: flex-end; max-width: 100%; }
+  /* …et se serrent pour tenir à deux sur la ligne : 118 + 8 + 167 = 293 px
+     pour 270 disponibles à 16 px ; à .9rem et 10 px de marge intérieure,
+     264 px (mesuré, police de secours Linux — SF sur iPhone est plus
+     étroite). La cible tactile garde ses 44 px de haut. */
+  .actions-jeu .bouton-voix, .actions-jeu .bouton-jeu { padding-left: 10px; padding-right: 10px; font-size: .9rem; }
+
   /* le jeu sur mobile : une seule vue (l'espace, qu'on manipule) — c'est le
      médaillon flottant qui montre la fenêtre, il reste visible pendant le jeu */
   .vues-jeu { grid-template-columns: 1fr; }
