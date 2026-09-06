@@ -104,8 +104,15 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; }
   font-size: .92rem; color: var(--muted); margin: 2px 4px 6px;
 }
 .titre-scene { flex: 1 1 auto; font-weight: 700; }
-.actions-scene { display: flex; gap: 8px; margin-left: auto; flex: none; }
 .bouton-lecture { padding: 5px 12px; font-size: .8rem; border-radius: 999px; }
+/* le ⏸/▶ est écrit dans la ligne « Depuis l'espace » (là où on regarde
+   tourner la Terre — c'est sa place sur téléphone) ; sur grand écran il
+   remonte en haut à droite du panneau, dans la rangée du titre : un seul
+   bouton, deux places */
+.panneau-scene { position: relative; }
+@media (min-width: 880px) {
+  .bouton-lecture { position: absolute; top: 10px; right: 12px; }
+}
 
 /* boutons à deux libellés (⏸/▶ et 🔇/🔊) : superposés dans une grille 1×1,
    le bouton garde en permanence la largeur du plus long — basculer ne décale
@@ -468,7 +475,7 @@ button:focus-visible, input:focus-visible, a:focus-visible {
      manipule) : espace revenu à 31vh, fenêtre à 22,5vh */
   .grille-vues .ratio-fenetre { aspect-ratio: auto; height: min(50vw, 22.5vh); }
   .grille-vues .ratio-espace { aspect-ratio: auto; height: min(58vw, 31vh); }
-  .entete-vue { margin-bottom: 4px; }
+  .entete-vue { margin-bottom: 2px; }
   .phrase-vue { margin-top: 4px; line-height: 1.38; font-size: .88rem; }
 
   /* la place du PIRE cas est réservée : le nombre de lignes de la phrase ne
@@ -543,6 +550,10 @@ button:focus-visible, input:focus-visible, a:focus-visible {
   /* la légende maison/kangourou passe sous le titre de vue, sans le casser */
   .entete-vue { flex-wrap: wrap; }
   .entete-vue .hint { flex-basis: 100%; font-size: .72rem; }
+  /* le ⏸/▶ à droite du titre « Depuis l’espace » : 28 px de haut (pas
+     44 — la rangée du titre ne doit pas grandir ; la cible reste large,
+     ~90 px, et c'est un bouton de parent) */
+  .entete-vue-espace .bouton-lecture { margin-left: auto; min-height: 28px; padding-top: 3px; padding-bottom: 3px; }
   .defi-jeu { font-size: 1.15rem; }
   .bravo-jeu { font-size: 1rem; }
 }

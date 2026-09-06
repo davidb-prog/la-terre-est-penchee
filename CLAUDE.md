@@ -143,7 +143,15 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
 - **La lecture automatique** (un tour de l'année en ~110 s — ralentie
   après tests utilisateurs, personne n'avait le temps de lire à 85 s —,
   `LECTURE_JOURS_PAR_SEC`) se commande UNIQUEMENT par le bouton ⏸/▶ (libellés
-  empilés, largeur stable) et la barre d'espace. Reprendre la main (glisser,
+  empilés, largeur stable) et la barre d'espace. **Le bouton est écrit dans
+  la ligne « 🚀 Depuis l'espace »** — sur téléphone il reste sous le pouce
+  quand on regarde la Terre tourner (retour utilisateur : dans l'en-tête de
+  la scène, il était 500 px plus haut, toujours hors écran) ; sur grand
+  écran le CSS le pose en absolu en haut à droite du panneau, dans la
+  rangée du titre, comme avant. Un seul bouton, jamais dupliqué (deux ⏸
+  visibles à la fois se contrediraient). Sur mobile il fait 28 px de haut
+  (pas 44 : la ligne du titre ne doit pas grandir — budget re-mesuré,
+  714 px). Reprendre la main (glisser,
   curseur, scénario, ouvrir le jeu) met en pause ; `prefers-reduced-motion` la
   désactive au chargement.
 - **La phrase du moment ne défile pas plus vite qu'on ne lit** : hors du

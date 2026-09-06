@@ -68,12 +68,6 @@
     <section class="panneau panneau-scene" id="panneau-scene" aria-labelledby="titre-scene">
       <div class="entete-scene">
         <span class="titre-scene" id="titre-scene">Le même jour, deux regards</span>
-        <div class="actions-scene">
-          <!-- les deux libellés vivent empilés : largeur stable, rien ne se décale -->
-          <button id="bouton-lecture" class="bouton-lecture" aria-pressed="true"><span
-              class="lecture-on" aria-hidden="true">⏸ Pause</span><span
-              class="lecture-off" aria-hidden="true">▶ Lecture</span></button>
-        </div>
       </div>
 
       <div class="grille-vues">
@@ -87,7 +81,15 @@
         </div>
 
         <div class="bloc-vue">
-          <div class="entete-vue entete-vue-espace">🚀 Depuis l’espace
+          <!-- le ⏸/▶ vit ICI, au-dessus de la vue qu'on regarde tourner : sur
+               téléphone il reste sous le pouce sans remonter la page ; sur
+               grand écran, le CSS le pose en haut à droite du panneau, dans
+               la rangée du titre, comme avant (un seul bouton, un seul
+               câblage). Les deux libellés vivent empilés : largeur stable. -->
+          <div class="entete-vue entete-vue-espace"><span class="titre-vue">🚀 Depuis l’espace</span>
+            <button id="bouton-lecture" class="bouton-lecture" aria-pressed="true"><span
+                class="lecture-on" aria-hidden="true">⏸ Pause</span><span
+                class="lecture-off" aria-hidden="true">▶ Lecture</span></button>
             <span class="hint">la maison&nbsp;: chez nous · le kangourou&nbsp;: l’Australie</span></div>
           <div class="cadre-canvas ratio-espace">
             <canvas id="canvas-orbite"
