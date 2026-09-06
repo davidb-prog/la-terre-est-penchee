@@ -157,6 +157,10 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; }
 /* le geste posé sur une vue appartient TOUJOURS au glisser de la Terre — un
    doigt un peu de travers ne part jamais en défilement de page */
 .cadre-canvas, .vues-jeu { touch-action: none; }
+/* la fenêtre ne se manipule pas : le doigt posé dessus fait défiler la
+   page (retour utilisateur : on tirait la barre du jour, rien ne bougeait,
+   pas même la page — « c'est cassé ») */
+.cadre-canvas.ratio-fenetre { touch-action: pan-x pan-y; }
 #canvas-orbite, #canvas-orbite-jeu { touch-action: none; cursor: grab; }
 #canvas-orbite.attrape, #canvas-orbite-jeu.attrape { cursor: grabbing; }
 

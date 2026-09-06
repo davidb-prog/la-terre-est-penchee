@@ -18,7 +18,8 @@ croisés de la famille vivent sur ce domaine, jamais `github.io`).
   pas de lookbehind regex, repli `@supports` pour `aspect-ratio`,
   `top/right/bottom/left` plutôt qu'`inset`. Tester à 390 px de large.
 - **Blindage tactile** : `touch-action: none` sur les canvas interactifs et
-  leurs cadres, doublé du repli JS `touchstart`/`touchmove` non passifs ;
+  leurs cadres (ceux de l'espace — la fenêtre, non interactive, laisse
+  défiler), doublé du repli JS `touchstart`/`touchmove` non passifs ;
   `user-select: none` sur `body`, `* { touch-action: pan-x pan-y }`, viewport
   `maximum-scale=1` + filet `gesturestart` → la page ne se sélectionne pas et
   ne se zoome pas sous les doigts d'un enfant (les zooms d'accessibilité du
@@ -285,7 +286,14 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   jauge jaune seule était illisible) : la barre = 24 h, midi au centre ;
   bouts nuit étoilés avec lune dessinée (mot « nuit » si la place le permet,
   grand écran seulement), segment jour en dégradé aube → midi → crépuscule
-  avec le petit disque de midi ; la durée s'écrit AU-DESSUS de la barre.
+  avec un petit soleil À RAYONS à midi (pas un disque : le rond blanc
+  sur la piste dégradée se lisait comme le pouce d'un curseur — retour
+  utilisateur, on essayait de le tirer en croyant tenir la frise) ; la
+  durée s'écrit AU-DESSUS de la barre, sur téléphone aussi (11 px CSS au
+  moins, halo clair devant les fils) — une barre sans valeur se lit comme
+  un contrôle. Et le cadre de la fenêtre laisse défiler la page
+  (`touch-action: pan-x pan-y`, seuls les canvas de l'espace sont à
+  `none`) : le doigt qui la « tire » obtient une réponse, la bonne.
   Les **pieds de l'arc du Soleil tombent PILE sur les bouts du segment
   jaune** (deux fils en pointillés les relient) : l'été l'arc est haut ET
   large, l'hiver bas ET court — le jour, c'est le temps où le Soleil est

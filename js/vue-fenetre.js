@@ -455,21 +455,42 @@ export function creerVueFenetre(canvas) {
       else ctx.rect(jx, by, jw, bh);
       ctx.fillStyle = degradeJour;
       ctx.fill();
-      /* le petit soleil de midi, au centre du jaune — sous le sommet de l'arc */
+      /* le petit soleil de midi, au centre du jaune — sous le sommet de
+       * l'arc. Un soleil À RAYONS, pas un disque : le rond blanc posé sur
+       * la piste dégradée se lisait comme le pouce d'un curseur (retour
+       * utilisateur : on essayait de le tirer, en croyant tenir la frise
+       * de l'année). */
+      var mx = bx + bw / 2, my = by + bh / 2, rs = bh * 0.2;
+      ctx.strokeStyle = '#ff9f1c';
+      ctx.lineWidth = Math.max(1, bh * 0.08);
+      ctx.lineCap = 'round';
+      for (var k = 0; k < 8; k++) {
+        var a = k * TAU / 8;
+        ctx.beginPath();
+        ctx.moveTo(mx + Math.cos(a) * rs * 1.5, my + Math.sin(a) * rs * 1.5);
+        ctx.lineTo(mx + Math.cos(a) * rs * 2.1, my + Math.sin(a) * rs * 2.1);
+        ctx.stroke();
+      }
       ctx.beginPath();
-      ctx.arc(bx + bw / 2, by + bh / 2, bh * 0.32, 0, TAU);
+      ctx.arc(mx, my, rs, 0, TAU);
       ctx.fillStyle = '#fff7d6';
       ctx.fill();
-      if (!g.compact) {
-        var taille = Math.round(g.h * 0.042);
-        ctx.font = '600 ' + taille + 'px system-ui, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        /* la durée s'écrit dans le jour, décalée pour laisser le soleil */
-        ctx.fillStyle = 'rgba(11, 16, 32, 0.9)';
-        ctx.fillText(Math.round(dureeJourHeures(jour)) + ' h de jour', bx + bw / 2, by - taille * 0.7);
-
-      }
+      /* la durée s'écrit AU-DESSUS de la barre, sur téléphone aussi (une
+       * barre sans valeur se lit comme un contrôle ; avec sa valeur, comme
+       * une jauge — retour utilisateur). En compact, 11 px CSS au moins,
+       * avec un halo clair pour passer devant les fils en pointillés. */
+      var dpr = window.devicePixelRatio || 1;
+      var taille = Math.round(Math.max(g.h * 0.042, g.compact ? 11 * dpr : 0));
+      ctx.font = '600 ' + taille + 'px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      var texteDuree = Math.round(dureeJourHeures(jour)) + '\u00a0h de jour';
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = Math.max(2, taille * 0.28);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+      ctx.strokeText(texteDuree, mx, by - taille * 0.75);
+      ctx.fillStyle = 'rgba(11, 16, 32, 0.9)';
+      ctx.fillText(texteDuree, mx, by - taille * 0.75);
     }
   };
 }
