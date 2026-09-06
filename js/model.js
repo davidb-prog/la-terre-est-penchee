@@ -447,6 +447,21 @@ export function momentDuMois(jour) {
   return 'Mi-' + mois.nom;
 }
 
+/* La typographie française des phrases affichées : fine insécable devant
+ * « ! ? ; », insécable devant « : », insécable entre un nombre et son unité
+ * (« 8 heures »). Mesuré au navigateur (Chromium, 300 à 1200 px) : sans
+ * elles, une ligne se réduisait à « ! » (jour 68 à 390 px), une autre
+ * s'ouvrait sur « : », un chiffre se séparait de « heures » — la règle
+ * Unicode « pas de coupure devant ! même après une espace » n'est PAS
+ * appliquée par tous les moteurs. `texteOral` ramène ces espaces à des
+ * espaces simples : la voix n'y voit rien. */
+export function typographie(t) {
+  return t
+    .replace(/ ([!?;])/g, '\u202f$1')
+    .replace(/ :/g, '\u00a0:')
+    .replace(/(\d) heures/g, '$1\u00a0heures');
+}
+
 /* La fin du titre : « … ! 🍂 ». L'espace devant le « ! » est la fine
  * insécable de la typographie française, celle entre le « ! » et l'émoji
  * est insécable aussi — l'émoji ne part JAMAIS seul à la ligne (retour
@@ -485,11 +500,11 @@ export function phraseDuMomentParties(jour) {
         titreAvant: momentDuMois(j) + ', chez nous, ',
         avantSaisonNom: SAISONS[s].nom,
         avantTeinte: SAISONS[s].teinte,
-        entre: ' se termine : ',
+        entre: typographie(' se termine : '),
         saisonNom: suivante.nom,
         titreApres: ' arrive' + FIN_TITRE + suivante.emoji,
         teinte: suivante.teinte,
-        texte: TEXTES_BANDE[reperes[i].saison]
+        texte: typographie(TEXTES_BANDE[reperes[i].saison])
       };
     }
   }
@@ -515,6 +530,7 @@ export function phraseDuMomentParties(jour) {
   } else {
     parties.texte = 'Chaque jour, le Soleil descend un peu, et le jour raccourcit.';
   }
+  parties.texte = typographie(parties.texte);
   return parties;
 }
 
@@ -527,11 +543,13 @@ export function phraseDuMoment(jour) {
 /* La phrase de la vue de l'espace : où penche notre moitié, en ce moment. */
 export function phraseEspace(jour) {
   var p = penchementNord(jour);
-  if (p > 0.7) return 'Notre moitié de la Terre penche à fond vers le Soleil : les jours sont les plus longs de l’année !';
-  if (p > 0.15) return 'Notre moitié penche vers le Soleil — et l’Australie, à l’opposé.';
-  if (p < -0.7) return 'Notre moitié penche à fond à l’opposé du Soleil : les jours sont les plus courts de l’année.';
-  if (p < -0.15) return 'Notre moitié penche à l’opposé du Soleil — l’Australie, elle, penche vers le Soleil.';
-  return 'Aucune moitié ne penche vers le Soleil : chez nous et l’Australie sont à égalité.';
+  var t;
+  if (p > 0.7) t = 'Notre moitié de la Terre penche à fond vers le Soleil : les jours sont les plus longs de l’année !';
+  else if (p > 0.15) t = 'Notre moitié penche vers le Soleil — et l’Australie, à l’opposé.';
+  else if (p < -0.7) t = 'Notre moitié penche à fond à l’opposé du Soleil : les jours sont les plus courts de l’année.';
+  else if (p < -0.15) t = 'Notre moitié penche à l’opposé du Soleil — l’Australie, elle, penche vers le Soleil.';
+  else t = 'Aucune moitié ne penche vers le Soleil : chez nous et l’Australie sont à égalité.';
+  return typographie(t);
 }
 
 /* ------------------------------------------------------------------ */

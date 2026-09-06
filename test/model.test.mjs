@@ -16,7 +16,7 @@ import {
   hauteurSoleilMidi, dureeJourHeures, heureLever, heureCoucher,
   ARBRES, arbreDuJour, jardinDuJour,
   LATITUDE_REPERES_DEGRES, positionLocaleMaison, positionLocaleKangourou, extremitesAnneau,
-  phraseDuMoment, phraseDuMomentParties, phraseEspace, momentDuMois,
+  phraseDuMoment, phraseDuMomentParties, phraseEspace, momentDuMois, typographie,
   LECTURE_JOURS_PAR_SEC, SCENARIOS, VOIX_TRANSITIONS,
   DEFIS, DEFI_ATTENTE_MS, DEFI_SORTIE_MARGE_JOURS,
   defiReussi, defiEncoreProche, coeurDeSaison,
@@ -209,11 +209,11 @@ test('la phrase du moment raconte le bon mois, la bonne saison et les bonnes heu
   var hiver = phraseDuMoment(JOUR_SOLSTICE_HIVER);
   assert.ok(hiver.indexOf('décembre') !== -1, 'décembre attendu : ' + hiver);
   assert.ok(hiver.indexOf('l’hiver') !== -1);
-  assert.ok(hiver.indexOf('8 heures') !== -1);
+  assert.ok(hiver.indexOf('8\u00a0heures') !== -1, hiver); /* insécable : le chiffre ne quitte pas son unité */
   var ete = phraseDuMoment(JOUR_SOLSTICE_ETE);
   assert.ok(ete.indexOf('juin') !== -1);
   assert.ok(ete.indexOf('l’été') !== -1);
-  assert.ok(ete.indexOf('16 heures') !== -1);
+  assert.ok(ete.indexOf('16\u00a0heures') !== -1, ete);
   assert.ok(phraseDuMoment(100).indexOf('le printemps') !== -1);
   assert.ok(phraseDuMoment(290).indexOf('l’automne') !== -1);
 });
@@ -305,6 +305,18 @@ test('pile sur un repère (les boutons y vont), la saison qui commence se dit «
     var bande = phraseDuMoment(j).indexOf('se termine') !== -1;
     assert.equal(mi, bande, 'jour ' + j + ' : ' + phraseDuMoment(j));
   }
+});
+
+test('les phrases affichées portent la typographie française : rien ne se coupe devant « : ! » ni entre un chiffre et « heures »', function () {
+  /* mesuré au navigateur : sans insécables, une ligne se réduisait à « ! »,
+   * une autre s'ouvrait sur « : », un « 8 » se séparait de « heures » */
+  for (var j = 0; j < ANNEE_JOURS; j += 0.5) {
+    [phraseDuMoment(j), phraseEspace(j)].forEach(function (p) {
+      assert.ok(!/ [:!?;]/.test(p), 'espace sécable devant une ponctuation au jour ' + j + ' : ' + p);
+      assert.ok(!/\d heures/.test(p), 'chiffre séparable de son unité au jour ' + j + ' : ' + p);
+    });
+  }
+  assert.equal(typographie('tôt : 8 heures !'), 'tôt\u00a0: 8\u00a0heures\u202f!');
 });
 
 test('l’émoji du titre ne part jamais seul à la ligne', function () {

@@ -158,7 +158,17 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   titre ne part jamais seul à la ligne** (`FIN_TITRE` = fine insécable
   devant le « ! », insécable entre le « ! » et l'émoji — retour
   utilisateur iPhone, « 🍂 » orphelin ; vérifié par test et au
-  navigateur par demi-journées à 320/360/390/1200 px).
+  navigateur par demi-journées à 320/360/390/1200 px). Plus largement,
+  **toute phrase affichée passe par `typographie()`** (fine insécable
+  devant « ! ? ; », insécable devant « : » et entre un chiffre et
+  « heures ») : mesuré au navigateur de 300 à 1200 px, Chromium coupe
+  devant « ! » et « : » même après une espace — à 390 px, le commentaire
+  du jour 68 laissait un « ! » seul sur sa ligne et la phrase de l'espace
+  s'ouvrait sur « : ». Les phrases générées la portent dans le modèle ;
+  les textes du corpus vocal (histoires des scénarios, consignes et bravos)
+  la reçoivent À L'AFFICHAGE seulement, dans `main.js` — le corpus reste
+  gelé au caractère près, et `texteOral` ramène de toute façon ces espaces
+  à des espaces simples.
 - **Les scénarios vont au moment choisi en douceur, toujours vers l'avant**
   (le vrai sens de l'année) ; reprendre la main efface l'histoire et désarme
   le bouton. L'histoire s'écrit en deux lignes à puces : 🏡 chez nous /
@@ -297,11 +307,19 @@ scénarios/jeu (clé de famille `petit-labo-son`), `visibilitychange` +
 `pagehide` → `stop()`. Sans synthèse, les boutons sonores se cachent et le
 site reste complet.
 
-**La voix enregistrée n'est pas encore générée** : manifeste vide, tout passe
-à la synthèse. Le corpus vit dans `tools/voix-lib.mjs`, la production se
-déroule avec le skill `generer-voix-petit-labo` sur la machine de
-l'utilisateur (clé dans `.cle-elevenlabs`, gitignoré). Tant que rien n'est
-enregistré, les textes du site restent libres — après, ils sont GELÉS.
+**La voix enregistrée est générée** (30 clips, 3 min 35 s, 1,9 Mo — la
+voix de la série astronomie, `GFj5Qf6cNQ3Lgp8VKBwc`, `eleven_multilingual_v2`) :
+les quatre scénarios (intro, fenêtre, espace), la transition, les consignes
+et bravos des cinq défis, les sept paragraphes de la grande histoire. Le
+corpus vit dans `tools/voix-lib.mjs`, la production s'est déroulée avec le
+skill `generer-voix-petit-labo` sur la machine de l'utilisateur (clé dans
+`.cle-elevenlabs`, gitignoré). **Les textes du corpus sont donc GELÉS** :
+un texte enregistré qui change ne casse rien, mais son clip se tait et la
+synthèse reprend (`test/voix.test.mjs` verrouille la cohérence manifeste ↔
+site) — toute retouche d'un texte du corpus impose de re-tirer son clip.
+Les phrases GÉNÉRÉES (phrase du moment, phrase de l'espace) ne sont pas
+dans le corpus : elles restent libres, et `texteOral` normalise de toute
+façon les espaces insécables du titre.
 
 ## Structure
 
@@ -320,7 +338,7 @@ tools/voix-lib.mjs   le corpus de l'épisode (la seule partie propre à lui)
 tools/build-voix.mjs génération ElevenLabs (hors site — voir docs/voix-conteur.md)
 tools/controle-voix.mjs  contrôle « sans oreilles » des mp3
 assets/fonts/        Baloo 2 (woff2, OFL)
-assets/audio/        manifest.json (+ mp3 une fois la voix générée)
+assets/audio/        manifest.json + les 30 mp3 du conteur
 docs/                captures du README + og.png (carte de partage)
 ```
 

@@ -9,7 +9,7 @@ import {
   jourNormalise, phraseDuMoment, phraseDuMomentParties, phraseEspace, JOUR_SOLSTICE_ETE, ANNEE_JOURS,
   LECTURE_JOURS_PAR_SEC, SCENARIOS, VOIX_TRANSITIONS,
   DEFIS, DEFI_ATTENTE_MS, defiReussi, defiEncoreProche,
-  texteOral
+  texteOral, typographie
 } from './model.js';
 import { creerVueOrbite } from './vue-orbite.js';
 import { creerVueFenetre, dessinerMiniFenetre } from './vue-fenetre.js';
@@ -244,7 +244,7 @@ function afficherHistoire(scn) {
     puce.textContent = ligne.puce;
     var texte = document.createElement('p');
     texte.className = 'texte-histoire';
-    texte.textContent = ligne.texte;
+    texte.textContent = typographie(ligne.texte); /* insécables à l'affichage seulement : la voix lit le texte du corpus */
     rangee.appendChild(puce); rangee.appendChild(texte);
     histoireScn.appendChild(rangee);
   });
@@ -774,7 +774,7 @@ function prochainDefi() {
   defiGagne = false;
   bravoVisible = false;
   defiEntreeMs = null;
-  defiJeu.textContent = defi.emoji + ' ' + defi.consigne;
+  defiJeu.textContent = defi.emoji + ' ' + typographie(defi.consigne);
   bravoJeu.hidden = true;
   boutonEncore.hidden = true;
   raconterDefi('consigne', defi.consigne);
@@ -784,7 +784,7 @@ function gagnerDefi(maintenant) {
   var premiere = !defiGagne;
   defiGagne = true;
   bravoVisible = true;
-  bravoJeu.textContent = '⭐ ' + defi.bravo;
+  bravoJeu.textContent = '⭐ ' + typographie(defi.bravo);
   bravoJeu.hidden = false;
   boutonEncore.hidden = false;
   if (premiere) {
