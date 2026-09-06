@@ -8,7 +8,7 @@
 import {
   jourNormalise, phraseDuMoment, phraseDuMomentParties, phraseEspace, JOUR_SOLSTICE_ETE, ANNEE_JOURS,
   LECTURE_JOURS_PAR_SEC, SCENARIOS, VOIX_TRANSITIONS,
-  DEFIS, DEFI_ATTENTE_MS, defiReussi, defiEncoreProche,
+  DEFIS, DEFI_ATTENTE_MS, DEFI_ENTREE_MARGE_JOURS, defiReussi, defiEncoreProche, procheDeSaison,
   texteOral, typographie
 } from './model.js';
 import { creerVueOrbite } from './vue-orbite.js';
@@ -40,7 +40,8 @@ var etat = {
   lecture: !mouvementReduit, /* l'année avance toute seule (un tour en ~85 s) */
   glissement: null,          /* { depart, delta, cible, t0, duree } pendant un scénario */
   scenarioActif: null,
-  glisse: false
+  glisse: false,
+  jourFabrique: true         /* faux après un scénario, jusqu'au prochain geste de l'enfant */
 };
 
 /* ------------------------------------------------------------------ */
@@ -82,16 +83,42 @@ function fixerLecture(enMarche) {
 }
 
 /* L'utilisateur reprend la main : le glissement s'arrête, la lecture se met
- * en pause, l'histoire affichée s'efface. */
+ * en pause, l'histoire affichée s'efface et la voix se tait. */
 function reprendreLaMain() {
   etat.glissement = null;
   if (etat.lecture) fixerLecture(false);
-  if (etat.scenarioActif !== null) {
-    etat.scenarioActif = null;
-    rafraichirBoutonsScenarios();
-    afficherInvite();
-    if (narrateur) narrateur.stop();
-  }
+  effacerHistoire(true);
+}
+
+/* Reprendre la main EN DOUCEUR (glisser la Terre, tirer le curseur) : le
+ * glissement s'arrête et la lecture se met en pause, mais l'histoire du
+ * scénario reste affichée tant que la Terre reste dans sa saison, et la
+ * voix finit toujours ce qu'elle dit (retour utilisateur : le texte qui
+ * s'effaçait et la voix coupée au premier doigt ressemblaient à un bug —
+ * l'enfant écoute ET joue). L'histoire ne s'efface que si la Terre quitte
+ * la saison (à la marge d'entrée du jeu près) ; la voix finit alors sa
+ * phrase et se tait — elle ne raconte pas le jardin PUIS l'espace d'une
+ * saison qu'on a quittée (retour utilisateur). */
+function reprendreLaMainDoucement() {
+  etat.glissement = null;
+  etat.jourFabrique = true; /* la main de l'enfant : le jeu peut se gagner */
+  if (etat.lecture) fixerLecture(false);
+  /* (surveillerHistoire se fait APRÈS fixerJour, chez l'appelant : ici le
+   * jour peut être celui d'un glissement interrompu à mi-chemin) */
+}
+
+function effacerHistoire(couperLaVoix) {
+  if (etat.scenarioActif === null) return;
+  etat.scenarioActif = null;
+  rafraichirBoutonsScenarios();
+  afficherInvite();
+  if (!narrateur) return;
+  if (couperLaVoix) narrateur.stop(); else narrateur.finirDoucement('scn-');
+}
+
+function surveillerHistoire() {
+  if (etat.scenarioActif === null || etat.glissement) return;
+  if (!procheDeSaison(etat.jour, etat.scenarioActif, 'nord', DEFI_ENTREE_MARGE_JOURS)) effacerHistoire(false);
 }
 
 function basculerLecture() {
@@ -127,8 +154,9 @@ function fixerJour(jour) {
 }
 
 curseur.addEventListener('input', function () {
-  reprendreLaMain();
+  reprendreLaMainDoucement();
   fixerJour(parseFloat(curseur.value));
+  surveillerHistoire();
 });
 curseur.addEventListener('pointerdown', function () { curseurTenu = true; });
 window.addEventListener('pointerup', function () { curseurTenu = false; });
@@ -152,11 +180,19 @@ function coordonneesCanvas(canvas, e) {
 }
 
 function brancherGesteTerre(canvas, vue) {
+  /* UN SEUL doigt tient la Terre : le pointeur qui l'a attrapée est mémorisé,
+   * les autres sont ignorés jusqu'au relâcher (retour utilisateur : un
+   * second doigt posé faisait sauter la Terre sous lui). */
+  var pointeurTenant = null;
+
   canvas.addEventListener('pointerdown', function (e) {
+    if (pointeurTenant !== null) { e.preventDefault(); return; }
     var c = coordonneesCanvas(canvas, e);
     if (!vue.attrapeTerre(c.x, c.y, etat.jour)) return;
+    pointeurTenant = e.pointerId;
     etat.glisse = true;
-    reprendreLaMain();
+    reprendreLaMainDoucement();
+    surveillerHistoire(); /* un glissement interrompu loin de la saison : l'histoire s'en va */
     cacherBulleGeste();
     canvas.classList.add('attrape');
     if (canvas.setPointerCapture) canvas.setPointerCapture(e.pointerId);
@@ -164,15 +200,18 @@ function brancherGesteTerre(canvas, vue) {
   });
 
   canvas.addEventListener('pointermove', function (e) {
-    if (!etat.glisse) return;
+    if (!etat.glisse || e.pointerId !== pointeurTenant) return;
     var c = coordonneesCanvas(canvas, e);
     /* le jour courant guide la recherche : la Terre suit le doigt le long
      * du cercle, sans sauter entre le devant et l'arrière de l'orbite */
     fixerJour(vue.jourDepuisPointeur(c.x, c.y, etat.jour));
+    surveillerHistoire();
     e.preventDefault();
   });
 
-  function lacherLaTerre() {
+  function lacherLaTerre(e) {
+    if (e && e.pointerId !== pointeurTenant) return;
+    pointeurTenant = null;
     etat.glisse = false;
     canvas.classList.remove('attrape');
   }
@@ -254,6 +293,10 @@ function afficherHistoire(scn) {
  * le vrai sens du voyage de la Terre. */
 function jouerScenario(scn) {
   fixerLecture(false);
+  /* le scénario finit pile sur un repère, qui est aussi le jourBravo des
+   * défis : jeu ouvert, il gagnait le défi sans que l'enfant fabrique
+   * rien. Le jeu ne se regagne qu'après un geste de l'enfant. */
+  etat.jourFabrique = false;
   etat.scenarioActif = scn.id;
   rafraichirBoutonsScenarios();
   afficherHistoire(scn);
@@ -432,8 +475,40 @@ function canvasHorsEcran(canvas) {
   return rect.bottom < 80 || rect.top > hauteur - 80;
 }
 
+/* La place d'origine du médaillon (avant le pied de page) : le jeu l'ancre
+ * dans son en-tête à l'ouverture, et l'y reprend au rangement. */
+var placeMedaillon = medaillon.parentNode;
+var suivantMedaillon = medaillon.nextSibling;
+var enteteJeu = document.querySelector('.entete-jeu');
+var panneauJeu = document.querySelector('.panneau-jeu');
+
+function medaillonAncre() {
+  return medaillon.parentNode === enteteJeu;
+}
+
+/* L'ancrage ne vaut que tant que l'en-tête du jeu est à l'écran : jeu
+ * ouvert, si l'enfant remonte vers les scénarios sans le ranger, le
+ * médaillon redevient flottant dès que l'en-tête sort par le bas (retour
+ * utilisateur : « coincé en haut du jeu »), et se ré-ancre quand l'en-tête
+ * revient. Le saut se fait à l'instant où sa copie ancrée disparaît —
+ * jamais deux médaillons à la fois. Appelé à chaque image : un seul
+ * getBoundingClientRect, un déplacement DOM aux transitions seulement. */
+function placerMedaillon() {
+  var ancrer = false;
+  if (!zoneJeu.hidden) {
+    var rect = enteteJeu.getBoundingClientRect();
+    var hauteur = window.innerHeight || document.documentElement.clientHeight;
+    ancrer = rect.bottom > 0 && rect.top < hauteur;
+  }
+  if (ancrer && !medaillonAncre()) enteteJeu.appendChild(medaillon);
+  else if (!ancrer && medaillonAncre()) placeMedaillon.insertBefore(medaillon, suivantMedaillon);
+}
+
 function gererMedaillon() {
-  var visible = estMobile && canvasHorsEcran(canvasFenetre);
+  placerMedaillon();
+  /* ancré dans l'en-tête du jeu, il est un élément de la page : visible
+   * sur mobile quoi qu'il arrive au défilement */
+  var visible = estMobile && (medaillonAncre() || canvasHorsEcran(canvasFenetre));
   if (medaillon.hidden === !visible) return;
   medaillon.hidden = !visible;
   if (visible) dessinerMedaillon();
@@ -549,8 +624,23 @@ if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
     return lecteur;
   };
   var prevenirFin = function () { var f = finEnCours; finEnCours = null; if (f) f(); };
+  /* « finis ta phrase, puis tais-toi » : le bloc en cours (clip ou phrase
+   * de synthèse) va au bout, les suivants ne partent pas (la Terre sort de
+   * la saison du scénario : l'histoire s'efface, la voix ne se coupe pas
+   * net — mais elle ne raconte pas non plus le jardin PUIS l'espace d'une
+   * saison que l'enfant a quittée ; retour utilisateur) */
+  var finirApresLeBloc = false;
+  var blocsEnCours = null;
+  /* ne vise que la narration dont le premier bloc porte ce préfixe d'id
+   * (« scn- » : l'histoire d'un scénario) — la grande histoire du bouton
+   * « Écouter », lancée par-dessus un scénario, n'a pas à se taire */
+  var finirDoucement = function (prefixe) {
+    if (!blocsEnCours || blocsEnCours[0].id.indexOf(prefixe) !== 0) return;
+    finirApresLeBloc = true;
+  };
   var toutArreter = function () {
     generation++;
+    finirApresLeBloc = false;
     window.speechSynthesis.cancel();
     if (lecteur) {
       try { lecteur.pause(); } catch (e) { /* déjà arrêté */ }
@@ -566,7 +656,7 @@ if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
     var indice = 0;
     var suivante = function () {
       if (maGen !== generation) return;
-      if (indice >= morceaux.length) { fini(); return; }
+      if (indice >= morceaux.length || finirApresLeBloc) { fini(); return; }
       var m = morceaux[indice++];
       var u = new SpeechSynthesisUtterance(m.texte);
       u.lang = voix ? voix.lang : 'fr-FR';
@@ -588,15 +678,51 @@ if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
   /* Le conteur : une suite de blocs { id, texte, pause? }. Chaque bloc joue
    * son fichier enregistré s'il existe ET dit encore le bon texte ; sinon la
    * synthèse lit le texte phrase à phrase. */
+  /* Les clips EN MÉMOIRE. Safari iOS ne réutilise pas le cache d'un
+   * `fetch` pour un <audio> (les médias passent par des requêtes de plage,
+   * cache à part) : le « préchauffage » ne servait à rien, chaque clip
+   * était retéléchargé à son tour — d'où des silences de une à trois
+   * secondes entre deux phrases selon le réseau, irreproductibles (retour
+   * utilisateur : le printemps enchaîne quatre clips, les deux derniers
+   * paragraphes de l'histoire sont les plus lourds). Désormais, au départ
+   * d'une narration, tous ses clips se téléchargent EN PARALLÈLE en blobs
+   * et se jouent depuis ces blobs ; gardés pour la session, rejouer est
+   * instantané. Le PREMIER clip part comme avant (src direct, dans le
+   * geste de l'utilisateur — iOS n'autorise le premier play() que là) ;
+   * les suivants attendent leur blob. Échec de téléchargement → src direct
+   * (comme avant). */
+  var clipsEnMemoire = {};
+  var chargerClip = function (src) {
+    if (src.indexOf('data:') === 0 || !window.fetch || !window.URL || !URL.createObjectURL) {
+      return Promise.resolve(src);
+    }
+    if (!clipsEnMemoire[src]) {
+      clipsEnMemoire[src] = fetch(src)
+        .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.blob(); })
+        .then(function (b) { return URL.createObjectURL(b); })
+        .catch(function () { delete clipsEnMemoire[src]; return src; });
+    }
+    return clipsEnMemoire[src];
+  };
+
   var narrate = function (blocs, quandFini) {
     toutArreter();
     rafraichirVoix(); /* certaines listes de voix n'arrivent qu'après le chargement */
     var maGen = generation;
+    blocsEnCours = blocs;
     finEnCours = quandFini || null;
     var indice = 0;
+    /* tous les clips de la narration partent ensemble */
+    if (window.Promise) {
+      blocs.forEach(function (b) {
+        var src = sourceAudio(b.id, b.texte);
+        if (src) chargerClip(src);
+      });
+    }
     var suivant = function () {
       if (maGen !== generation) return;
-      if (indice >= blocs.length) { prevenirFin(); return; }
+      if (indice >= blocs.length || finirApresLeBloc) { prevenirFin(); return; }
+      var premier = indice === 0;
       var bloc = blocs[indice++];
       var apres = function () { if (maGen === generation) window.setTimeout(suivant, 0); };
       var replie = false; /* onerror ET promesse rejetée peuvent tomber tous les deux */
@@ -609,22 +735,21 @@ if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
       if (!src) { repli(); return; }
       var a = obtenirLecteur();
       var pause = typeof bloc.pause === 'number' ? bloc.pause : 620;
-      a.onended = function () { if (maGen === generation) window.setTimeout(apres, pause); };
-      a.onerror = repli;
-      a.src = src;
-      var promesse = a.play();
-      if (promesse && promesse.then) promesse.then(null, repli);
-      /* préchauffer le fichier du bloc suivant pendant que celui-ci joue */
-      if (indice < blocs.length && window.fetch) {
-        var prochain = sourceAudio(blocs[indice].id, blocs[indice].texte);
-        if (prochain && prochain.indexOf('data:') !== 0) {
-          fetch(prochain).catch(function () { /* le lecteur retentera */ });
-        }
-      }
+      var jouer = function (url) {
+        if (maGen !== generation) return;
+        if (finirApresLeBloc) { prevenirFin(); return; } /* demandé pendant le chargement */
+        a.onended = function () { if (maGen === generation) window.setTimeout(apres, pause); };
+        a.onerror = repli;
+        a.src = url;
+        var promesse = a.play();
+        if (promesse && promesse.then) promesse.then(null, repli);
+      };
+      if (premier || !window.Promise) jouer(src);
+      else chargerClip(src).then(jouer, function () { jouer(src); });
     };
     suivant();
   };
-  narrateur = { narrate: narrate, stop: toutArreter };
+  narrateur = { narrate: narrate, stop: toutArreter, finirDoucement: finirDoucement };
 
   /* -- « 🔊 Écouter l'histoire » : la boîte d'explication, bloc par bloc -- */
   boutonEcouter.hidden = false;
@@ -817,6 +942,7 @@ function surveillerDefi(maintenant) {
     return;
   }
   if (etat.glissement) return; /* rien ne se gagne pendant une animation */
+  if (!etat.jourFabrique) return; /* ni sur le point d'arrivée d'un scénario */
   if (defiReussi(defi, etat.jour)) {
     if (defiEntreeMs === null) defiEntreeMs = maintenant;
     else if (maintenant - defiEntreeMs >= DEFI_ATTENTE_MS) gagnerDefi(maintenant);
@@ -828,12 +954,17 @@ function surveillerDefi(maintenant) {
 boutonJouer.addEventListener('click', function () {
   if (!zoneJeu.hidden) {
     zoneJeu.hidden = true;
+    panneauJeu.classList.remove('jeu-ouvert');
+    gererMedaillon(); /* rend le médaillon à sa place flottante */
     defi = null;
+    boutonEncore.hidden = true;
     boutonJouer.textContent = '🎮 Jouer';
     boutonJouer.setAttribute('aria-expanded', 'false');
     return;
   }
   zoneJeu.hidden = false;
+  panneauJeu.classList.add('jeu-ouvert');
+  gererMedaillon(); /* ancre le médaillon dans l'en-tête */
   boutonJouer.textContent = '📦 Ranger le jeu';
   boutonJouer.setAttribute('aria-expanded', 'true');
   reprendreLaMain(); /* l'enfant prend la main : rien ne doit gagner tout seul */

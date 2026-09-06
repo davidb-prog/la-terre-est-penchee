@@ -18,7 +18,8 @@ croisés de la famille vivent sur ce domaine, jamais `github.io`).
   pas de lookbehind regex, repli `@supports` pour `aspect-ratio`,
   `top/right/bottom/left` plutôt qu'`inset`. Tester à 390 px de large.
 - **Blindage tactile** : `touch-action: none` sur les canvas interactifs et
-  leurs cadres, doublé du repli JS `touchstart`/`touchmove` non passifs ;
+  leurs cadres (ceux de l'espace — la fenêtre, non interactive, laisse
+  défiler), doublé du repli JS `touchstart`/`touchmove` non passifs ;
   `user-select: none` sur `body`, `* { touch-action: pan-x pan-y }`, viewport
   `maximum-scale=1` + filet `gesturestart` → la page ne se sélectionne pas et
   ne se zoome pas sous les doigts d'un enfant (les zooms d'accessibilité du
@@ -104,8 +105,15 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   d'été : Terre à gauche du Soleil ; hiver : à droite ; l'automne passe par le
   bas de l'écran, le printemps par le haut.
 - Rayon du globe : `0,095 × min(l, h)` sur grand écran, **`min(0,08 l ;
-  (0,48 h − rSoleil − 6 px) / 2,73)` en mode compact** (< 400 px de
-  canvas) — le plafond est DÉRIVÉ : aux équinoxes la Terre passe par
+  0,123 h ; (0,48 h − rSoleil − 6 px) / 2,73)` en mode compact** (< 400 px
+  de canvas). `0,123 h` est le rapport globe/orbite de l'iPhone 13 (0,24) :
+  sur un canvas bas (iframe de l'artefact, navigateur intégré d'Instagram —
+  200 px au lieu de 222), la garde verticale resserrait l'orbite de 17 %
+  pendant que le globe, mesuré à la largeur, ne bougeait pas — il
+  paraissait plus gros (retour utilisateur, captures prod / artefact) ;
+  avec ce plafond, globe et orbite rétrécissent ensemble (200 px : globe
+  49 px, orbite 102 px ; iPhone 13 plein écran : rien ne change). Le
+  troisième terme est DÉRIVÉ : aux équinoxes la Terre passe par
   cy ± ry, l'anneau (1,73 rTerre) au-delà, le Soleil en deçà ; sans lui,
   la garde verticale resserre l'orbite jusqu'à mettre la Terre dans le
   Soleil (iPhone SE, canvas de 170 px : globe ramené à 45 px, écart 6 px).
@@ -143,17 +151,32 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
 - **La lecture automatique** (un tour de l'année en ~110 s — ralentie
   après tests utilisateurs, personne n'avait le temps de lire à 85 s —,
   `LECTURE_JOURS_PAR_SEC`) se commande UNIQUEMENT par le bouton ⏸/▶ (libellés
-  empilés, largeur stable) et la barre d'espace. Reprendre la main (glisser,
-  curseur, scénario, ouvrir le jeu) met en pause ; `prefers-reduced-motion` la
-  désactive au chargement.
-- **La phrase du moment ne défile pas plus vite qu'on ne lit** : hors du
-  cœur de l'été et de l'hiver (|penchement| > 0,75, seuls moments où le
-  chiffre d'heures s'écrit — avec son unité « heures de lumière »), elle dit
-  seulement le mouvement (« le jour s'allonge / raccourcit ») — les heures
-  vivent dans la barre du jour, pas de compteur qui tourne pendant la
-  lecture. Les ~12 jours avant chaque repère, la **bande de transition**
-  annonce « X se termine : Y arrive ! » — juin ne raconte plus le printemps
-  puis l'été en deux phrases contradictoires (retour test). La frise du
+  empilés, largeur stable) et la barre d'espace. **Le bouton est écrit dans
+  la ligne « 🚀 Depuis l'espace »** — sur téléphone il reste sous le pouce
+  quand on regarde la Terre tourner (retour utilisateur : dans l'en-tête de
+  la scène, il était 500 px plus haut, toujours hors écran) ; sur grand
+  écran le CSS le pose en absolu en haut à droite du panneau, dans la
+  rangée du titre, comme avant. Un seul bouton, jamais dupliqué (deux ⏸
+  visibles à la fois se contrediraient). Sur mobile il a le format des
+  autres boutons (corps .9rem, marges 12 px) mais 36 px de haut, pas 44 :
+  la ligne du titre grandirait de 16 px (compromis validé, budget
+  re-mesuré). Reprendre la main (glisser, curseur, scénario, ouvrir le
+  jeu) met en pause ; `prefers-reduced-motion` la désactive au chargement.
+- **La phrase du moment ne défile pas plus vite qu'on ne lit** : au cœur
+  de l'été et de l'hiver (mai-juin-juillet, novembre-décembre-janvier)
+  elle dit le superlatif (« il fait jour très longtemps ! », « la nuit
+  tombe très tôt. »), ailleurs seulement le mouvement (« le jour
+  s'allonge / raccourcit ») — **aucun chiffre d'heures dans le
+  commentaire** (verrouillé par test) : les heures vivent dans la barre du
+  jour, juste au-dessus, qui écrit « X h de jour » (retour utilisateur :
+  « 16 heures de lumière » sous « 16 h de jour » faisait doublon), et pas
+  de compteur qui tourne pendant la lecture. Les ~12 jours avant chaque repère, la **bande de transition**
+  annonce « X se termine : Y arrive ! » DANS LE TITRE SEULEMENT — juin ne
+  raconte plus le printemps puis l'été en deux phrases contradictoires
+  (retour test) ; le commentaire, lui, reste celui du mois, et la phrase de
+  l'espace ne bouge pas non plus (retour utilisateur : 12 jours = 3,6 s à
+  la lecture, un texte propre à la bande n'a pas le temps d'être lu —
+  supprimé, pas réécrit ; verrouillé par test, plus aucun « bientôt »). La frise du
   curseur porte les initiales des mois (`piste-mois`). La phrase s'affiche
   en DEUX parties (`phraseDuMomentParties`) : le titre en blanc gras avec
   **le mot de la saison dans la teinte de SON bouton** (rose/or/violet/
@@ -193,9 +216,31 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   (vérifié : `test/voix.test.mjs` + balayage navigateur des paragraphes,
   des histoires de scénarios et des consignes, 320 à 1200 px, zéro ligne
   orpheline).
+- **Les deux phrases basculent toujours ensemble** (`trancheDuMoment`,
+  verrouillé par test) : la phrase de l'espace lit LA MÊME coupe
+  calendaire que celle du jardin (mois + bande de transition) au lieu de
+  seuils physiques de penchant (±0,15, ±0,70) — retour utilisateur : un
+  seul jour de bascule commun sur 28, pendant la lecture l'une changeait
+  puis l'autre quatre jours plus tard. Ses paliers : « à fond » sur les
+  mois de cœur (mai-juin-juillet, novembre-décembre-janvier, ceux du
+  superlatif du jardin) ; « à égalité » sur la tranche qui suit chaque
+  équinoxe ; « penche vers / à l'opposé » ailleurs — rien de propre à la
+  bande de transition. Aux coupes, le penchant vaut ±0,2 au plus (testé :
+  « à fond » ⇒ |p| > 0,55, « à égalité » ⇒ |p| < 0,25).
 - **Les scénarios vont au moment choisi en douceur, toujours vers l'avant**
-  (le vrai sens de l'année) ; reprendre la main efface l'histoire et désarme
-  le bouton. L'histoire s'écrit en deux lignes à puces : 🏡 chez nous /
+  (le vrai sens de l'année). **Glisser la Terre ou tirer le curseur ne
+  coupe ni l'histoire ni la voix** (`reprendreLaMainDoucement`) : le texte
+  reste tant que la Terre reste dans la saison du scénario, à la marge
+  d'entrée du jeu près (8 jours — `procheDeSaison`), et s'efface quand elle
+  en sort, SANS couper la voix net : elle **finit le bloc en cours puis se
+  tait** (`narrateur.finirDoucement('scn-')` — le clip, ou la phrase de
+  synthèse, va au bout ; les blocs suivants ne partent pas). Retour
+  utilisateur en deux temps : le texte effacé et la voix coupée au premier
+  doigt ressemblaient à un bug — l'enfant écoute et joue ; puis la voix
+  qui racontait quand même le jardin PUIS l'espace d'une saison quittée.
+  La grande histoire du bouton « Écouter », elle, n'est jamais visée. Le bouton ▶, un autre
+  scénario ou l'ouverture du jeu, eux, effacent et coupent (`reprendreLaMain`).
+  L'histoire s'écrit en deux lignes à puces : 🏡 chez nous /
   🚀 vu de l'espace. Les puces 🚀 d'été et d'hiver répètent le maillon
   causal de l'expérience de la lampe avec SES mots — « bien en face » /
   « de biais », jamais « rayons directs » ni « rasants » (décision
@@ -204,7 +249,11 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   l'Australie qui « reçoit la lumière bien en face » — la révélation se
   raccorde à la cause. Verrouillé par test.
 - **Le jeu ne se gagne qu'en fabriquant soi-même** (jamais pendant un
-  glissement animé) : fenêtre de victoire = la saison demandée, tempo de
+  glissement animé) : fenêtre de victoire = la saison demandée **plus une
+  marge d'entrée de 8 jours avant son début** (`DEFI_ENTREE_MARGE_JOURS`,
+  `procheDeSaison` — retour utilisateur : la saison commence pile au repère
+  que l'enfant vise sur l'orbite, s'arrêter un poil avant était raté ;
+  asymétrique par construction, testé), tempo de
   maintien `DEFI_ATTENTE_MS`, hystérésis de sortie `DEFI_SORTIE_MARGE_JOURS`
   (le bravo ne clignote pas au bord et ne ment jamais). Recalage doux, à la
   première victoire seulement, vers le `jourBravo` du défi — toujours un
@@ -217,7 +266,15 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   n'a plus que des défis gagnés d'avance (l'hiver en réussit deux — la
   neige et l'été australien), on remélange un panier neuf au lieu de
   laisser tomber un bravo gratuit (retour utilisateur ; verrouillé par la
-  suite navigateur). Les deux vues du jeu partagent la même hauteur
+  suite navigateur). **Le point d'arrivée d'un scénario ne gagne pas non
+  plus** (`etat.jourFabrique`) : jeu ouvert, un bouton de saison glissait
+  la Terre pile sur le repère, qui est aussi le `jourBravo` — bravo sans
+  rien fabriquer (bug trouvé en remontant vers les scénarios sans ranger
+  le jeu) ; le drapeau tombe à l'ouverture d'un scénario et se relève au
+  premier geste de l'enfant (Terre ou curseur), vérifié au navigateur. Le
+  jeu ne se range jamais tout seul (ni au défilement, ni au choix d'un
+  scénario — décision utilisateur : ranger à la place de l'enfant, c'est
+  décider pour lui). Les deux vues du jeu partagent la même hauteur
   (colonnes 9fr/8fr = le rapport de leurs ratios). Le défi du kangourou
   (l'été australien) est la révélation du site.
 - **Les repères de saison (❄️🌸☀️🍂) autour de l'orbite s'effacent** quand la
@@ -257,7 +314,10 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   ne laissant que le contour de l'union.
 - **Le glisser lit l'angle sur l'ellipse** : `jourDepuisPointeur(x, y)`
   (l'argument `jourActuel` que passe `main.js` est ignoré, sans danger) ;
-  `attrapeTerre` garde sa zone généreuse pour les petits doigts.
+  `attrapeTerre` garde sa zone généreuse pour les petits doigts. **Un seul
+  doigt tient la Terre** : le `pointerId` qui l'a attrapée est mémorisé,
+  les autres pointeurs sont ignorés jusqu'au relâcher (retour utilisateur :
+  un second doigt posé la faisait sauter).
 - L'étiquette « Terre » s'écrit sous le globe, décalée vers la droite (le
   bas-gauche porte le kangourou, le haut la maison). Mode compact (< 400 px
   de canvas) : étiquettes Soleil/Terre masquées.
@@ -265,7 +325,14 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   jauge jaune seule était illisible) : la barre = 24 h, midi au centre ;
   bouts nuit étoilés avec lune dessinée (mot « nuit » si la place le permet,
   grand écran seulement), segment jour en dégradé aube → midi → crépuscule
-  avec le petit disque de midi ; la durée s'écrit AU-DESSUS de la barre.
+  avec un petit soleil À RAYONS à midi (pas un disque : le rond blanc
+  sur la piste dégradée se lisait comme le pouce d'un curseur — retour
+  utilisateur, on essayait de le tirer en croyant tenir la frise) ; la
+  durée s'écrit AU-DESSUS de la barre, sur téléphone aussi (11 px CSS au
+  moins, halo clair devant les fils) — une barre sans valeur se lit comme
+  un contrôle. Et le cadre de la fenêtre laisse défiler la page
+  (`touch-action: pan-x pan-y`, seuls les canvas de l'espace sont à
+  `none`) : le doigt qui la « tire » obtient une réponse, la bonne.
   Les **pieds de l'arc du Soleil tombent PILE sur les bouts du segment
   jaune** (deux fils en pointillés les relient) : l'été l'arc est haut ET
   large, l'hiver bas ET court — le jour, c'est le temps où le Soleil est
@@ -290,7 +357,7 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   tiennent dans un écran de téléphone** (retour utilisateur, resserré
   trois fois) : du titre de la fenêtre au bas de la frise, **715 px** pour
   ~715 px visibles sur iPhone — hauteurs `min(50vw, 22.5vh)` (fenêtre) et
-  `min(58vw, 31vh)` (espace), gap 8 px, phrases en `.88rem` interligne
+  `min(58vw, 31vh)` (espace), gap 6 px, phrases en `.88rem` interligne
   1,38, réserve de la phrase re-mesurée à 5,75 em (pire cas : jour 68, la
   bande de transition — à ce corps la phrase tient sur QUATRE lignes, plus
   cinq). Les 107 px qu'a coûtés la frise se sont pris d'abord là où les
@@ -325,11 +392,26 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   bouton qu'il vient de choisir.
 - **Sur mobile (< 880 px) seulement** : un médaillon flottant (haut droit,
   hors du chemin du pouce) montre la fenêtre de chez nous en miniature dès
-  qu'elle sort de l'écran — un tap y ramène. **Il ne recouvre jamais un
-  bouton** : les en-têtes du jeu et des scénarios gardent 62 px à droite
-  (`padding-right`), et les boutons du jeu passent à la ligne plutôt que de
-  déborder sous lui (retour utilisateur : « Ranger le jeu » était masqué —
-  vérifié par sonde de chevauchement dans les deux panneaux). Le jeu n'affiche qu'une vue
+  qu'elle sort de l'écran — un tap y ramène. **Pendant le jeu, il est
+  ANCRÉ dans l'en-tête du jeu** (`main.js` le déplace à l'ouverture, le
+  rend à sa place au rangement ; classe `jeu-ouvert` sur le panneau) : à
+  droite du titre, 60 px, élément de la mise en page — et l'ancrage ne
+  vaut que **tant que l'en-tête du jeu est à l'écran** (`placerMedaillon`,
+  à chaque image) : jeu ouvert, si l'enfant remonte vers les scénarios
+  sans le ranger, le médaillon redevient flottant dès que l'en-tête sort
+  par le bas et se ré-ancre quand il revient (retour utilisateur :
+  « coincé en haut du jeu ») — le saut se fait à l'instant où la copie
+  ancrée disparaît, jamais deux médaillons à la fois. La rangée des
+  actions prend toute la largeur dessous : **[🔇] [Encore une !] [Ranger le jeu]** sur UNE
+  ligne, la voix en icône seule (son libellé, `.libelle`, vit dans le
+  jumeau des scénarios), « Encore une ! » est monté dans cette rangée (et
+  se range avec le jeu)
+  (retour utilisateur : le médaillon flottait par-dessus les boutons,
+  qu'on serrait et empilait pour le fuir — « posés n'importe comment »).
+  Dans les scénarios, le bouton 🔊/🔇 est à droite du titre, sans
+  réserve pour le médaillon (décision utilisateur : le chevauchement
+  n'est que transitoire, le temps que l'en-tête passe sous lui en
+  défilant). Le jeu n'affiche qu'une vue
   (l'espace) : c'est le médaillon qui montre le résultat. Rien de tel sur
   grand écran, et rien n'est incrusté dans le canvas qu'on manipule.
 
@@ -344,7 +426,15 @@ phrases, ton rate/pitch, score des voix françaises sans menu). Bouton
 « 🔊 Écouter l'histoire » (blocs `histoire-1…6`), bouton 🔇/🔊 jumeau
 scénarios/jeu (clé de famille `petit-labo-son`), `visibilitychange` +
 `pagehide` → `stop()`. Sans synthèse, les boutons sonores se cachent et le
-site reste complet.
+site reste complet. **Les clips d'une narration se téléchargent tous en
+parallèle au départ, en blobs, et se jouent depuis ces blobs** (gardés
+pour la session) : Safari iOS ne réutilise pas le cache d'un `fetch` pour
+un `<audio>`, le simple préchauffage laissait chaque clip se retélécharger
+à son tour — silences de une à trois secondes entre deux phrases selon le
+réseau (retour utilisateur : le printemps enchaîne quatre clips, les deux
+derniers paragraphes sont les plus lourds). Le PREMIER clip part en src
+direct, dans le geste de l'utilisateur (iOS n'autorise le premier `play()`
+que là) ; échec de téléchargement → src direct.
 
 **La voix enregistrée est générée** (30 clips, 3 min 35 s, 1,9 Mo — la
 voix de la série astronomie, `GFj5Qf6cNQ3Lgp8VKBwc`, `eleven_multilingual_v2`) :

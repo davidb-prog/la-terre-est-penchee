@@ -104,8 +104,15 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; }
   font-size: .92rem; color: var(--muted); margin: 2px 4px 6px;
 }
 .titre-scene { flex: 1 1 auto; font-weight: 700; }
-.actions-scene { display: flex; gap: 8px; margin-left: auto; flex: none; }
 .bouton-lecture { padding: 5px 12px; font-size: .8rem; border-radius: 999px; }
+/* le ⏸/▶ est écrit dans la ligne « Depuis l'espace » (là où on regarde
+   tourner la Terre — c'est sa place sur téléphone) ; sur grand écran il
+   remonte en haut à droite du panneau, dans la rangée du titre : un seul
+   bouton, deux places */
+.panneau-scene { position: relative; }
+@media (min-width: 880px) {
+  .bouton-lecture { position: absolute; top: 10px; right: 12px; }
+}
 
 /* boutons à deux libellés (⏸/▶ et 🔇/🔊) : superposés dans une grille 1×1,
    le bouton garde en permanence la largeur du plus long — basculer ne décale
@@ -150,6 +157,10 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; }
 /* le geste posé sur une vue appartient TOUJOURS au glisser de la Terre — un
    doigt un peu de travers ne part jamais en défilement de page */
 .cadre-canvas, .vues-jeu { touch-action: none; }
+/* la fenêtre ne se manipule pas : le doigt posé dessus fait défiler la
+   page (retour utilisateur : on tirait la barre du jour, rien ne bougeait,
+   pas même la page — « c'est cassé ») */
+.cadre-canvas.ratio-fenetre { touch-action: pan-x pan-y; }
 #canvas-orbite, #canvas-orbite-jeu { touch-action: none; cursor: grab; }
 #canvas-orbite.attrape, #canvas-orbite-jeu.attrape { cursor: grabbing; }
 
@@ -341,7 +352,9 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; }
   background: rgba(255, 207, 92, .12); border: 1px solid rgba(255, 207, 92, .55);
   color: var(--sun); font-weight: 700; font-size: 1.05rem;
 }
-#bouton-encore { margin-top: 2px; }
+/* le médaillon ancré dans l'en-tête du jeu (mobile, jeu ouvert — voir le
+   bloc mobile) : sur grand écran il reste caché, où qu'il soit */
+.entete-jeu .medaillon-fenetre { display: none; }
 
 /* ---------- note aux parents (repliée) ---------- */
 
@@ -463,13 +476,13 @@ button:focus-visible, input:focus-visible, a:focus-visible {
      un écran de téléphone (~715 px visibles) : hauteurs, marges et
      interlignes serrés, mesurés au script (pire cas balayé sur l'année :
      713 px) */
-  .grille-vues { gap: 8px; }
+  .grille-vues { gap: 6px; }
   /* la frise se paie sur le jardin, pas sur l'espace (la vue qu'on
      manipule) : espace revenu à 31vh, fenêtre à 22,5vh */
   .grille-vues .ratio-fenetre { aspect-ratio: auto; height: min(50vw, 22.5vh); }
   .grille-vues .ratio-espace { aspect-ratio: auto; height: min(58vw, 31vh); }
-  .entete-vue { margin-bottom: 4px; }
-  .phrase-vue { margin-top: 4px; line-height: 1.38; font-size: .88rem; }
+  .entete-vue { margin-bottom: 2px; }
+  .phrase-vue { margin-top: 3px; line-height: 1.38; font-size: .88rem; }
 
   /* la place du PIRE cas est réservée : le nombre de lignes de la phrase ne
      fait plus jamais sauter la page (retour test iPhone). À ce corps, la
@@ -491,28 +504,40 @@ button:focus-visible, input:focus-visible, a:focus-visible {
      cible tactile, piste de 16 px au milieu) — jamais SUR le ruban, où
      ils se lisaient comme un bug (retour utilisateur, iPhone). */
   .legende-curseur { display: none; }
-  .commande-annee { margin-top: 2px; }
+  .commande-annee { margin-top: 0; }
   .piste-emojis {
     height: 1.2em; font-size: 1rem; margin-bottom: -8px;
     position: relative; z-index: 1; pointer-events: none;
   }
-  .bulle-geste { margin-top: 4px; font-size: .78rem; }
+  .bulle-geste { margin-top: 2px; font-size: .78rem; }
   .bulle-geste-pilule { padding: 4px 12px; }
 
-  /* le médaillon flottant (72 px, à 14 px du bord droit) survole les
-     en-têtes du jeu et des scénarios quand on y est : leurs boutons de
-     droite lui laissent la place, sinon il masque « Ranger le jeu »
-     (retour utilisateur, capture iPhone) */
-  .entete-jeu, .titre-scenarios { padding-right: 62px; }
-  /* « 📦 Ranger le jeu » + « 🔇 sans la voix » dépassent la largeur qui
-     reste : les boutons du jeu passent à la ligne au lieu de déborder
-     sous le médaillon */
-  .actions-jeu { flex-wrap: wrap; justify-content: flex-end; max-width: 100%; }
-  /* …et se serrent pour tenir à deux sur la ligne : 118 + 8 + 167 = 293 px
-     pour 270 disponibles à 16 px ; à .9rem et 10 px de marge intérieure,
-     264 px (mesuré, police de secours Linux — SF sur iPhone est plus
-     étroite). La cible tactile garde ses 44 px de haut. */
-  .actions-jeu .bouton-voix, .actions-jeu .bouton-jeu { padding-left: 10px; padding-right: 10px; font-size: .9rem; }
+  /* LE MÉDAILLON EST ANCRÉ DANS L'EN-TÊTE DU JEU pendant le jeu (main.js
+     l'y déplace à l'ouverture, le rend à sa place au rangement) : il
+     devient un élément de la mise en page — à droite du titre, 60 px —
+     et la rangée des actions prend toute la largeur dessous. Avant, il
+     flottait par-dessus les boutons, qu'on serrait et empilait pour le
+     fuir (retour utilisateur : « posés n'importe comment »). Hors du jeu
+     il redevient flottant. */
+  .panneau-jeu.jeu-ouvert .entete-jeu {
+    display: grid; grid-template-columns: 1fr auto;
+    grid-template-areas: "titre medaillon" "actions actions";
+    gap: 8px 12px; align-items: center;
+  }
+  .panneau-jeu.jeu-ouvert .entete-jeu h2 { grid-area: titre; }
+  .entete-jeu .medaillon-fenetre {
+    display: block; grid-area: medaillon; position: static;
+    width: 60px; height: 60px; box-shadow: none;
+  }
+  .panneau-jeu.jeu-ouvert .actions-jeu { grid-area: actions; margin: 0; }
+  /* la rangée des actions du jeu : [🔇] [Ranger le jeu] [Encore une !] —
+     la voix en icône seule (son libellé vit dans le jumeau des scénarios),
+     les deux autres se partagent le reste, sur UNE ligne, texte jamais
+     coupé */
+  .actions-jeu { display: flex; gap: 8px; max-width: 100%; }
+  .actions-jeu .bouton-voix { flex: none; padding-left: 12px; padding-right: 12px; }
+  .actions-jeu .bouton-voix .libelle { display: none; }
+  .actions-jeu .bouton-jeu { flex: 1 1 0; padding-left: 8px; padding-right: 8px; font-size: .9rem; white-space: nowrap; }
 
   /* le jeu sur mobile : une seule vue (l'espace, qu'on manipule) — c'est le
      médaillon flottant qui montre la fenêtre, il reste visible pendant le jeu */
@@ -543,6 +568,11 @@ button:focus-visible, input:focus-visible, a:focus-visible {
   /* la légende maison/kangourou passe sous le titre de vue, sans le casser */
   .entete-vue { flex-wrap: wrap; }
   .entete-vue .hint { flex-basis: 100%; font-size: .72rem; }
+  /* le ⏸/▶ à droite du titre « Depuis l’espace », au format des autres
+     boutons (corps .9rem, marges 12 px) mais 36 px de haut, pas 44 : la
+     rangée du titre grandirait de 16 px (retour utilisateur : même format ;
+     compromis validé) */
+  .entete-vue-espace .bouton-lecture { margin-left: auto; min-height: 36px; padding: 4px 12px; font-size: .9rem; }
   .defi-jeu { font-size: 1.15rem; }
   .bravo-jeu { font-size: 1rem; }
 }

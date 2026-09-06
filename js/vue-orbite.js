@@ -178,8 +178,16 @@ export function creerVueOrbite(canvas) {
      * équinoxes — 9 px entre les disques ; à 0,08, 14 px.) */
     var dpr = window.devicePixelRatio || 1;
     var rSoleil = Math.min(w, h) * 0.08; /* 8 % : de l'air pour l'orbite et le faisceau */
+    /* …et 0,123 h : le rapport globe/orbite de l'iPhone 13 (0,24). Sur un
+     * canvas bas (iframe de l'artefact, navigateur intégré d'Instagram :
+     * 200 px au lieu de 222), la garde verticale resserrait l'orbite de
+     * 17 % pendant que le globe, mesuré à la largeur, ne bougeait pas — il
+     * paraissait plus gros (retour utilisateur, captures prod / artefact).
+     * Avec ce plafond, globe et orbite rétrécissent ensemble : canvas de
+     * 200 px → globe 49 px, orbite 102 px. iPhone 13 plein écran : rien
+     * ne change (0,123 × 220 = 27 = 0,08 × 338). */
     var rTerre = compact
-      ? Math.min(w * 0.08, (h * 0.48 - rSoleil - 6 * dpr) / (1 + 1.73))
+      ? Math.min(w * 0.08, h * 0.123, (h * 0.48 - rSoleil - 6 * dpr) / (1 + 1.73))
       : Math.min(w, h) * 0.095;
     /* Le globe et son anneau « attrape-moi » (jusqu'à 1,6 rTerre) doivent
      * tenir en entier : aux solstices (bord gauche/droit) ET aux équinoxes

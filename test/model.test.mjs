@@ -16,7 +16,7 @@ import {
   hauteurSoleilMidi, dureeJourHeures, heureLever, heureCoucher,
   ARBRES, arbreDuJour, jardinDuJour,
   LATITUDE_REPERES_DEGRES, positionLocaleMaison, positionLocaleKangourou, extremitesAnneau,
-  phraseDuMoment, phraseDuMomentParties, phraseEspace, momentDuMois, typographie,
+  phraseDuMoment, phraseDuMomentParties, phraseEspace, momentDuMois, typographie, DEFI_ENTREE_MARGE_JOURS,
   LECTURE_JOURS_PAR_SEC, SCENARIOS, VOIX_TRANSITIONS,
   DEFIS, DEFI_ATTENTE_MS, DEFI_SORTIE_MARGE_JOURS,
   defiReussi, defiEncoreProche, coeurDeSaison,
@@ -205,17 +205,22 @@ test('les douze mois font ensemble 365 jours, et chaque jour retrouve son mois',
 /* La phrase du moment                                                 */
 /* ------------------------------------------------------------------ */
 
-test('la phrase du moment raconte le bon mois, la bonne saison et les bonnes heures', function () {
+test('la phrase du moment raconte le bon mois et la bonne saison, sans chiffre d’heures', function () {
   var hiver = phraseDuMoment(JOUR_SOLSTICE_HIVER);
   assert.ok(hiver.indexOf('décembre') !== -1, 'décembre attendu : ' + hiver);
   assert.ok(hiver.indexOf('l’hiver') !== -1);
-  assert.ok(hiver.indexOf('8\u00a0heures') !== -1, hiver); /* insécable : le chiffre ne quitte pas son unité */
+  assert.ok(hiver.indexOf('tout bas') !== -1, hiver);
   var ete = phraseDuMoment(JOUR_SOLSTICE_ETE);
   assert.ok(ete.indexOf('juin') !== -1);
   assert.ok(ete.indexOf('l’été') !== -1);
-  assert.ok(ete.indexOf('16\u00a0heures') !== -1, ete);
+  assert.ok(ete.indexOf('très longtemps') !== -1, ete);
   assert.ok(phraseDuMoment(100).indexOf('le printemps') !== -1);
   assert.ok(phraseDuMoment(290).indexOf('l’automne') !== -1);
+  /* les heures vivent dans la barre du jour, juste au-dessus : aucun
+   * chiffre dans le commentaire (retour utilisateur : doublon) */
+  for (var j = 0; j < ANNEE_JOURS; j += 0.5) {
+    assert.ok(!/\d/.test(phraseDuMomentParties(j).texte), 'chiffre dans le commentaire au jour ' + j + ' : ' + phraseDuMomentParties(j).texte);
+  }
 });
 
 test('aux bords de saison, la phrase dit le mouvement vrai, pas le cliché du solstice', function () {
@@ -242,12 +247,34 @@ test('hors mois de transition, la phrase ne change jamais en cours de mois', fun
   });
 });
 
-test('juste avant un repère, la phrase annonce la saison qui arrive (bande de transition)', function () {
+test('juste avant un repère, le TITRE annonce la saison qui arrive — le commentaire reste celui du mois', function () {
   var finJuin = phraseDuMoment(165); /* 6 jours avant le solstice d'été */
   assert.ok(finJuin.indexOf('le printemps se termine') !== -1, finJuin);
   assert.ok(finJuin.indexOf('l’été arrive') !== -1, finJuin);
   var finDecembre = phraseDuMoment(348); /* ~5 jours avant le solstice d'hiver */
   assert.ok(finDecembre.indexOf('l’hiver arrive') !== -1, finDecembre);
+  /* retour utilisateur : 12 jours = 3,6 s à la lecture, un commentaire
+   * propre à la bande n'a pas le temps d'être lu — il n'y en a plus */
+  assert.equal(phraseDuMomentParties(165).texte, phraseDuMomentParties(155).texte, 'juin : même commentaire avant et dans la bande');
+  assert.equal(phraseDuMomentParties(348).texte, phraseDuMomentParties(338).texte, 'décembre : même commentaire avant et dans la bande');
+  assert.equal(phraseEspace(348), phraseEspace(338), 'l’espace non plus ne change pas à l’entrée de la bande');
+  for (var j = 0; j < ANNEE_JOURS; j += 0.5) {
+    assert.ok(phraseDuMoment(j).indexOf('bientôt') === -1 && phraseEspace(j).indexOf('bientôt') === -1, 'plus de « bientôt » éphémère au jour ' + j);
+  }
+});
+
+test('le jeu se gagne huit jours avant le début de la saison — pas un de plus', function () {
+  /* retour utilisateur : l'enfant vise le repère sur l'orbite et s'arrête un
+   * poil avant — c'était raté, la saison commençant pile au repère */
+  var ete = DEFIS.filter(function (d) { return d.cible === 'ete' && d.hemisphere === 'nord'; })[0];
+  assert.ok(defiReussi(ete, JOUR_SOLSTICE_ETE - DEFI_ENTREE_MARGE_JOURS), 'gagné 8 jours avant l’été');
+  assert.ok(!defiReussi(ete, JOUR_SOLSTICE_ETE - DEFI_ENTREE_MARGE_JOURS - 1), 'pas 9');
+  var australie = DEFIS.filter(function (d) { return d.hemisphere === 'sud'; })[0];
+  assert.ok(defiReussi(australie, JOUR_SOLSTICE_HIVER - DEFI_ENTREE_MARGE_JOURS), 'l’été australien aussi, avant le solstice d’hiver');
+  assert.ok(!defiReussi(australie, JOUR_SOLSTICE_HIVER - DEFI_ENTREE_MARGE_JOURS - 1));
+  /* et la fin de saison n'a pas bougé : l'été s'arrête à l'équinoxe */
+  assert.ok(defiReussi(ete, JOUR_EQUINOXE_AUTOMNE - 0.5));
+  assert.ok(!defiReussi(ete, JOUR_EQUINOXE_AUTOMNE + 0.5));
 });
 
 test('deux phrases d’affilée ne commencent jamais par les mêmes mots', function () {
@@ -639,6 +666,33 @@ test('tous les textes du conteur sont propres pour l’oral', function () {
     assert.ok(oral.indexOf("'") === -1, 'apostrophe droite dans : ' + oral);
     assert.ok(!/[«»—]/.test(oral), 'guillemet ou cadratin dans : ' + oral);
   });
+});
+
+test('les deux phrases basculent toujours ensemble : l’espace ne change qu’aux coupes du jardin', function () {
+  /* retour utilisateur : l'espace suivait des seuils physiques étrangers au
+   * calendrier du jardin — un seul jour de bascule commun sur 28 */
+  var coupesJardin = {}, precJ = null, precE = null, bascules = 0;
+  for (var j = 0; j < ANNEE_JOURS; j += 0.5) {
+    var pj = phraseDuMoment(j), pe = phraseEspace(j);
+    if (pj !== precJ) coupesJardin[j] = true;
+    if (pe !== precE) {
+      bascules++;
+      assert.ok(coupesJardin[j], 'l’espace change seul au jour ' + j + ' : ' + pe);
+    }
+    precJ = pj; precE = pe;
+  }
+  assert.ok(bascules >= 8, 'l’espace raconte l’année en au moins 8 phrases : ' + bascules);
+  /* et l'espace reste fidèle au penchant, à 0,2 près, aux quatre repères */
+  assert.ok(phraseEspace(JOUR_SOLSTICE_ETE).indexOf('à fond vers le Soleil') !== -1);
+  assert.ok(phraseEspace(JOUR_SOLSTICE_HIVER).indexOf('à fond à l’opposé') !== -1);
+  assert.ok(phraseEspace(JOUR_EQUINOXE_PRINTEMPS).indexOf('égalité') !== -1);
+  assert.ok(phraseEspace(JOUR_EQUINOXE_AUTOMNE).indexOf('égalité') !== -1);
+  for (var k = 0; k < ANNEE_JOURS; k += 0.5) {
+    var ph = phraseEspace(k), pen = penchementNord(k);
+    if (ph.indexOf('à fond vers') !== -1) assert.ok(pen > 0.55, '« à fond vers » au jour ' + k + ' (penchant ' + pen.toFixed(2) + ')');
+    if (ph.indexOf('à fond à l’opposé') !== -1) assert.ok(pen < -0.55, '« à fond à l’opposé » au jour ' + k + ' (penchant ' + pen.toFixed(2) + ')');
+    if (ph.indexOf('sont à égalité') !== -1) assert.ok(Math.abs(pen) < 0.25, '« à égalité » au jour ' + k + ' (penchant ' + pen.toFixed(2) + ')');
+  }
 });
 
 test('la phrase de l’espace suit le penchant, et nomme toujours qui penche', function () {
