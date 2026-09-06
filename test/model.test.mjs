@@ -641,6 +641,33 @@ test('tous les textes du conteur sont propres pour l’oral', function () {
   });
 });
 
+test('les deux phrases basculent toujours ensemble : l’espace ne change qu’aux coupes du jardin', function () {
+  /* retour utilisateur : l'espace suivait des seuils physiques étrangers au
+   * calendrier du jardin — un seul jour de bascule commun sur 28 */
+  var coupesJardin = {}, precJ = null, precE = null, bascules = 0;
+  for (var j = 0; j < ANNEE_JOURS; j += 0.5) {
+    var pj = phraseDuMoment(j), pe = phraseEspace(j);
+    if (pj !== precJ) coupesJardin[j] = true;
+    if (pe !== precE) {
+      bascules++;
+      assert.ok(coupesJardin[j], 'l’espace change seul au jour ' + j + ' : ' + pe);
+    }
+    precJ = pj; precE = pe;
+  }
+  assert.ok(bascules >= 12, 'l’espace raconte l’année en au moins 12 phrases : ' + bascules);
+  /* et l'espace reste fidèle au penchant, à 0,2 près, aux quatre repères */
+  assert.ok(phraseEspace(JOUR_SOLSTICE_ETE).indexOf('à fond vers le Soleil') !== -1);
+  assert.ok(phraseEspace(JOUR_SOLSTICE_HIVER).indexOf('à fond à l’opposé') !== -1);
+  assert.ok(phraseEspace(JOUR_EQUINOXE_PRINTEMPS).indexOf('égalité') !== -1);
+  assert.ok(phraseEspace(JOUR_EQUINOXE_AUTOMNE).indexOf('égalité') !== -1);
+  for (var k = 0; k < ANNEE_JOURS; k += 0.5) {
+    var ph = phraseEspace(k), pen = penchementNord(k);
+    if (ph.indexOf('à fond vers') !== -1) assert.ok(pen > 0.55, '« à fond vers » au jour ' + k + ' (penchant ' + pen.toFixed(2) + ')');
+    if (ph.indexOf('à fond à l’opposé') !== -1) assert.ok(pen < -0.55, '« à fond à l’opposé » au jour ' + k + ' (penchant ' + pen.toFixed(2) + ')');
+    if (ph.indexOf('sont à égalité') !== -1) assert.ok(Math.abs(pen) < 0.25, '« à égalité » au jour ' + k + ' (penchant ' + pen.toFixed(2) + ')');
+  }
+});
+
 test('la phrase de l’espace suit le penchant, et nomme toujours qui penche', function () {
   assert.ok(phraseEspace(JOUR_SOLSTICE_ETE).indexOf('à fond vers le Soleil') !== -1);
   assert.ok(phraseEspace(JOUR_SOLSTICE_HIVER).indexOf('à l’opposé du Soleil') !== -1);

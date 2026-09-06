@@ -193,6 +193,18 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   (vérifié : `test/voix.test.mjs` + balayage navigateur des paragraphes,
   des histoires de scénarios et des consignes, 320 à 1200 px, zéro ligne
   orpheline).
+- **Les deux phrases basculent toujours ensemble** (`trancheDuMoment`,
+  verrouillé par test) : la phrase de l'espace lit LA MÊME coupe
+  calendaire que celle du jardin (mois + bande de transition) au lieu de
+  seuils physiques de penchant (±0,15, ±0,70) — retour utilisateur : un
+  seul jour de bascule commun sur 28, pendant la lecture l'une changeait
+  puis l'autre quatre jours plus tard. Ses paliers : « à fond » sur les
+  mois de cœur (mai-juin-juillet, novembre-décembre-janvier, ceux où le
+  jardin écrit les heures) et sur les bandes de solstice ; « à égalité »
+  sur la tranche qui suit chaque équinoxe, « encore un peu » sur la
+  bande qui le précède ; « penche vers / à l'opposé » ailleurs. Aux
+  coupes, le penchant vaut ±0,2 au plus (testé : « à fond » ⇒ |p| > 0,55,
+  « à égalité » ⇒ |p| < 0,25).
 - **Les scénarios vont au moment choisi en douceur, toujours vers l'avant**
   (le vrai sens de l'année) ; reprendre la main efface l'histoire et désarme
   le bouton. L'histoire s'écrit en deux lignes à puces : 🏡 chez nous /
