@@ -69,9 +69,12 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   comparaison 2D / hybride / 3D en artefact — la 3D, restée trop petite sur
   téléphone, vit dans l'historique git) : l'orbite-ellipse en perspective à
   plat (cx = 0,5 l ; cy = 0,52 h ; rx = min(0,38 l ; 0,62 h ; 0,5 l −
-  1,95 rTerre) — le dernier terme garantit que le globe et son anneau
-  « attrape-moi » (1,82 rTerre) tiennent EN ENTIER aux solstices, le jeu
-  coupait la Terre au bord droit ; ry = 0,52 rx),
+  1,73 rTerre ; (0,48 h − 1,73 rTerre) / 0,52) — les deux derniers termes
+  garantissent que le globe et son anneau « attrape-moi » (1,4 rTerre au
+  repos, 1,6 tenu) tiennent EN ENTIER aux solstices (bords gauche/droit —
+  le jeu coupait la Terre au bord droit) ET aux équinoxes (bords haut/bas —
+  l'anneau plein dépassait de 5 px sous la scène mobile à l'automne ;
+  retour utilisateur) ; ry = 0,52 rx),
   un **Soleil-boule** (dégradé radial + granules) fixe au centre, rayon
   **8 % de min(l, h)** — de l'air pour l'orbite et le faisceau —, et le
   modelé du globe (voile clair, bord assombri). La sonde de pixels « Soleil
@@ -100,6 +103,21 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   `positionTerre(jour) = (−cos a, −sin a)` (sens trigonométrique). Solstice
   d'été : Terre à gauche du Soleil ; hiver : à droite ; l'automne passe par le
   bas de l'écran, le printemps par le haut.
+- Rayon du globe : `0,095 × min(l, h)` sur grand écran, **`min(0,08 l ;
+  (0,48 h − rSoleil − 6 px) / 2,73)` en mode compact** (< 400 px de
+  canvas) — le plafond est DÉRIVÉ : aux équinoxes la Terre passe par
+  cy ± ry, l'anneau (1,73 rTerre) au-delà, le Soleil en deçà ; sans lui,
+  la garde verticale resserre l'orbite jusqu'à mettre la Terre dans le
+  Soleil (iPhone SE, canvas de 170 px : globe ramené à 45 px, écart 6 px).
+  Voir le bloc mobile des invariants. Sur 220 px de haut, trois choses se disputent la
+  hauteur : l'anneau doit tenir dans le canvas, la Terre doit rester à
+  distance du Soleil aux équinoxes (elle passe par cy ± ry), et l'ellipse
+  est plate. Budget mesuré (scène iPhone 13, 338 × 220) : globe 54 px,
+  orbite 113 px, 14 px entre les disques Terre et Soleil, 4 px sous
+  l'anneau tenu. À 0,085 l (57 px) la Terre tenue reposait sur le Soleil
+  (9 px) ; resserrer l'orbite seule (garde à 1,95) la mettait DANS le
+  Soleil. Toute retouche de ces trois chiffres se re-mesure aux quatre
+  repères, Terre tenue (halo = 1).
 - L'axe penche vers **+x** (`AXE_DIR`, constant), dessiné à 30°
   (`INCLINAISON_DESSIN_DEGRES`, exagéré — les 23,5° réels servent aux chiffres).
 - `penchementNord(jour) = cos(angleAnnee) = −positionTerre.x` : +1 au solstice
@@ -148,9 +166,33 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   phrase dit « En janvier », un mois de repère (mars, juin, septembre,
   décembre) en porte trois et les nomme « Début / Mi- / Fin décembre »
   — les tranches sont pilées sur les bornes de la bande de transition,
-  le mot ne change donc jamais sans que la phrase change aussi (retour
-  utilisateur : trois « En décembre, chez nous, » de suite, pendant la
-  lecture, passaient pour un affichage bloqué).
+  FRACTIONNAIRES comme les repères (arrondies au jour entier, le bouton
+  « L'automne arrive », jour 262,25, titrait « Mi-septembre, chez nous,
+  c'est l'automne » — retour utilisateur ; les tests balaient par
+  demi-journées, le pas du curseur), le mot ne change donc jamais sans
+  que la phrase change aussi, et « Mi- » ne se dit QUE dans la bande
+  (retour utilisateur : trois « En décembre, chez nous, » de suite,
+  pendant la lecture, passaient pour un affichage bloqué). **L'émoji du
+  titre ne part jamais seul à la ligne** (`FIN_TITRE` = fine insécable
+  devant le « ! », insécable entre le « ! » et l'émoji — retour
+  utilisateur iPhone, « 🍂 » orphelin ; vérifié par test et au
+  navigateur par demi-journées à 320/360/390/1200 px). Plus largement,
+  **toute phrase affichée passe par `typographie()`** (fine insécable
+  devant « ! ? ; », insécable devant « : » et entre un chiffre et
+  « heures ») : mesuré au navigateur de 300 à 1200 px, Chromium coupe
+  devant « ! » et « : » même après une espace — à 390 px, le commentaire
+  du jour 68 laissait un « ! » seul sur sa ligne et la phrase de l'espace
+  s'ouvrait sur « : ». Les phrases générées la portent dans le modèle ;
+  les textes du corpus vocal (histoires des scénarios, consignes et bravos)
+  la reçoivent À L'AFFICHAGE seulement, dans `main.js` — le corpus reste
+  gelé au caractère près, et `texteOral` ramène de toute façon ces espaces
+  à des espaces simples. Les textes STATIQUES d'`index.html` (la grande
+  histoire, la note aux parents, l'accroche) portent les entités
+  `&#8239;` / `&nbsp;` dans le HTML même ; `tools/voix-lib.mjs` les décode
+  avant `texteOral`, donc les sept clips `histoire-N` jouent toujours
+  (vérifié : `test/voix.test.mjs` + balayage navigateur des paragraphes,
+  des histoires de scénarios et des consignes, 320 à 1200 px, zéro ligne
+  orpheline).
 - **Les scénarios vont au moment choisi en douceur, toujours vers l'avant**
   (le vrai sens de l'année) ; reprendre la main efface l'histoire et désarme
   le bouton. L'histoire s'écrit en deux lignes à puces : 🏡 chez nous /
@@ -246,23 +288,36 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   tous ce chiffre.
 - **Sur mobile, les DEUX vues, leurs DEUX phrases ET la frise de l'année
   tiennent dans un écran de téléphone** (retour utilisateur, resserré
-  trois fois) : du titre de la fenêtre au bas de la frise, **712 px** pour
-  ~715 px visibles sur iPhone — hauteurs `min(50vw, 24.5vh)` (fenêtre) et
-  `min(58vw, 29vh)` (espace), gap 8 px, phrases en `.88rem` interligne
+  trois fois) : du titre de la fenêtre au bas de la frise, **715 px** pour
+  ~715 px visibles sur iPhone — hauteurs `min(50vw, 22.5vh)` (fenêtre) et
+  `min(58vw, 31vh)` (espace), gap 8 px, phrases en `.88rem` interligne
   1,38, réserve de la phrase re-mesurée à 5,75 em (pire cas : jour 68, la
   bande de transition — à ce corps la phrase tient sur QUATRE lignes, plus
   cinq). Les 107 px qu'a coûtés la frise se sont pris d'abord là où les
   vues ne paient rien : la **légende du curseur disparaît** (la bulle
-  « attrape la Terre » enseigne déjà le geste), les **quatre repères de
-  saison montent SUR le ruban** (`piste-emojis` en absolu, `pointer-events:
-  none` — le curseur reste attrapable au travers) au lieu d'une rangée à
-  eux, la bulle du geste tient sur une ligne ; les 65 restants ont rogné
-  les vues de ~7 % (globe : 23,1 → 21,6 px de rayon ; la zone de saisie,
-  `max(rTerre × 2,6 ; 44 px)`, reste à 56 px). Raccourcir les textes ne
+  « attrape la Terre » enseigne déjà le geste), la bulle du geste tient
+  sur une ligne, et la **rangée des repères de saison se serre AU-DESSUS
+  du ruban** (1 rem, 1,2 em de haut, descendue de 8 px dans le vide que
+  le curseur garde au-dessus de sa piste, `pointer-events: none`) — JAMAIS
+  sur le ruban : posés dessus, ils se lisaient comme un bug (retour
+  utilisateur, iPhone) ; les 65 restants se prennent sur le JARDIN
+  (24,5 → 22,5vh), jamais sur l'espace — la vue qu'on manipule est revenue
+  à 31vh, sa hauteur d'avant la frise. **Le globe ne dépend plus de la
+  hauteur** : en mode compact, `rTerre = min(0,08 l ; plafond dérivé de
+  h)` (retour
+  utilisateur : quatre resserrages en vh l'avaient fait passer de 57 à
+  43 px de diamètre en une semaine — « très petit ») ; à 0,08 l, la scène
+  et le jeu (ratio 9/7) portent la MÊME Terre (54 px), et le prochain
+  réglage de hauteur ne la touchera pas ; la zone de saisie
+  `max(rTerre × 2,6 ; 44 px)` suit. Raccourcir les textes ne
   rendrait RIEN à ce corps (mesuré : le pire cas n'est plus le commentaire
   d'été mais la bande de transition). Toujours MESURER au script (balayage
   de l'année) avant de régler ces chiffres. Les hauteurs sont portées par
-  `.grille-vues` seule : le jeu garde son `aspect-ratio` 9/7.
+  `.grille-vues` seule : le jeu garde son `aspect-ratio` 9/7. **Le budget
+  est calé sur l'iPhone 13 ; sur un iPhone SE (375 × 548 visibles, barres
+  dépliées) la frise passe sous le pli — accepté, décision utilisateur** :
+  on ne rétrécit pas les vues davantage pour les petits écrans (le globe y
+  est déjà ramené à 45 px par son plafond).
 - **La remontée d'écran des scénarios ne cache jamais le bouton pressé**
   (retour utilisateur) : quand les vues sont hors écran, on remonte à la
   position la plus BASSE entre « vues en haut d'écran » et « rangée des
@@ -270,7 +325,11 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   bouton qu'il vient de choisir.
 - **Sur mobile (< 880 px) seulement** : un médaillon flottant (haut droit,
   hors du chemin du pouce) montre la fenêtre de chez nous en miniature dès
-  qu'elle sort de l'écran — un tap y ramène. Le jeu n'affiche qu'une vue
+  qu'elle sort de l'écran — un tap y ramène. **Il ne recouvre jamais un
+  bouton** : les en-têtes du jeu et des scénarios gardent 62 px à droite
+  (`padding-right`), et les boutons du jeu passent à la ligne plutôt que de
+  déborder sous lui (retour utilisateur : « Ranger le jeu » était masqué —
+  vérifié par sonde de chevauchement dans les deux panneaux). Le jeu n'affiche qu'une vue
   (l'espace) : c'est le médaillon qui montre le résultat. Rien de tel sur
   grand écran, et rien n'est incrusté dans le canvas qu'on manipule.
 
@@ -287,11 +346,19 @@ scénarios/jeu (clé de famille `petit-labo-son`), `visibilitychange` +
 `pagehide` → `stop()`. Sans synthèse, les boutons sonores se cachent et le
 site reste complet.
 
-**La voix enregistrée n'est pas encore générée** : manifeste vide, tout passe
-à la synthèse. Le corpus vit dans `tools/voix-lib.mjs`, la production se
-déroule avec le skill `generer-voix-petit-labo` sur la machine de
-l'utilisateur (clé dans `.cle-elevenlabs`, gitignoré). Tant que rien n'est
-enregistré, les textes du site restent libres — après, ils sont GELÉS.
+**La voix enregistrée est générée** (30 clips, 3 min 35 s, 1,9 Mo — la
+voix de la série astronomie, `GFj5Qf6cNQ3Lgp8VKBwc`, `eleven_multilingual_v2`) :
+les quatre scénarios (intro, fenêtre, espace), la transition, les consignes
+et bravos des cinq défis, les sept paragraphes de la grande histoire. Le
+corpus vit dans `tools/voix-lib.mjs`, la production s'est déroulée avec le
+skill `generer-voix-petit-labo` sur la machine de l'utilisateur (clé dans
+`.cle-elevenlabs`, gitignoré). **Les textes du corpus sont donc GELÉS** :
+un texte enregistré qui change ne casse rien, mais son clip se tait et la
+synthèse reprend (`test/voix.test.mjs` verrouille la cohérence manifeste ↔
+site) — toute retouche d'un texte du corpus impose de re-tirer son clip.
+Les phrases GÉNÉRÉES (phrase du moment, phrase de l'espace) ne sont pas
+dans le corpus : elles restent libres, et `texteOral` normalise de toute
+façon les espaces insécables du titre.
 
 ## Structure
 
@@ -310,7 +377,7 @@ tools/voix-lib.mjs   le corpus de l'épisode (la seule partie propre à lui)
 tools/build-voix.mjs génération ElevenLabs (hors site — voir docs/voix-conteur.md)
 tools/controle-voix.mjs  contrôle « sans oreilles » des mp3
 assets/fonts/        Baloo 2 (woff2, OFL)
-assets/audio/        manifest.json (+ mp3 une fois la voix générée)
+assets/audio/        manifest.json + les 30 mp3 du conteur
 docs/                captures du README + og.png (carte de partage)
 ```
 

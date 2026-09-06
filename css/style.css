@@ -464,8 +464,10 @@ button:focus-visible, input:focus-visible, a:focus-visible {
      interlignes serrés, mesurés au script (pire cas balayé sur l'année :
      713 px) */
   .grille-vues { gap: 8px; }
-  .grille-vues .ratio-fenetre { aspect-ratio: auto; height: min(50vw, 24.5vh); }
-  .grille-vues .ratio-espace { aspect-ratio: auto; height: min(58vw, 29vh); }
+  /* la frise se paie sur le jardin, pas sur l'espace (la vue qu'on
+     manipule) : espace revenu à 31vh, fenêtre à 22,5vh */
+  .grille-vues .ratio-fenetre { aspect-ratio: auto; height: min(50vw, 22.5vh); }
+  .grille-vues .ratio-espace { aspect-ratio: auto; height: min(58vw, 31vh); }
   .entete-vue { margin-bottom: 4px; }
   .phrase-vue { margin-top: 4px; line-height: 1.38; font-size: .88rem; }
 
@@ -481,19 +483,36 @@ button:focus-visible, input:focus-visible, a:focus-visible {
 
   /* LA FRISE DE L'ANNÉE TIENT DANS L'ÉCRAN, elle aussi : la carte de
      l'année reste sous les yeux pendant qu'on tire la Terre (retour
-     utilisateur). Trois économies qui ne coûtent rien aux vues — la
-     légende du curseur s'en va (la bulle « attrape la Terre » enseigne
-     déjà le geste), les quatre repères de saison montent SUR le ruban au
-     lieu d'une rangée à eux, la bulle tient sur une ligne. */
+     utilisateur). Les économies qui ne coûtent rien aux vues — la légende
+     du curseur s'en va (la bulle « attrape la Terre » enseigne déjà le
+     geste), la bulle tient sur une ligne, et la rangée des repères de
+     saison se serre AU-DESSUS du ruban : plus petite, et descendue dans
+     le vide que le curseur garde au-dessus de sa piste (les 44 px de la
+     cible tactile, piste de 16 px au milieu) — jamais SUR le ruban, où
+     ils se lisaient comme un bug (retour utilisateur, iPhone). */
   .legende-curseur { display: none; }
-  .commande-annee { position: relative; margin-top: 8px; }
+  .commande-annee { margin-top: 2px; }
   .piste-emojis {
-    position: absolute; top: 13px; left: 0; right: 0;
-    height: 0; font-size: .95rem; z-index: 2; pointer-events: none;
+    height: 1.2em; font-size: 1rem; margin-bottom: -8px;
+    position: relative; z-index: 1; pointer-events: none;
   }
-  #curseur-jours { position: relative; z-index: 1; }
-  .bulle-geste { margin-top: 6px; font-size: .78rem; }
+  .bulle-geste { margin-top: 4px; font-size: .78rem; }
   .bulle-geste-pilule { padding: 4px 12px; }
+
+  /* le médaillon flottant (72 px, à 14 px du bord droit) survole les
+     en-têtes du jeu et des scénarios quand on y est : leurs boutons de
+     droite lui laissent la place, sinon il masque « Ranger le jeu »
+     (retour utilisateur, capture iPhone) */
+  .entete-jeu, .titre-scenarios { padding-right: 62px; }
+  /* « 📦 Ranger le jeu » + « 🔇 sans la voix » dépassent la largeur qui
+     reste : les boutons du jeu passent à la ligne au lieu de déborder
+     sous le médaillon */
+  .actions-jeu { flex-wrap: wrap; justify-content: flex-end; max-width: 100%; }
+  /* …et se serrent pour tenir à deux sur la ligne : 118 + 8 + 167 = 293 px
+     pour 270 disponibles à 16 px ; à .9rem et 10 px de marge intérieure,
+     264 px (mesuré, police de secours Linux — SF sur iPhone est plus
+     étroite). La cible tactile garde ses 44 px de haut. */
+  .actions-jeu .bouton-voix, .actions-jeu .bouton-jeu { padding-left: 10px; padding-right: 10px; font-size: .9rem; }
 
   /* le jeu sur mobile : une seule vue (l'espace, qu'on manipule) — c'est le
      médaillon flottant qui montre la fenêtre, il reste visible pendant le jeu */
