@@ -164,7 +164,13 @@ export function creerVueOrbite(canvas) {
     var compact = Math.min(w, h) < 400 * (window.devicePixelRatio || 1);
     var cx = w * 0.5;                 /* le Soleil au centre : l'objet-repère fixe */
     var cy = h * 0.52;
-    var rTerre = Math.min(w, h) * (compact ? 0.105 : 0.095);
+    /* En mode compact (téléphone), le globe se mesure à la LARGEUR : c'est
+     * la hauteur qui manque sur un téléphone, et chaque resserrage en vh
+     * rognait le globe (57 → 43 px de diamètre en une semaine — retour
+     * utilisateur : « très petit »). 8,5 % de la largeur = la Terre du jeu
+     * (56 px) dans la scène aussi, quelle que soit la hauteur ; plafond
+     * 0,16 h pour qu'elle reste entière dans un canvas en paysage. */
+    var rTerre = compact ? Math.min(w * 0.085, h * 0.16) : Math.min(w, h) * 0.095;
     /* Le globe et son anneau « attrape-moi » (1,82 rTerre) doivent tenir en
      * entier aux solstices : l'orbite se borne pour leur laisser la place. */
     var rx = Math.min(w * 0.38, h * 0.62, w * 0.5 - rTerre * 1.95);

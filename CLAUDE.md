@@ -100,6 +100,9 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   `positionTerre(jour) = (−cos a, −sin a)` (sens trigonométrique). Solstice
   d'été : Terre à gauche du Soleil ; hiver : à droite ; l'automne passe par le
   bas de l'écran, le printemps par le haut.
+- Rayon du globe : `0,095 × min(l, h)` sur grand écran, **`min(0,085 l ;
+  0,16 h)` en mode compact** (< 400 px de canvas) — voir le bloc mobile
+  des invariants.
 - L'axe penche vers **+x** (`AXE_DIR`, constant), dessiné à 30°
   (`INCLINAISON_DESSIN_DEGRES`, exagéré — les 23,5° réels servent aux chiffres).
 - `penchementNord(jour) = cos(angleAnnee) = −positionTerre.x` : +1 au solstice
@@ -265,8 +268,8 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
 - **Sur mobile, les DEUX vues, leurs DEUX phrases ET la frise de l'année
   tiennent dans un écran de téléphone** (retour utilisateur, resserré
   trois fois) : du titre de la fenêtre au bas de la frise, **715 px** pour
-  ~715 px visibles sur iPhone — hauteurs `min(50vw, 24.5vh)` (fenêtre) et
-  `min(58vw, 29vh)` (espace), gap 8 px, phrases en `.88rem` interligne
+  ~715 px visibles sur iPhone — hauteurs `min(50vw, 22.5vh)` (fenêtre) et
+  `min(58vw, 31vh)` (espace), gap 8 px, phrases en `.88rem` interligne
   1,38, réserve de la phrase re-mesurée à 5,75 em (pire cas : jour 68, la
   bande de transition — à ce corps la phrase tient sur QUATRE lignes, plus
   cinq). Les 107 px qu'a coûtés la frise se sont pris d'abord là où les
@@ -276,9 +279,15 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   du ruban** (1 rem, 1,2 em de haut, descendue de 8 px dans le vide que
   le curseur garde au-dessus de sa piste, `pointer-events: none`) — JAMAIS
   sur le ruban : posés dessus, ils se lisaient comme un bug (retour
-  utilisateur, iPhone) ; les 65 restants ont rogné
-  les vues de ~7 % (globe : 23,1 → 21,6 px de rayon ; la zone de saisie,
-  `max(rTerre × 2,6 ; 44 px)`, reste à 56 px). Raccourcir les textes ne
+  utilisateur, iPhone) ; les 65 restants se prennent sur le JARDIN
+  (24,5 → 22,5vh), jamais sur l'espace — la vue qu'on manipule est revenue
+  à 31vh, sa hauteur d'avant la frise. **Le globe ne dépend plus de la
+  hauteur** : en mode compact, `rTerre = min(0,085 l ; 0,16 h)` (retour
+  utilisateur : quatre resserrages en vh l'avaient fait passer de 57 à
+  43 px de diamètre en une semaine — « très petit ») ; à 0,085 l, la scène
+  (57 px) et le jeu (56 px, ratio 9/7) portent la MÊME Terre, et le
+  prochain réglage de hauteur ne la touchera pas ; la zone de saisie
+  `max(rTerre × 2,6 ; 44 px)` suit. Raccourcir les textes ne
   rendrait RIEN à ce corps (mesuré : le pire cas n'est plus le commentaire
   d'été mais la bande de transition). Toujours MESURER au script (balayage
   de l'année) avant de régler ces chiffres. Les hauteurs sont portées par

@@ -464,8 +464,10 @@ button:focus-visible, input:focus-visible, a:focus-visible {
      interlignes serrés, mesurés au script (pire cas balayé sur l'année :
      713 px) */
   .grille-vues { gap: 8px; }
-  .grille-vues .ratio-fenetre { aspect-ratio: auto; height: min(50vw, 24.5vh); }
-  .grille-vues .ratio-espace { aspect-ratio: auto; height: min(58vw, 29vh); }
+  /* la frise se paie sur le jardin, pas sur l'espace (la vue qu'on
+     manipule) : espace revenu à 31vh, fenêtre à 22,5vh */
+  .grille-vues .ratio-fenetre { aspect-ratio: auto; height: min(50vw, 22.5vh); }
+  .grille-vues .ratio-espace { aspect-ratio: auto; height: min(58vw, 31vh); }
   .entete-vue { margin-bottom: 4px; }
   .phrase-vue { margin-top: 4px; line-height: 1.38; font-size: .88rem; }
 
