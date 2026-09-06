@@ -148,9 +148,17 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   phrase dit « En janvier », un mois de repère (mars, juin, septembre,
   décembre) en porte trois et les nomme « Début / Mi- / Fin décembre »
   — les tranches sont pilées sur les bornes de la bande de transition,
-  le mot ne change donc jamais sans que la phrase change aussi (retour
-  utilisateur : trois « En décembre, chez nous, » de suite, pendant la
-  lecture, passaient pour un affichage bloqué).
+  FRACTIONNAIRES comme les repères (arrondies au jour entier, le bouton
+  « L'automne arrive », jour 262,25, titrait « Mi-septembre, chez nous,
+  c'est l'automne » — retour utilisateur ; les tests balaient par
+  demi-journées, le pas du curseur), le mot ne change donc jamais sans
+  que la phrase change aussi, et « Mi- » ne se dit QUE dans la bande
+  (retour utilisateur : trois « En décembre, chez nous, » de suite,
+  pendant la lecture, passaient pour un affichage bloqué). **L'émoji du
+  titre ne part jamais seul à la ligne** (`FIN_TITRE` = fine insécable
+  devant le « ! », insécable entre le « ! » et l'émoji — retour
+  utilisateur iPhone, « 🍂 » orphelin ; vérifié par test et au
+  navigateur par demi-journées à 320/360/390/1200 px).
 - **Les scénarios vont au moment choisi en douceur, toujours vers l'avant**
   (le vrai sens de l'année) ; reprendre la main efface l'histoire et désarme
   le bouton. L'histoire s'écrit en deux lignes à puces : 🏡 chez nous /
@@ -246,17 +254,19 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   tous ce chiffre.
 - **Sur mobile, les DEUX vues, leurs DEUX phrases ET la frise de l'année
   tiennent dans un écran de téléphone** (retour utilisateur, resserré
-  trois fois) : du titre de la fenêtre au bas de la frise, **712 px** pour
+  trois fois) : du titre de la fenêtre au bas de la frise, **715 px** pour
   ~715 px visibles sur iPhone — hauteurs `min(50vw, 24.5vh)` (fenêtre) et
   `min(58vw, 29vh)` (espace), gap 8 px, phrases en `.88rem` interligne
   1,38, réserve de la phrase re-mesurée à 5,75 em (pire cas : jour 68, la
   bande de transition — à ce corps la phrase tient sur QUATRE lignes, plus
   cinq). Les 107 px qu'a coûtés la frise se sont pris d'abord là où les
   vues ne paient rien : la **légende du curseur disparaît** (la bulle
-  « attrape la Terre » enseigne déjà le geste), les **quatre repères de
-  saison montent SUR le ruban** (`piste-emojis` en absolu, `pointer-events:
-  none` — le curseur reste attrapable au travers) au lieu d'une rangée à
-  eux, la bulle du geste tient sur une ligne ; les 65 restants ont rogné
+  « attrape la Terre » enseigne déjà le geste), la bulle du geste tient
+  sur une ligne, et la **rangée des repères de saison se serre AU-DESSUS
+  du ruban** (1 rem, 1,2 em de haut, descendue de 8 px dans le vide que
+  le curseur garde au-dessus de sa piste, `pointer-events: none`) — JAMAIS
+  sur le ruban : posés dessus, ils se lisaient comme un bug (retour
+  utilisateur, iPhone) ; les 65 restants ont rogné
   les vues de ~7 % (globe : 23,1 → 21,6 px de rayon ; la zone de saisie,
   `max(rTerre × 2,6 ; 44 px)`, reste à 56 px). Raccourcir les textes ne
   rendrait RIEN à ce corps (mesuré : le pire cas n'est plus le commentaire

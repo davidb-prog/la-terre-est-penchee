@@ -416,18 +416,25 @@ export var JOURS_REPERES = [
  * de la bande de transition. Une seule tranche → « En » ; deux → début et
  * fin ; trois → début, milieu et fin. Les tranches suivent donc toujours
  * le texte qu'elles ouvrent : le mot ne change jamais sans que la phrase
- * change aussi. */
+ * change aussi.
+ *
+ * Les bornes restent FRACTIONNAIRES, comme les repères (79,75 ; 262,25 ;
+ * 353,5) : arrondies au jour entier, le bouton « L'automne arrive »
+ * (jour 262,25) tombait dans le trou entre la sortie de la bande et le
+ * premier jour entier qui suit, et titrait « Mi-septembre, chez nous,
+ * c'est l'automne » (retour utilisateur — le curseur avance par demi-
+ * journées, il y tombait aussi). */
 export function momentDuMois(jour) {
   var j = jourNormalise(jour);
   var mois = moisDuJour(j);
   var debut = debutDuMois(mois.index);
   var fin = debut + JOURS_PAR_MOIS[mois.index];
-  /* les coupures du mois : premier jour ENTIER de chaque tranche */
+  /* les coupures du mois : l'entrée et la sortie de chaque bande */
   var coupures = [];
   for (var i = 0; i < JOURS_REPERES.length; i++) {
     var bornes = [JOURS_REPERES[i] - BANDE_TRANSITION_JOURS, JOURS_REPERES[i]];
     for (var b = 0; b < bornes.length; b++) {
-      var d = Math.ceil(bornes[b]);
+      var d = bornes[b];
       if (d > debut && d < fin && coupures.indexOf(d) === -1) coupures.push(d);
     }
   }
@@ -439,6 +446,12 @@ export function momentDuMois(jour) {
   if (rang === coupures.length) return 'Fin ' + mois.nom;
   return 'Mi-' + mois.nom;
 }
+
+/* La fin du titre : « … ! 🍂 ». L'espace devant le « ! » est la fine
+ * insécable de la typographie française, celle entre le « ! » et l'émoji
+ * est insécable aussi — l'émoji ne part JAMAIS seul à la ligne (retour
+ * utilisateur, iPhone : « c'est l'automne ! » puis « 🍂 » orphelin). */
+export var FIN_TITRE = '\u202f!\u00a0';
 
 /* La phrase du moment, en deux parties : le TITRE (le mois et la saison —
  * affiché en doré) et le TEXTE (le commentaire, en clair) — retour test :
@@ -474,7 +487,7 @@ export function phraseDuMomentParties(jour) {
         avantTeinte: SAISONS[s].teinte,
         entre: ' se termine : ',
         saisonNom: suivante.nom,
-        titreApres: ' arrive ! ' + suivante.emoji,
+        titreApres: ' arrive' + FIN_TITRE + suivante.emoji,
         teinte: suivante.teinte,
         texte: TEXTES_BANDE[reperes[i].saison]
       };
@@ -483,7 +496,7 @@ export function phraseDuMomentParties(jour) {
   var parties = {
     titreAvant: momentDuMois(j) + ', chez nous, c’est ',
     saisonNom: SAISONS[s].nom,
-    titreApres: ' ! ' + SAISONS[s].emoji,
+    titreApres: FIN_TITRE + SAISONS[s].emoji,
     teinte: SAISONS[s].teinte
   };
   /* Hors bande, le commentaire ne change JAMAIS en cours de mois (retour

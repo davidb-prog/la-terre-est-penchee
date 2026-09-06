@@ -16,7 +16,7 @@ import {
   hauteurSoleilMidi, dureeJourHeures, heureLever, heureCoucher,
   ARBRES, arbreDuJour, jardinDuJour,
   LATITUDE_REPERES_DEGRES, positionLocaleMaison, positionLocaleKangourou, extremitesAnneau,
-  phraseDuMoment, phraseEspace, momentDuMois,
+  phraseDuMoment, phraseDuMomentParties, phraseEspace, momentDuMois,
   LECTURE_JOURS_PAR_SEC, SCENARIOS, VOIX_TRANSITIONS,
   DEFIS, DEFI_ATTENTE_MS, DEFI_SORTIE_MARGE_JOURS,
   defiReussi, defiEncoreProche, coeurDeSaison,
@@ -257,7 +257,7 @@ test('deux phrases d’affilée ne commencent jamais par les mêmes mots', funct
    * maintenant son propre mot : « Début / Mi- / Fin décembre ». */
   var vues = [];
   var precedente = null;
-  for (var j = 0; j < ANNEE_JOURS; j++) {
+  for (var j = 0; j < ANNEE_JOURS; j += 0.5) { /* le pas du curseur */
     var p = phraseDuMoment(j);
     if (p === precedente) continue;
     precedente = p;
@@ -281,12 +281,41 @@ test('le mot du mois suit les tranches de la phrase, jamais un jour de plus', fu
   assert.equal(momentDuMois(353), 'Mi-décembre');
   assert.equal(momentDuMois(354), 'Fin décembre');
   assert.equal(momentDuMois(364), 'Fin décembre');
-  /* le mot ne bouge que quand la phrase bouge : même découpage des deux côtés */
-  for (var j = 1; j < ANNEE_JOURS; j++) {
-    if (momentDuMois(j) !== momentDuMois(j - 1)) {
-      assert.notEqual(phraseDuMoment(j), phraseDuMoment(j - 1),
+  /* le mot ne bouge que quand la phrase bouge : même découpage des deux
+   * côtés — balayé par demi-journées, le pas du curseur */
+  for (var j = 0.5; j < ANNEE_JOURS; j += 0.5) {
+    if (momentDuMois(j) !== momentDuMois(j - 0.5)) {
+      assert.notEqual(phraseDuMoment(j), phraseDuMoment(j - 0.5),
         'le mot du mois change seul au jour ' + j);
     }
+  }
+});
+
+test('pile sur un repère (les boutons y vont), la saison qui commence se dit « Fin » du mois', function () {
+  /* retour utilisateur : « L'automne arrive » (jour 262,25) titrait
+   * « Mi-septembre, chez nous, c'est l'automne » — la bande s'arrêtait au
+   * repère mais le mot ne basculait qu'au jour entier suivant */
+  assert.equal(momentDuMois(JOUR_EQUINOXE_PRINTEMPS), 'Fin mars');
+  assert.equal(momentDuMois(JOUR_SOLSTICE_ETE), 'Fin juin');
+  assert.equal(momentDuMois(JOUR_EQUINOXE_AUTOMNE), 'Fin septembre');
+  assert.equal(momentDuMois(JOUR_SOLSTICE_HIVER), 'Fin décembre');
+  /* et « Mi- » ne se dit QUE dans la bande « X se termine : Y arrive » */
+  for (var j = 0; j < ANNEE_JOURS; j += 0.5) {
+    var mi = momentDuMois(j).indexOf('Mi-') === 0;
+    var bande = phraseDuMoment(j).indexOf('se termine') !== -1;
+    assert.equal(mi, bande, 'jour ' + j + ' : ' + phraseDuMoment(j));
+  }
+});
+
+test('l’émoji du titre ne part jamais seul à la ligne', function () {
+  /* retour utilisateur (iPhone) : « c'est l'automne ! » puis « 🍂 » orphelin.
+   * Devant le « ! » : la fine insécable ; entre le « ! » et l'émoji : une
+   * insécable — aucune espace sécable après le nom de la saison */
+  for (var j = 0; j < ANNEE_JOURS; j += 0.5) {
+    var p = phraseDuMomentParties(j);
+    /* (« l'été arrive ! ☀️ » peut se couper avant « arrive » : l'émoji
+     * suit alors « arrive ! », jamais seul) */
+    assert.ok(/\u202f!\u00a0\S+$/u.test(p.titreApres), 'fin de titre au jour ' + j + ' : ' + JSON.stringify(p.titreApres));
   }
 });
 

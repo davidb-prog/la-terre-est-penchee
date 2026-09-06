@@ -481,18 +481,20 @@ button:focus-visible, input:focus-visible, a:focus-visible {
 
   /* LA FRISE DE L'ANNÉE TIENT DANS L'ÉCRAN, elle aussi : la carte de
      l'année reste sous les yeux pendant qu'on tire la Terre (retour
-     utilisateur). Trois économies qui ne coûtent rien aux vues — la
-     légende du curseur s'en va (la bulle « attrape la Terre » enseigne
-     déjà le geste), les quatre repères de saison montent SUR le ruban au
-     lieu d'une rangée à eux, la bulle tient sur une ligne. */
+     utilisateur). Les économies qui ne coûtent rien aux vues — la légende
+     du curseur s'en va (la bulle « attrape la Terre » enseigne déjà le
+     geste), la bulle tient sur une ligne, et la rangée des repères de
+     saison se serre AU-DESSUS du ruban : plus petite, et descendue dans
+     le vide que le curseur garde au-dessus de sa piste (les 44 px de la
+     cible tactile, piste de 16 px au milieu) — jamais SUR le ruban, où
+     ils se lisaient comme un bug (retour utilisateur, iPhone). */
   .legende-curseur { display: none; }
-  .commande-annee { position: relative; margin-top: 8px; }
+  .commande-annee { margin-top: 2px; }
   .piste-emojis {
-    position: absolute; top: 13px; left: 0; right: 0;
-    height: 0; font-size: .95rem; z-index: 2; pointer-events: none;
+    height: 1.2em; font-size: 1rem; margin-bottom: -8px;
+    position: relative; z-index: 1; pointer-events: none;
   }
-  #curseur-jours { position: relative; z-index: 1; }
-  .bulle-geste { margin-top: 6px; font-size: .78rem; }
+  .bulle-geste { margin-top: 4px; font-size: .78rem; }
   .bulle-geste-pilule { padding: 4px 12px; }
 
   /* le jeu sur mobile : une seule vue (l'espace, qu'on manipule) — c'est le
