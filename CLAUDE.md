@@ -143,6 +143,14 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   test : tout en un bloc doré, ça se lisait mal). Dans la bande de
   transition, LES DEUX saisons portent chacune leur teinte (« le
   printemps se termine : l'été arrive ! » — la passation se voit).
+  **Deux phrases d'affilée ne s'ouvrent jamais sur les mêmes mots**
+  (`momentDuMois`, verrouillé par test) : un mois qui ne porte qu'une
+  phrase dit « En janvier », un mois de repère (mars, juin, septembre,
+  décembre) en porte trois et les nomme « Début / Mi- / Fin décembre »
+  — les tranches sont pilées sur les bornes de la bande de transition,
+  le mot ne change donc jamais sans que la phrase change aussi (retour
+  utilisateur : trois « En décembre, chez nous, » de suite, pendant la
+  lecture, passaient pour un affichage bloqué).
 - **Les scénarios vont au moment choisi en douceur, toujours vers l'avant**
   (le vrai sens de l'année) ; reprendre la main efface l'histoire et désarme
   le bouton. L'histoire s'écrit en deux lignes à puces : 🏡 chez nous /
@@ -236,13 +244,25 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
 - **Le seuil mobile UNIQUE de l'épisode : 880 px.** La grille CSS, le
   médaillon, le repli de la boîte d'explication et la vue unique du jeu lisent
   tous ce chiffre.
-- **Sur mobile, les DEUX vues et leurs DEUX phrases tiennent dans un
-  écran de téléphone** (retour utilisateur, resserré deux fois) : du titre
-  de la fenêtre au bas de la phrase de l'espace, ~685 px pour ~715 px
-  visibles sur iPhone — hauteurs `min(50vw, 26vh)` (fenêtre) et
-  `min(58vw, 31vh)` (espace), gap 8 px, interligne 1,38, réserve de la
-  phrase re-mesurée à 7,05 em (pire cas : jour 121). Toujours MESURER au
-  script (balayage de l'année) avant de régler ces chiffres.
+- **Sur mobile, les DEUX vues, leurs DEUX phrases ET la frise de l'année
+  tiennent dans un écran de téléphone** (retour utilisateur, resserré
+  trois fois) : du titre de la fenêtre au bas de la frise, **712 px** pour
+  ~715 px visibles sur iPhone — hauteurs `min(50vw, 24.5vh)` (fenêtre) et
+  `min(58vw, 29vh)` (espace), gap 8 px, phrases en `.88rem` interligne
+  1,38, réserve de la phrase re-mesurée à 5,75 em (pire cas : jour 68, la
+  bande de transition — à ce corps la phrase tient sur QUATRE lignes, plus
+  cinq). Les 107 px qu'a coûtés la frise se sont pris d'abord là où les
+  vues ne paient rien : la **légende du curseur disparaît** (la bulle
+  « attrape la Terre » enseigne déjà le geste), les **quatre repères de
+  saison montent SUR le ruban** (`piste-emojis` en absolu, `pointer-events:
+  none` — le curseur reste attrapable au travers) au lieu d'une rangée à
+  eux, la bulle du geste tient sur une ligne ; les 65 restants ont rogné
+  les vues de ~7 % (globe : 23,1 → 21,6 px de rayon ; la zone de saisie,
+  `max(rTerre × 2,6 ; 44 px)`, reste à 56 px). Raccourcir les textes ne
+  rendrait RIEN à ce corps (mesuré : le pire cas n'est plus le commentaire
+  d'été mais la bande de transition). Toujours MESURER au script (balayage
+  de l'année) avant de régler ces chiffres. Les hauteurs sont portées par
+  `.grille-vues` seule : le jeu garde son `aspect-ratio` 9/7.
 - **La remontée d'écran des scénarios ne cache jamais le bouton pressé**
   (retour utilisateur) : quand les vues sont hors écran, on remonte à la
   position la plus BASSE entre « vues en haut d'écran » et « rangée des
