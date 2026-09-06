@@ -313,7 +313,11 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   rendrait RIEN à ce corps (mesuré : le pire cas n'est plus le commentaire
   d'été mais la bande de transition). Toujours MESURER au script (balayage
   de l'année) avant de régler ces chiffres. Les hauteurs sont portées par
-  `.grille-vues` seule : le jeu garde son `aspect-ratio` 9/7.
+  `.grille-vues` seule : le jeu garde son `aspect-ratio` 9/7. **Le budget
+  est calé sur l'iPhone 13 ; sur un iPhone SE (375 × 548 visibles, barres
+  dépliées) la frise passe sous le pli — accepté, décision utilisateur** :
+  on ne rétrécit pas les vues davantage pour les petits écrans (le globe y
+  est déjà ramené à 45 px par son plafond).
 - **La remontée d'écran des scénarios ne cache jamais le bouton pressé**
   (retour utilisateur) : quand les vues sont hors écran, on remonte à la
   position la plus BASSE entre « vues en haut d'écran » et « rangée des
