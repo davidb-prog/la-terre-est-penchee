@@ -500,35 +500,33 @@ export function phraseDuMomentParties(jour) {
   var t = trancheDuMoment(jour);
   var mois = t.mois;
   var s = t.saison;
-  /* La bande de transition (les ~12 jours avant un repère) : la phrase
-   * annonce la saison qui arrive, avec un commentaire STATIQUE et cohérent
-   * avec ses voisins (retour test : « le Soleil grimpe un peu plus haut »
-   * juste avant le solstice d'été jurait avec les phrases d'à côté). */
-  var TEXTES_BANDE = {
-    printemps: 'Le jour s’allonge : bientôt aussi long que la nuit !',
-    ete: 'Les jours sont bientôt les plus longs de l’année !',
-    automne: 'Le jour raccourcit : bientôt aussi long que la nuit.',
-    hiver: 'Les jours sont bientôt les plus courts de l’année.'
-  };
+  /* La bande de transition (les ~12 jours avant un repère) : SEUL LE TITRE
+   * annonce la saison qui arrive — le commentaire reste celui du mois.
+   * (Retour utilisateur : 12 jours, c'est 3,6 secondes à la lecture ; un
+   * commentaire propre à la bande — « Le jour raccourcit : bientôt aussi
+   * long que la nuit » — changeait en même temps que le titre et la phrase
+   * de l'espace, illisible et mal tourné. Supprimé, pas réécrit : réécrit,
+   * il resterait 3,6 secondes.) */
+  var parties;
   if (t.bande) {
     var suivante = SAISONS[t.bande];
-    return {
+    parties = {
       titreAvant: t.mot + ', chez nous, ',
       avantSaisonNom: SAISONS[s].nom,
       avantTeinte: SAISONS[s].teinte,
       entre: typographie(' se termine : '),
       saisonNom: suivante.nom,
       titreApres: ' arrive' + FIN_TITRE + suivante.emoji,
-      teinte: suivante.teinte,
-      texte: typographie(TEXTES_BANDE[t.bande])
+      teinte: suivante.teinte
+    };
+  } else {
+    parties = {
+      titreAvant: t.mot + ', chez nous, c’est ',
+      saisonNom: SAISONS[s].nom,
+      titreApres: FIN_TITRE + SAISONS[s].emoji,
+      teinte: SAISONS[s].teinte
     };
   }
-  var parties = {
-    titreAvant: t.mot + ', chez nous, c’est ',
-    saisonNom: SAISONS[s].nom,
-    titreApres: FIN_TITRE + SAISONS[s].emoji,
-    teinte: SAISONS[s].teinte
-  };
   /* Hors bande, le commentaire ne change JAMAIS en cours de mois (retour
    * test : début mai et début novembre, la phrase basculait au milieu du
    * mois). Les clauses sont ancrées sur des MOIS ENTIERS — superlatifs en
@@ -560,7 +558,7 @@ export function phraseDuMoment(jour) {
  * deux basculent ensemble, toujours. Ses paliers suivent donc le calendrier
  * — « à fond » sur les mois de cœur (mai-juin-juillet, novembre-décembre-
  * janvier : ceux où le jardin écrit les heures), « à égalité » sur la bande
- * d'équinoxe et la tranche qui la suit — au lieu des seuils ±0,15 / ±0,70
+ * la tranche qui suit chaque équinoxe — au lieu des seuils ±0,15 / ±0,70
  * de penchant : aux coupes, le penchant vaut ±0,2 au plus, l'approximation
  * est invisible pour un enfant, les vrais chiffres vivent dans la note aux
  * parents. */
@@ -568,15 +566,9 @@ export function phraseEspace(jour) {
   var t = trancheDuMoment(jour);
   var m = t.mois.index;
   var texte;
-  /* (les bandes de solstice gardent « à fond » : la tranche d'avant le
-   * disait déjà, « presque » aurait sonné comme un recul) */
-  if (t.bande === 'ete') texte = 'Notre moitié penche à fond vers le Soleil : les jours les plus longs de l’année arrivent !';
-  else if (t.bande === 'hiver') texte = 'Notre moitié penche à fond à l’opposé du Soleil : les jours les plus courts de l’année arrivent.';
-  /* (courtes : sur téléphone, la phrase de l'espace ne dépasse jamais
-   * trois lignes — le budget « tout sur un écran » y tient) */
-  else if (t.bande === 'automne') texte = 'Notre moitié penche encore un peu vers le Soleil : bientôt à égalité avec l’Australie.';
-  else if (t.bande === 'printemps') texte = 'Notre moitié penche encore un peu à l’opposé du Soleil : bientôt à égalité avec l’Australie.';
-  else if ((m === 2 && t.saison === 'printemps') || (m === 8 && t.saison === 'automne')) {
+  /* (pas de phrase propre à la bande de transition : 12 jours = 3,6 s à la
+   * lecture, on n'a pas le temps de la lire — retour utilisateur) */
+  if ((m === 2 && t.saison === 'printemps') || (m === 8 && t.saison === 'automne')) {
     /* fin mars, fin septembre : la tranche qui suit l'équinoxe */
     texte = 'Aucune moitié ne penche vers le Soleil : chez nous et l’Australie sont à égalité.';
   } else if (m >= 4 && m <= 6) texte = 'Notre moitié de la Terre penche à fond vers le Soleil : les jours sont les plus longs de l’année !';
@@ -665,6 +657,23 @@ export var VOIX_TRANSITIONS = {
 export var DEFI_ATTENTE_MS = 350;
 export var DEFI_SORTIE_MARGE_JOURS = 6;
 
+/* La marge d'ENTRÉE : la saison commence pile au repère, et l'enfant vise
+ * le repère sur l'orbite — s'arrêter un poil avant, c'était raté (retour
+ * utilisateur : « il faut vraiment rentrer dans la saison »). Huit jours
+ * avant le début, c'est gagné. Même marge pour l'histoire d'un scénario :
+ * elle reste affichée tant que la Terre est dans sa saison, à huit jours
+ * près. */
+export var DEFI_ENTREE_MARGE_JOURS = 8;
+
+/* Le jour est-il dans la saison — ou à moins de `marge` jours de son début ? */
+export function procheDeSaison(jour, cible, hemisphere, marge) {
+  if (saison(jour, hemisphere) === cible) return true;
+  for (var d = 1; d <= marge; d++) {
+    if (saison(jour + d, hemisphere) === cible) return true;
+  }
+  return false;
+}
+
 /* `jourBravo` : le jour où le recalage doux emmène la Terre après la
  * victoire — TOUJOURS un des quatre repères de l'année (solstices et
  * équinoxes), les mêmes que les boutons-saisons (décision utilisateur :
@@ -737,15 +746,14 @@ export function coeurDeSaison(saisonCible, hemisphere) {
 }
 
 export function defiReussi(defi, jour) {
-  return saison(jour, defi.hemisphere) === defi.cible;
+  return procheDeSaison(jour, defi.cible, defi.hemisphere, DEFI_ENTREE_MARGE_JOURS);
 }
 
 /* Le bravo se range seulement une marge AU-DELÀ des bords de la saison. */
 export function defiEncoreProche(defi, jour) {
   if (defiReussi(defi, jour)) return true;
   for (var d = 1; d <= DEFI_SORTIE_MARGE_JOURS; d++) {
-    if (saison(jour + d, defi.hemisphere) === defi.cible) return true;
-    if (saison(jour - d, defi.hemisphere) === defi.cible) return true;
+    if (defiReussi(defi, jour + d) || defiReussi(defi, jour - d)) return true;
   }
   return false;
 }

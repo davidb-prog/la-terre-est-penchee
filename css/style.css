@@ -476,13 +476,13 @@ button:focus-visible, input:focus-visible, a:focus-visible {
      un écran de téléphone (~715 px visibles) : hauteurs, marges et
      interlignes serrés, mesurés au script (pire cas balayé sur l'année :
      713 px) */
-  .grille-vues { gap: 8px; }
+  .grille-vues { gap: 6px; }
   /* la frise se paie sur le jardin, pas sur l'espace (la vue qu'on
      manipule) : espace revenu à 31vh, fenêtre à 22,5vh */
   .grille-vues .ratio-fenetre { aspect-ratio: auto; height: min(50vw, 22.5vh); }
   .grille-vues .ratio-espace { aspect-ratio: auto; height: min(58vw, 31vh); }
   .entete-vue { margin-bottom: 2px; }
-  .phrase-vue { margin-top: 4px; line-height: 1.38; font-size: .88rem; }
+  .phrase-vue { margin-top: 3px; line-height: 1.38; font-size: .88rem; }
 
   /* la place du PIRE cas est réservée : le nombre de lignes de la phrase ne
      fait plus jamais sauter la page (retour test iPhone). À ce corps, la
@@ -504,12 +504,12 @@ button:focus-visible, input:focus-visible, a:focus-visible {
      cible tactile, piste de 16 px au milieu) — jamais SUR le ruban, où
      ils se lisaient comme un bug (retour utilisateur, iPhone). */
   .legende-curseur { display: none; }
-  .commande-annee { margin-top: 2px; }
+  .commande-annee { margin-top: 0; }
   .piste-emojis {
     height: 1.2em; font-size: 1rem; margin-bottom: -8px;
     position: relative; z-index: 1; pointer-events: none;
   }
-  .bulle-geste { margin-top: 4px; font-size: .78rem; }
+  .bulle-geste { margin-top: 2px; font-size: .78rem; }
   .bulle-geste-pilule { padding: 4px 12px; }
 
   /* LE MÉDAILLON EST ANCRÉ DANS L'EN-TÊTE DU JEU pendant le jeu (main.js
@@ -568,10 +568,11 @@ button:focus-visible, input:focus-visible, a:focus-visible {
   /* la légende maison/kangourou passe sous le titre de vue, sans le casser */
   .entete-vue { flex-wrap: wrap; }
   .entete-vue .hint { flex-basis: 100%; font-size: .72rem; }
-  /* le ⏸/▶ à droite du titre « Depuis l’espace » : 28 px de haut (pas
-     44 — la rangée du titre ne doit pas grandir ; la cible reste large,
-     ~90 px, et c'est un bouton de parent) */
-  .entete-vue-espace .bouton-lecture { margin-left: auto; min-height: 28px; padding-top: 3px; padding-bottom: 3px; }
+  /* le ⏸/▶ à droite du titre « Depuis l’espace », au format des autres
+     boutons (corps .9rem, marges 12 px) mais 36 px de haut, pas 44 : la
+     rangée du titre grandirait de 16 px (retour utilisateur : même format ;
+     compromis validé) */
+  .entete-vue-espace .bouton-lecture { margin-left: auto; min-height: 36px; padding: 4px 12px; font-size: .9rem; }
   .defi-jeu { font-size: 1.15rem; }
   .bravo-jeu { font-size: 1rem; }
 }

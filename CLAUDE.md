@@ -150,19 +150,23 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   la scène, il était 500 px plus haut, toujours hors écran) ; sur grand
   écran le CSS le pose en absolu en haut à droite du panneau, dans la
   rangée du titre, comme avant. Un seul bouton, jamais dupliqué (deux ⏸
-  visibles à la fois se contrediraient). Sur mobile il fait 28 px de haut
-  (pas 44 : la ligne du titre ne doit pas grandir — budget re-mesuré,
-  714 px). Reprendre la main (glisser,
-  curseur, scénario, ouvrir le jeu) met en pause ; `prefers-reduced-motion` la
-  désactive au chargement.
+  visibles à la fois se contrediraient). Sur mobile il a le format des
+  autres boutons (corps .9rem, marges 12 px) mais 36 px de haut, pas 44 :
+  la ligne du titre grandirait de 16 px (compromis validé, budget
+  re-mesuré). Reprendre la main (glisser, curseur, scénario, ouvrir le
+  jeu) met en pause ; `prefers-reduced-motion` la désactive au chargement.
 - **La phrase du moment ne défile pas plus vite qu'on ne lit** : hors du
   cœur de l'été et de l'hiver (|penchement| > 0,75, seuls moments où le
   chiffre d'heures s'écrit — avec son unité « heures de lumière »), elle dit
   seulement le mouvement (« le jour s'allonge / raccourcit ») — les heures
   vivent dans la barre du jour, pas de compteur qui tourne pendant la
   lecture. Les ~12 jours avant chaque repère, la **bande de transition**
-  annonce « X se termine : Y arrive ! » — juin ne raconte plus le printemps
-  puis l'été en deux phrases contradictoires (retour test). La frise du
+  annonce « X se termine : Y arrive ! » DANS LE TITRE SEULEMENT — juin ne
+  raconte plus le printemps puis l'été en deux phrases contradictoires
+  (retour test) ; le commentaire, lui, reste celui du mois, et la phrase de
+  l'espace ne bouge pas non plus (retour utilisateur : 12 jours = 3,6 s à
+  la lecture, un texte propre à la bande n'a pas le temps d'être lu —
+  supprimé, pas réécrit ; verrouillé par test, plus aucun « bientôt »). La frise du
   curseur porte les initiales des mois (`piste-mois`). La phrase s'affiche
   en DEUX parties (`phraseDuMomentParties`) : le titre en blanc gras avec
   **le mot de la saison dans la teinte de SON bouton** (rose/or/violet/
@@ -209,14 +213,20 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   seul jour de bascule commun sur 28, pendant la lecture l'une changeait
   puis l'autre quatre jours plus tard. Ses paliers : « à fond » sur les
   mois de cœur (mai-juin-juillet, novembre-décembre-janvier, ceux où le
-  jardin écrit les heures) et sur les bandes de solstice ; « à égalité »
-  sur la tranche qui suit chaque équinoxe, « encore un peu » sur la
-  bande qui le précède ; « penche vers / à l'opposé » ailleurs. Aux
-  coupes, le penchant vaut ±0,2 au plus (testé : « à fond » ⇒ |p| > 0,55,
-  « à égalité » ⇒ |p| < 0,25).
+  jardin écrit les heures) ; « à égalité » sur la tranche qui suit chaque
+  équinoxe ; « penche vers / à l'opposé » ailleurs — rien de propre à la
+  bande de transition. Aux coupes, le penchant vaut ±0,2 au plus (testé :
+  « à fond » ⇒ |p| > 0,55, « à égalité » ⇒ |p| < 0,25).
 - **Les scénarios vont au moment choisi en douceur, toujours vers l'avant**
-  (le vrai sens de l'année) ; reprendre la main efface l'histoire et désarme
-  le bouton. L'histoire s'écrit en deux lignes à puces : 🏡 chez nous /
+  (le vrai sens de l'année). **Glisser la Terre ou tirer le curseur ne
+  coupe ni l'histoire ni la voix** (`reprendreLaMainDoucement`) : le texte
+  reste tant que la Terre reste dans la saison du scénario, à la marge
+  d'entrée du jeu près (8 jours — `procheDeSaison`), et s'efface quand elle
+  en sort, SANS couper la voix, qui finit toujours ce qu'elle dit (retour
+  utilisateur : le texte effacé et la voix coupée au premier doigt
+  ressemblaient à un bug — l'enfant écoute et joue). Le bouton ▶, un autre
+  scénario ou l'ouverture du jeu, eux, effacent et coupent (`reprendreLaMain`).
+  L'histoire s'écrit en deux lignes à puces : 🏡 chez nous /
   🚀 vu de l'espace. Les puces 🚀 d'été et d'hiver répètent le maillon
   causal de l'expérience de la lampe avec SES mots — « bien en face » /
   « de biais », jamais « rayons directs » ni « rasants » (décision
@@ -225,7 +235,11 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   l'Australie qui « reçoit la lumière bien en face » — la révélation se
   raccorde à la cause. Verrouillé par test.
 - **Le jeu ne se gagne qu'en fabriquant soi-même** (jamais pendant un
-  glissement animé) : fenêtre de victoire = la saison demandée, tempo de
+  glissement animé) : fenêtre de victoire = la saison demandée **plus une
+  marge d'entrée de 8 jours avant son début** (`DEFI_ENTREE_MARGE_JOURS`,
+  `procheDeSaison` — retour utilisateur : la saison commence pile au repère
+  que l'enfant vise sur l'orbite, s'arrêter un poil avant était raté ;
+  asymétrique par construction, testé), tempo de
   maintien `DEFI_ATTENTE_MS`, hystérésis de sortie `DEFI_SORTIE_MARGE_JOURS`
   (le bravo ne clignote pas au bord et ne ment jamais). Recalage doux, à la
   première victoire seulement, vers le `jourBravo` du défi — toujours un
@@ -278,7 +292,10 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   ne laissant que le contour de l'union.
 - **Le glisser lit l'angle sur l'ellipse** : `jourDepuisPointeur(x, y)`
   (l'argument `jourActuel` que passe `main.js` est ignoré, sans danger) ;
-  `attrapeTerre` garde sa zone généreuse pour les petits doigts.
+  `attrapeTerre` garde sa zone généreuse pour les petits doigts. **Un seul
+  doigt tient la Terre** : le `pointerId` qui l'a attrapée est mémorisé,
+  les autres pointeurs sont ignorés jusqu'au relâcher (retour utilisateur :
+  un second doigt posé la faisait sauter).
 - L'étiquette « Terre » s'écrit sous le globe, décalée vers la droite (le
   bas-gauche porte le kangourou, le haut la maison). Mode compact (< 400 px
   de canvas) : étiquettes Soleil/Terre masquées.
@@ -318,7 +335,7 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   tiennent dans un écran de téléphone** (retour utilisateur, resserré
   trois fois) : du titre de la fenêtre au bas de la frise, **715 px** pour
   ~715 px visibles sur iPhone — hauteurs `min(50vw, 22.5vh)` (fenêtre) et
-  `min(58vw, 31vh)` (espace), gap 8 px, phrases en `.88rem` interligne
+  `min(58vw, 31vh)` (espace), gap 6 px, phrases en `.88rem` interligne
   1,38, réserve de la phrase re-mesurée à 5,75 em (pire cas : jour 68, la
   bande de transition — à ce corps la phrase tient sur QUATRE lignes, plus
   cinq). Les 107 px qu'a coûtés la frise se sont pris d'abord là où les
@@ -358,9 +375,10 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   rend à sa place au rangement ; classe `jeu-ouvert` sur le panneau) : à
   droite du titre, 60 px, élément de la mise en page — visible quoi
   qu'il arrive au défilement — et la rangée des actions prend toute la
-  largeur dessous : **[🔇] [Ranger le jeu] [Encore une !]** sur UNE
+  largeur dessous : **[🔇] [Encore une !] [Ranger le jeu]** sur UNE
   ligne, la voix en icône seule (son libellé, `.libelle`, vit dans le
-  jumeau des scénarios), « Encore une ! » est monté dans cette rangée
+  jumeau des scénarios), « Encore une ! » est monté dans cette rangée (et
+  se range avec le jeu)
   (retour utilisateur : le médaillon flottait par-dessus les boutons,
   qu'on serrait et empilait pour le fuir — « posés n'importe comment »).
   Dans les scénarios, le bouton 🔊/🔇 est à droite du titre, sans
@@ -381,7 +399,15 @@ phrases, ton rate/pitch, score des voix françaises sans menu). Bouton
 « 🔊 Écouter l'histoire » (blocs `histoire-1…6`), bouton 🔇/🔊 jumeau
 scénarios/jeu (clé de famille `petit-labo-son`), `visibilitychange` +
 `pagehide` → `stop()`. Sans synthèse, les boutons sonores se cachent et le
-site reste complet.
+site reste complet. **Les clips d'une narration se téléchargent tous en
+parallèle au départ, en blobs, et se jouent depuis ces blobs** (gardés
+pour la session) : Safari iOS ne réutilise pas le cache d'un `fetch` pour
+un `<audio>`, le simple préchauffage laissait chaque clip se retélécharger
+à son tour — silences de une à trois secondes entre deux phrases selon le
+réseau (retour utilisateur : le printemps enchaîne quatre clips, les deux
+derniers paragraphes sont les plus lourds). Le PREMIER clip part en src
+direct, dans le geste de l'utilisateur (iOS n'autorise le premier `play()`
+que là) ; échec de téléchargement → src direct.
 
 **La voix enregistrée est générée** (30 clips, 3 min 35 s, 1,9 Mo — la
 voix de la série astronomie, `GFj5Qf6cNQ3Lgp8VKBwc`, `eleven_multilingual_v2`) :
