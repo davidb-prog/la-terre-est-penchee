@@ -362,8 +362,14 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   MESURÉES sur cet épisode (960 et 1140 px utiles, +4 px de garde) : 301 px
   de fixe dans la scène, 0,433 × largeur utile pour les vues, `--entete-px`
   = bas de l'en-tête (239). Plancher 880 px utiles (la vue qu'on manipule ne
-  se sacrifie pas).
-  Toute
+  se sacrifie pas). **L'en-tête se serre sous 850 px de hauteur visible**
+  (grand écran seulement) : titre 2,4 rem, accroche 0,95 rem sur deux lignes,
+  respirations réduites — 239 → 151 px, rien de retiré, `--entete-px` suit
+  (son bloc CSS vient APRÈS celui du plafond : même `:root`, le dernier
+  gagne). Mesuré : 24" 1080p → 947 px de large, tout tient ; 13" 1440×900 →
+  plancher, il reste 10 px sous le pli (l'aide de la ligne « Depuis
+  l'espace » passe sur deux lignes sous 900 px, le modèle linéaire ne le
+  voit pas) ; 13" 1280×800 → ~110 px à faire défiler, accepté. Toute
   retouche des marges de la scène ou de l'en-tête se re-mesure et se
   reporte dans ces constantes.
 - **Sur mobile, les DEUX vues, leurs DEUX phrases ET la frise de l'année
