@@ -17,6 +17,7 @@
 
 :root {
   --titres: "Baloo 2", "Arial Rounded MT Bold", "Trebuchet MS", system-ui, sans-serif;
+  --corps: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --bg: #0b1020;
   --bg2: #0e1530;
   --surface: #121a33;
@@ -62,7 +63,7 @@ body {
     radial-gradient(900px 600px at 8% 108%, rgba(169, 139, 255, 0.10) 0%, rgba(11, 16, 32, 0) 55%);
   background-attachment: fixed;
   color: var(--text);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--corps);
   line-height: 1.55;
 }
 
@@ -95,6 +96,11 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; }
 .entete h1, .kicker, .titre-scene, .entete-vue, .titre-scenarios > span,
 .entete-explication h2, .resume-explication h2, .entete-jeu h2, .defi-jeu,
 .parents summary { font-family: var(--titres); }
+/* la ligne de titre d'une vue (.entete-vue) porte aussi le ⏸/▶ et l'aide
+   « la maison : chez nous… » : ni un titre ni l'autre — bouton et aide
+   reviennent à la pile système (le font: inherit du bouton attraperait
+   Baloo 2, l'aide est du texte explicatif) */
+.entete-vue button, .entete-vue .hint { font-family: var(--corps); }
 
 /* ---------- la scène : les deux vues synchronisées ---------- */
 
