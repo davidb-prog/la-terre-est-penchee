@@ -82,6 +82,41 @@ body {
 
 main { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; }
 
+/* LE BLOC DE LA SCÈNE TIENT DANS L'ÉCRAN D'UN PORTABLE AUSSI (règle de la
+   famille, née sur la-lune-change-de-forme : sur un 13", la page
+   dimensionnée par la largeur seule montrait les vues et rien d'autre — la
+   même vue qu'un téléphone). La largeur se plafonne par la HAUTEUR visible :
+   en-tête + scène doivent tenir en 100vh. Constantes MESURÉES sur cet
+   épisode (script Playwright, 960 et 1140 px utiles, +4 px de garde) : la
+   scène fait 301 px de fixe + 0.433 × la largeur utile ; --entete-px est le
+   bas de l'en-tête (= haut de la scène, main n'a pas de marge haute). Les
+   40 px sont le padding latéral de main (sa max-width les comprend).
+   Plancher 880 px utiles : la vue qu'on manipule ne se sacrifie pas.
+   Sans clamp() (vieux navigateurs), la ligne est ignorée : 1180 comme
+   avant. Rien sous 880 px : le mobile a son propre budget. */
+@media (min-width: 880px) {
+  :root { --entete-px: 239px; }
+  main, .pied-serie, .site-footer {
+    max-width: clamp(920px, calc((100vh - 301px - var(--entete-px)) / 0.433 + 40px), 1180px);
+  }
+}
+
+/* L'EN-TÊTE SE SERRE SUR LES ÉCRANS LARGES MAIS BAS (le portable — règle de
+   la famille, née sur la-lune-change-de-forme) : 239 px avant la première
+   image, c'est un tiers d'un 13" pour un kicker, un titre et trois lignes
+   d'accroche. Rien n'est retiré (le H1 reste le H1, l'accroche reste lue),
+   tout se resserre : titre à 2,4 rem, accroche à 0,95 rem sur deux lignes
+   (toute la largeur de l'en-tête), respirations réduites. Mesuré :
+   239 → 151 px, et --entete-px suit pour le plafond de largeur (le bloc ci-dessus doit rester AVANT celui-ci : même sélecteur :root, le dernier gagne).
+   Une règle sur la HAUTEUR : un 24" ou un téléphone gardent l'en-tête de
+   la charte. */
+@media (min-width: 880px) and (max-height: 849px) {
+  :root { --entete-px: 151px; }
+  .entete { padding: 8px 20px 14px; }
+  .entete h1 { font-size: 2.4rem; margin: .18em 0 .22em; }
+  .tagline { font-size: .95rem; max-width: none; }
+}
+
 .panneau {
   background: linear-gradient(180deg, var(--surface), var(--bg2));
   border: 1px solid var(--border);

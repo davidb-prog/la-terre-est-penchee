@@ -353,6 +353,25 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
 - **Le seuil mobile UNIQUE de l'épisode : 880 px.** La grille CSS, le
   médaillon, le repli de la boîte d'explication et la vue unique du jeu lisent
   tous ce chiffre.
+- **Sur grand écran, la largeur utile se plafonne par la hauteur visible**
+  (règle de la famille née sur la-lune-change-de-forme, retour utilisateur :
+  sur un portable 13", la page dimensionnée par la largeur seule montrait
+  les vues et rien d'autre — la même vue qu'un téléphone) : `main` (et le
+  pied) en `max-width: clamp(920px, (100vh − 301px − --entete-px) / 0.433 +
+  40px, 1180px)` pour qu'en-tête + scène tiennent en 100vh. Constantes
+  MESURÉES sur cet épisode (960 et 1140 px utiles, +4 px de garde) : 301 px
+  de fixe dans la scène, 0,433 × largeur utile pour les vues, `--entete-px`
+  = bas de l'en-tête (239). Plancher 880 px utiles (la vue qu'on manipule ne
+  se sacrifie pas). **L'en-tête se serre sous 850 px de hauteur visible**
+  (grand écran seulement) : titre 2,4 rem, accroche 0,95 rem sur deux lignes,
+  respirations réduites — 239 → 151 px, rien de retiré, `--entete-px` suit
+  (son bloc CSS vient APRÈS celui du plafond : même `:root`, le dernier
+  gagne). Mesuré : 24" 1080p → 947 px de large, tout tient ; 13" 1440×900 →
+  plancher, il reste 10 px sous le pli (l'aide de la ligne « Depuis
+  l'espace » passe sur deux lignes sous 900 px, le modèle linéaire ne le
+  voit pas) ; 13" 1280×800 → ~110 px à faire défiler, accepté. Toute
+  retouche des marges de la scène ou de l'en-tête se re-mesure et se
+  reporte dans ces constantes.
 - **Sur mobile, les DEUX vues, leurs DEUX phrases ET la frise de l'année
   tiennent dans un écran de téléphone** (retour utilisateur, resserré
   trois fois) : du titre de la fenêtre au bas de la frise, **715 px** pour
@@ -482,7 +501,9 @@ pause à la reprise en main, rien ne bouge en mouvement réduit), le
 geste-signature, les scénarios (glissement, histoire à deux regards,
 effacement), le jeu (consigne, bravo, rangement), le conteur, le médaillon
 mobile, zéro erreur console, pas de débordement horizontal, et des sondes de
-pixels (le Soleil doré fixe au centre ; le ciel de la fenêtre). Servir avant :
+pixels (le Soleil doré fixe au centre ; le ciel de la fenêtre). Deux passes de plus depuis la règle de largeur de la famille : portable 1440×820 et écran
+1920×1040 — la largeur utile attendue par le `clamp()` (lue depuis `--entete-px`), et
+en-tête + scène qui tiennent dans l'écran (ou le plancher atteint). Servir avant :
 `python3 -m http.server 8123`. Régénérer les captures `docs/*.png` à chaque
 évolution visuelle (variable `CAPTURES=docs` ; les passes `reduit-*.png` ne se
 committent pas). La carte `docs/og.png` se régénère depuis le dépôt du portail
