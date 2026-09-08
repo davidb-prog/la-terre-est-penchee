@@ -580,7 +580,10 @@ button:focus-visible, input:focus-visible, a:focus-visible {
      la voix en icône seule (son libellé vit dans le jumeau des scénarios),
      les deux autres se partagent le reste, sur UNE ligne, texte jamais
      coupé */
-  .actions-jeu { display: flex; gap: 8px; max-width: 100%; }
+  /* la rangée prend toute la largeur sous le titre, jeu fermé aussi :
+     « 🎮 Jouer » s'étire comme « Ranger le jeu » (patron d'ou-va-le-soleil,
+     décision utilisateur) */
+  .actions-jeu { display: flex; gap: 8px; flex: 1 1 100%; margin-left: 0; max-width: 100%; }
   .actions-jeu .bouton-voix { flex: none; padding-left: 12px; padding-right: 12px; }
   .actions-jeu .bouton-voix .libelle { display: none; }
   .actions-jeu .bouton-jeu { flex: 1 1 0; padding-left: 8px; padding-right: 8px; font-size: .9rem; white-space: nowrap; }
