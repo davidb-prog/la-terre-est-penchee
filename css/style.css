@@ -82,6 +82,24 @@ body {
 
 main { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; }
 
+/* LE BLOC DE LA SCÈNE TIENT DANS L'ÉCRAN D'UN PORTABLE AUSSI (règle de la
+   famille, née sur la-lune-change-de-forme : sur un 13", la page
+   dimensionnée par la largeur seule montrait les vues et rien d'autre — la
+   même vue qu'un téléphone). La largeur se plafonne par la HAUTEUR visible :
+   en-tête + scène doivent tenir en 100vh. Constantes MESURÉES sur cet
+   épisode (script Playwright, 960 et 1140 px utiles, +4 px de garde) : la
+   scène fait 301 px de fixe + 0.433 × la largeur utile ; --entete-px est le
+   bas de l'en-tête (= haut de la scène, main n'a pas de marge haute). Les
+   40 px sont le padding latéral de main (sa max-width les comprend).
+   Plancher 880 px utiles : la vue qu'on manipule ne se sacrifie pas.
+   Sans clamp() (vieux navigateurs), la ligne est ignorée : 1180 comme
+   avant. Rien sous 880 px : le mobile a son propre budget. */
+@media (min-width: 880px) {
+  :root { --entete-px: 239px; }
+  main, .pied-serie, .site-footer {
+    max-width: clamp(920px, calc((100vh - 301px - var(--entete-px)) / 0.433 + 40px), 1180px);
+  }
+}
 .panneau {
   background: linear-gradient(180deg, var(--surface), var(--bg2));
   border: 1px solid var(--border);
