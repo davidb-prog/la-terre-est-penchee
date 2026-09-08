@@ -123,7 +123,12 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; }
 /* boutons à deux libellés (⏸/▶ et 🔇/🔊) : superposés dans une grille 1×1,
    le bouton garde en permanence la largeur du plus long — basculer ne décale
    jamais la ligne de titre */
-.bouton-voix, .bouton-lecture { display: inline-grid; align-items: center; justify-items: center; }
+.bouton-voix, .bouton-lecture {
+  display: inline-grid; align-items: center; justify-items: center;
+  /* écrits dans des lignes de titre en gras (800 / 700) : ces boutons
+     d'état reviennent à la graisse normale, comme leur jumeau du jeu */
+  font-weight: 400;
+}
 .bouton-voix > span, .bouton-lecture > span { grid-row: 1; grid-column: 1; white-space: nowrap; }
 .bouton-voix[aria-pressed="false"] .voix-on,
 .bouton-voix[aria-pressed="true"] .voix-off,
