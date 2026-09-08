@@ -17,6 +17,7 @@
 
 :root {
   --titres: "Baloo 2", "Arial Rounded MT Bold", "Trebuchet MS", system-ui, sans-serif;
+  --corps: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --bg: #0b1020;
   --bg2: #0e1530;
   --surface: #121a33;
@@ -62,7 +63,7 @@ body {
     radial-gradient(900px 600px at 8% 108%, rgba(169, 139, 255, 0.10) 0%, rgba(11, 16, 32, 0) 55%);
   background-attachment: fixed;
   color: var(--text);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--corps);
   line-height: 1.55;
 }
 
@@ -95,6 +96,9 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; }
 .entete h1, .kicker, .titre-scene, .entete-vue, .titre-scenarios > span,
 .entete-explication h2, .resume-explication h2, .entete-jeu h2, .defi-jeu,
 .parents summary { font-family: var(--titres); }
+/* le ⏸/▶ est écrit DANS une ligne de titre (.entete-vue) : son font: inherit
+   attraperait Baloo 2 — on le ramène à la pile système des autres boutons */
+.entete-vue button { font-family: var(--corps); }
 
 /* ---------- la scène : les deux vues synchronisées ---------- */
 
