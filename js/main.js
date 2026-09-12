@@ -690,8 +690,16 @@ if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
    * instantané. Le PREMIER clip part comme avant (src direct, dans le
    * geste de l'utilisateur — iOS n'autorise le premier play() que là) ;
    * les suivants attendent leur blob. Échec de téléchargement → src direct
-   * (comme avant). */
+   * (comme avant).
+   * Sauf si son blob est DÉJÀ là (`clipsPrets`, lu de façon synchrone,
+   * donc toujours dans le geste) : le jeu ne parle qu'en narrations d'un
+   * seul bloc — consigne, bravo —, toujours « le premier », qui partaient
+   * donc TOUJOURS à froid en src direct, même rejouées (retour
+   * utilisateur, iPhone : le bravo s'affichait une bonne seconde avant la
+   * voix). Le bravo, lui, part de la boucle d'animation, hors geste : il
+   * est préchargé au tirage du défi (`precharger`). */
   var clipsEnMemoire = {};
+  var clipsPrets = {};
   var chargerClip = function (src) {
     if (src.indexOf('data:') === 0 || !window.fetch || !window.URL || !URL.createObjectURL) {
       return Promise.resolve(src);
@@ -699,7 +707,7 @@ if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
     if (!clipsEnMemoire[src]) {
       clipsEnMemoire[src] = fetch(src)
         .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.blob(); })
-        .then(function (b) { return URL.createObjectURL(b); })
+        .then(function (b) { clipsPrets[src] = URL.createObjectURL(b); return clipsPrets[src]; })
         .catch(function () { delete clipsEnMemoire[src]; return src; });
     }
     return clipsEnMemoire[src];
@@ -744,12 +752,19 @@ if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
         var promesse = a.play();
         if (promesse && promesse.then) promesse.then(null, repli);
       };
-      if (premier || !window.Promise) jouer(src);
+      if (premier || !window.Promise) jouer(clipsPrets[src] || src);
       else chargerClip(src).then(jouer, function () { jouer(src); });
     };
     suivant();
   };
-  narrateur = { narrate: narrate, stop: toutArreter, finirDoucement: finirDoucement };
+  var precharger = function (blocs) {
+    if (!window.Promise) return;
+    blocs.forEach(function (b) {
+      var src = sourceAudio(b.id, b.texte);
+      if (src) chargerClip(src);
+    });
+  };
+  narrateur = { narrate: narrate, stop: toutArreter, finirDoucement: finirDoucement, precharger: precharger };
 
   /* -- « 🔊 Écouter l'histoire » : la boîte d'explication, bloc par bloc -- */
   boutonEcouter.hidden = false;
@@ -805,7 +820,7 @@ function basculerVoix() {
   try { window.localStorage.setItem('petit-labo-son', voixActive ? '1' : '0'); } catch (e) { /* tant pis */ }
   rafraichirBoutonsVoix();
   if (!narrateur) return;
-  if (voixActive) raconterScenario(); else narrateur.stop();
+  if (voixActive) { raconterScenario(); prechargerBravoDefi(); } else narrateur.stop();
 }
 
 if (narrateur) {
@@ -855,10 +870,21 @@ var defiEntreeMs = null; /* entrée dans la saison (tempo anti « gagné en pass
 var defiGagne = false;
 var bravoVisible = false;
 
+function blocDefi(genre, texte) {
+  return { id: 'defi-' + defi.id + '-' + genre, texte: texteOral(texte) };
+}
+
 function raconterDefi(genre, texte) {
-  if (narrateur && voixActive) {
-    narrateur.narrate([{ id: 'defi-' + defi.id + '-' + genre, texte: texteOral(texte) }]);
-  }
+  if (narrateur && voixActive) narrateur.narrate([blocDefi(genre, texte)]);
+}
+
+/* Le bravo part de la boucle d'animation, hors de tout geste et au moment
+ * où l'enfant réussit : son clip se télécharge dès le tirage du défi (et à
+ * la remise du son, jeu ouvert) pour jouer depuis la mémoire, sans le
+ * silence d'un src direct. La consigne, elle, est déjà mise en mémoire par
+ * sa propre narration : rejouer le défi la trouve prête. */
+function prechargerBravoDefi() {
+  if (defi && narrateur && voixActive) narrateur.precharger([blocDefi('bravo', defi.bravo)]);
 }
 
 function remplirPanierDefis() {
@@ -903,6 +929,7 @@ function prochainDefi() {
   bravoJeu.hidden = true;
   boutonEncore.hidden = true;
   raconterDefi('consigne', defi.consigne);
+  prechargerBravoDefi();
 }
 
 function gagnerDefi(maintenant) {
