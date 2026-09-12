@@ -367,11 +367,22 @@ Vérités verrouillées par `test/model.test.mjs` (à compléter, jamais supprim
   respirations réduites — 239 → 151 px, rien de retiré, `--entete-px` suit
   (son bloc CSS vient APRÈS celui du plafond : même `:root`, le dernier
   gagne). Mesuré : 24" 1080p → 947 px de large, tout tient ; 13" 1440×900 →
-  plancher, il reste 10 px sous le pli (l'aide de la ligne « Depuis
-  l'espace » passe sur deux lignes sous 900 px, le modèle linéaire ne le
-  voit pas) ; 13" 1280×800 → ~110 px à faire défiler, accepté. Toute
+  plancher, la scène passe de 3 px sous le pli (bulle « attrape-moi »
+  repliée) ; 13" 1280×800 → 15 px, accepté. Toute
   retouche des marges de la scène ou de l'en-tête se re-mesure et se
   reporte dans ces constantes.
+- **Sur grand écran, les deux images ont la MÊME hauteur** (retour
+  utilisateur : le jardin finissait 36 px plus haut que l'espace) :
+  colonnes `8fr / 9fr` = le rapport des ratios 8/7 et 9/7, la règle que
+  le jeu appliquait déjà — bas et phrases alignés. Coût mesuré au
+  plancher : l'espace passe de 468 × 364 à 446 × 347 px (−4,7 %), décision
+  utilisateur. Deux conditions en découlent : **la phrase du jardin
+  réserve QUATRE lignes** (`6em` — 55 jours par an, la bande de transition
+  en tête, en prennent quatre ; à trois, la frise sautait de 8 px en
+  pleine lecture) et **l'aide « maison : chez nous · kangourou :
+  l'Australie » ne passe jamais sur deux lignes** (raccourcie, `nowrap` +
+  ellipse sur grand écran) : deux en-têtes de même hauteur, deux images
+  au même haut. Balayage de l'année au script : un seul haut de frise.
 - **Sur mobile, les DEUX vues, leurs DEUX phrases ET la frise de l'année
   tiennent dans un écran de téléphone** (retour utilisateur, resserré
   trois fois) : du titre de la fenêtre au bas de la frise, **715 px** pour

@@ -153,6 +153,11 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; }
 .panneau-scene { position: relative; }
 @media (min-width: 880px) {
   .bouton-lecture { position: absolute; top: 10px; right: 12px; }
+  /* l'aide de la ligne « Depuis l'espace » ne passe JAMAIS sur deux lignes
+     sur grand écran : les deux en-têtes gardent la même hauteur, donc les
+     deux images le même haut (au plancher, la colonne de l'espace fait
+     446 px ; l'aide raccourcie en tient 433, filet ellipse au cas où) */
+  .entete-vue .hint { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 }
 
 /* boutons à deux libellés (⏸/▶ et 🔇/🔊) : superposés dans une grille 1×1,
@@ -177,7 +182,12 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; }
 
 .grille-vues {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+  /* 8fr / 9fr = le rapport des ratios des deux cadres (8/7 et 9/7), comme
+     les deux vues du jeu : les deux images ont la MÊME hauteur, bas et
+     phrases alignés (retour utilisateur : avec 1fr / 1,25fr, le jardin
+     finissait 36 px plus haut que l'espace). Coût mesuré au plancher :
+     l'espace passe de 468 × 364 à 446 × 347 px (−4,7 %). */
+  grid-template-columns: minmax(0, 8fr) minmax(0, 9fr);
   gap: 12px;
   align-items: start;
 }
