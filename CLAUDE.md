@@ -453,7 +453,18 @@ un `<audio>`, le simple préchauffage laissait chaque clip se retélécharger
 réseau (retour utilisateur : le printemps enchaîne quatre clips, les deux
 derniers paragraphes sont les plus lourds). Le PREMIER clip part en src
 direct, dans le geste de l'utilisateur (iOS n'autorise le premier `play()`
-que là) ; échec de téléchargement → src direct.
+que là) — SAUF si son blob est déjà en mémoire (`clipsPrets`, lu de façon
+synchrone, donc toujours dans le geste) ; échec de téléchargement → src
+direct. **Le jeu parle en narrations d'un seul bloc** (consigne, bravo),
+toujours « le premier » : sans cette exception, ses clips partaient
+TOUJOURS à froid, même rejoués (retour utilisateur, iPhone : le bravo
+s'affichait une bonne seconde avant la voix). Et le bravo part de la
+boucle d'animation, hors geste, au moment où l'enfant réussit : **son
+clip se précharge au tirage du défi** (`prechargerBravoDefi`, aussi à la
+remise du son jeu ouvert) pour jouer depuis la mémoire ; la consigne, mise
+en mémoire par sa propre narration, est prête au rejeu. Vérifié au
+navigateur : sept défis d'affilée, chaque bravo et chaque consigne rejouée
+partent en `blob:`, aucun clip téléchargé deux fois.
 
 **La voix enregistrée est générée** (30 clips, 3 min 35 s, 1,9 Mo — la
 voix de la série astronomie, `GFj5Qf6cNQ3Lgp8VKBwc`, `eleven_multilingual_v2`) :
