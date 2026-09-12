@@ -478,6 +478,8 @@ js/model.js          modèle pur + constantes du récit + textes oraux
 js/vue-orbite.js     la vue de l'espace (orbite-ellipse, Soleil-boule fixe,
                      faisceau de lumière, geste-signature)
 js/vue-fenetre.js    chez nous par la fenêtre (+ dessinerMiniFenetre, médaillon)
+js/mesure.js         mesure d'audience GoatCounter (copie du fichier du portail,
+                     sans cookie ; vider CODE coupe tout)
 js/main.js           câblage : boucle rAF, lecture auto, curseur, geste,
                      scénarios, jeu, conteur narrate(), médaillon
 test/model.test.mjs  tests du modèle (Node)
