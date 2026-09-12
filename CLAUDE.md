@@ -476,6 +476,24 @@ remise du son jeu ouvert) pour jouer depuis la mémoire ; la consigne, mise
 en mémoire par sa propre narration, est prête au rejeu. Vérifié au
 navigateur : sept défis d'affilée, chaque bravo et chaque consigne rejouée
 partent en `blob:`, aucun clip téléchargé deux fois.
+**Et le premier clip a la route pour lui** (retour utilisateur, réseau
+faible : « retard à l'allumage » sur les quatre boutons et la consigne du
+jeu — tout partait au tap, en parallèle, l'intro de 20 Ko attendait
+derrière les 200 Ko des blocs suivants) : UNE file de fond (`fileDeFond`,
+un téléchargement à la fois), GELÉE tant qu'un premier clip part à froid
+en src direct (`premierClipEnRoute`, libérée à `playing`, à l'erreur, au
+stop, ou après 8 s) ; les blocs suivants d'une narration y entrent en
+tête, dans l'ordre du récit, le premier bloc en dernier ; les
+réchauffements en queue. Et le **réchauffement des premiers clips**
+(`rechaufferPremiersClips`) : quand la rangée des scénarios ou le bouton
+« Jouer » entre à l'écran (repli : premier toucher), les quatre intros et
+les cinq consignes (~170 Ko) entrent dans la file — voix active
+seulement, manifeste arrivé (sinon on repasse à son arrivée), jamais à
+l'ouverture de la page. Mesuré au navigateur sous 3G bridée (300 ms,
+40 Ko/s) : intro à froid seule sur le réseau, joue en 0,9 s (au lieu
+d'attendre 200 Ko) ; fenêtre, transition, espace l'un après l'autre, le
+bloc 2 part de la mémoire pile à la fin de l'intro ; intro réchauffée et
+consigne du jeu : 13 ms.
 
 **La voix enregistrée est générée** (30 clips, 3 min 35 s, 1,9 Mo — la
 voix de la série astronomie, `GFj5Qf6cNQ3Lgp8VKBwc`, `eleven_multilingual_v2`) :

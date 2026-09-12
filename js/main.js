@@ -546,6 +546,7 @@ if (window.__VOIX_MANIFESTE && window.__VOIX_MANIFESTE.blocs) {
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (m) {
       if (m && m.blocs) blocsAudio = m.blocs;
+      rechaufferPremiersClips(); /* demandé avant l'arrivée du manifeste ? c'est le moment */
       /* le conseil « voix robotiques » ne concerne que le repli synthèse */
       if (Object.keys(blocsAudio).length > 0 && conseilVoix) conseilVoix.hidden = true;
     })
@@ -646,7 +647,9 @@ if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
       try { lecteur.pause(); } catch (e) { /* déjà arrêté */ }
       lecteur.onended = null;
       lecteur.onerror = null;
+      lecteur.onplaying = null;
     }
+    libererLaRoute();
     prevenirFin();
   };
 
@@ -697,7 +700,18 @@ if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
    * donc TOUJOURS à froid en src direct, même rejouées (retour
    * utilisateur, iPhone : le bravo s'affichait une bonne seconde avant la
    * voix). Le bravo, lui, part de la boucle d'animation, hors geste : il
-   * est préchargé au tirage du défi (`precharger`). */
+   * est préchargé au tirage du défi (`precharger`).
+   * ET LE PREMIER CLIP A LA ROUTE POUR LUI (retour utilisateur, réseau
+   * faible : « retard à l'allumage » sur les quatre boutons et sur la
+   * consigne du jeu). Tout partait au tap, en parallèle : l'intro de
+   * 20 Ko partageait la bande passante avec les 200 Ko des blocs
+   * suivants et arrivait en dernier. Désormais UNE SEULE file de fond
+   * (`fileDeFond`, un téléchargement à la fois), GELÉE tant qu'un premier
+   * clip part à froid en src direct (`premierClipEnRoute`, libérée à
+   * `playing`, à l'erreur, au stop, ou après 8 s) ; les blocs suivants
+   * d'une narration y entrent EN TÊTE, dans l'ordre du récit, le premier
+   * bloc en dernier (il rejouera de la mémoire) ; les réchauffements
+   * (`precharger`) en queue. */
   var clipsEnMemoire = {};
   var clipsPrets = {};
   var chargerClip = function (src) {
@@ -712,6 +726,32 @@ if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
     }
     return clipsEnMemoire[src];
   };
+  var fileDeFond = [];
+  var fileEnCours = false;
+  var premierClipEnRoute = false;
+  var avancerFile = function () {
+    if (fileEnCours || premierClipEnRoute || !fileDeFond.length) return;
+    var src = fileDeFond.shift();
+    if (clipsPrets[src]) { avancerFile(); return; }
+    fileEnCours = true;
+    var apres = function () { fileEnCours = false; avancerFile(); };
+    chargerClip(src).then(apres, apres);
+  };
+  var mettreEnFile = function (blocs, enTete) {
+    if (!window.Promise) return;
+    var srcs = [];
+    blocs.forEach(function (b) {
+      var src = sourceAudio(b.id, b.texte);
+      if (src && !clipsPrets[src] && fileDeFond.indexOf(src) < 0 && srcs.indexOf(src) < 0) srcs.push(src);
+    });
+    fileDeFond = enTete ? srcs.concat(fileDeFond) : fileDeFond.concat(srcs);
+    avancerFile();
+  };
+  var libererLaRoute = function () {
+    if (!premierClipEnRoute) return;
+    premierClipEnRoute = false;
+    avancerFile();
+  };
 
   var narrate = function (blocs, quandFini) {
     toutArreter();
@@ -720,13 +760,6 @@ if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
     blocsEnCours = blocs;
     finEnCours = quandFini || null;
     var indice = 0;
-    /* tous les clips de la narration partent ensemble */
-    if (window.Promise) {
-      blocs.forEach(function (b) {
-        var src = sourceAudio(b.id, b.texte);
-        if (src) chargerClip(src);
-      });
-    }
     var suivant = function () {
       if (maGen !== generation) return;
       if (indice >= blocs.length || finirApresLeBloc) { prevenirFin(); return; }
@@ -737,10 +770,11 @@ if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
       var repli = function () {
         if (replie || maGen !== generation) return;
         replie = true;
+        if (premier) libererLaRoute();
         direLesPhrases(phrasesDe(bloc.texte, true), maGen, apres);
       };
       var src = sourceAudio(bloc.id, bloc.texte);
-      if (!src) { repli(); return; }
+      if (!src) { if (premier) mettreEnFile(blocs.slice(1), true); repli(); return; }
       var a = obtenirLecteur();
       var pause = typeof bloc.pause === 'number' ? bloc.pause : 620;
       var jouer = function (url) {
@@ -748,22 +782,40 @@ if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
         if (finirApresLeBloc) { prevenirFin(); return; } /* demandé pendant le chargement */
         a.onended = function () { if (maGen === generation) window.setTimeout(apres, pause); };
         a.onerror = repli;
+        a.onplaying = null;
         a.src = url;
         var promesse = a.play();
         if (promesse && promesse.then) promesse.then(null, repli);
       };
-      if (premier || !window.Promise) jouer(clipsPrets[src] || src);
-      else chargerClip(src).then(jouer, function () { jouer(src); });
+      if (!premier && window.Promise) {
+        chargerClip(src).then(jouer, function () { jouer(src); });
+        return;
+      }
+      /* le premier bloc part dans le geste : depuis la mémoire si son blob
+       * est déjà là, sinon en src direct — et la file de fond attend qu'il
+       * joue avant de faire partir la suite, dans l'ordre du récit */
+      var laSuite = blocs.slice(1);
+      if (clipsPrets[src] || !window.Promise) {
+        jouer(clipsPrets[src] || src);
+        mettreEnFile(laSuite, true);
+        return;
+      }
+      premierClipEnRoute = true;
+      var libere = false;
+      var liberer = function () {
+        if (libere) return;
+        libere = true;
+        if (a.onplaying === liberer) a.onplaying = null;
+        if (maGen === generation) mettreEnFile(laSuite.concat([bloc]), true);
+        libererLaRoute();
+      };
+      jouer(src);
+      a.onplaying = liberer;
+      window.setTimeout(liberer, 8000); /* filet : un « playing » qui ne vient pas ne gèle pas la file */
     };
     suivant();
   };
-  var precharger = function (blocs) {
-    if (!window.Promise) return;
-    blocs.forEach(function (b) {
-      var src = sourceAudio(b.id, b.texte);
-      if (src) chargerClip(src);
-    });
-  };
+  var precharger = function (blocs) { mettreEnFile(blocs, false); };
   narrateur = { narrate: narrate, stop: toutArreter, finirDoucement: finirDoucement, precharger: precharger };
 
   /* -- « 🔊 Écouter l'histoire » : la boîte d'explication, bloc par bloc -- */
@@ -820,7 +872,47 @@ function basculerVoix() {
   try { window.localStorage.setItem('petit-labo-son', voixActive ? '1' : '0'); } catch (e) { /* tant pis */ }
   rafraichirBoutonsVoix();
   if (!narrateur) return;
-  if (voixActive) { raconterScenario(); prechargerBravoDefi(); } else narrateur.stop();
+  if (voixActive) { raconterScenario(); prechargerBravoDefi(); demanderRechauffement(); } else narrateur.stop();
+}
+
+/* Le RÉCHAUFFEMENT des premiers clips (retour utilisateur, réseau faible :
+ * « retard à l'allumage » sur les quatre boutons et la consigne du jeu) :
+ * le premier clip d'une narration part à froid, en src direct, dans le
+ * geste — le seul remède est qu'il soit déjà en mémoire AVANT le tap.
+ * Quand la rangée des scénarios ou le bouton « Jouer » entre à l'écran
+ * (repli sans IntersectionObserver : au premier toucher), les quatre intros
+ * et les cinq consignes (~170 Ko) entrent dans la file de fond, un
+ * téléchargement à la fois, derrière tout ce qui joue — voix active
+ * seulement, et une fois le manifeste arrivé (sinon on repasse). Rien
+ * n'est téléchargé à l'ouverture de la page : l'enfant lit peut-être sans
+ * son, ou ne descendra jamais jusque-là. */
+var rechauffementVoulu = false;
+var rechauffementFait = false;
+function rechaufferPremiersClips() {
+  if (rechauffementFait || !rechauffementVoulu || !narrateur || !voixActive) return;
+  if (!Object.keys(blocsAudio).length) return; /* le manifeste n'est pas encore là */
+  rechauffementFait = true;
+  var blocs = [];
+  SCENARIOS.forEach(function (scn) { blocs.push(blocsScenario(scn)[0]); });
+  DEFIS.forEach(function (d) { blocs.push({ id: 'defi-' + d.id + '-consigne', texte: texteOral(d.consigne) }); });
+  narrateur.precharger(blocs);
+}
+function demanderRechauffement() {
+  rechauffementVoulu = true;
+  rechaufferPremiersClips();
+}
+if (narrateur) {
+  if (window.IntersectionObserver) {
+    var guetteurRechauffement = new IntersectionObserver(function (entrees) {
+      for (var i = 0; i < entrees.length; i++) {
+        if (entrees[i].isIntersecting) { guetteurRechauffement.disconnect(); demanderRechauffement(); return; }
+      }
+    });
+    guetteurRechauffement.observe(conteneurScenarios);
+    guetteurRechauffement.observe($('bouton-jouer'));
+  } else {
+    document.addEventListener('pointerdown', demanderRechauffement);
+  }
 }
 
 if (narrateur) {
