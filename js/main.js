@@ -839,6 +839,7 @@ if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
   };
   boutonEcouter.addEventListener('click', function () {
     if (lectureEnCours) { narrateur.stop(); return; } /* le quandFini remet le bouton */
+    if (window.jalon) window.jalon('audio'); /* jalon d'engagement (mesure.js) */
     lireExplication();
   });
 
@@ -872,7 +873,10 @@ function basculerVoix() {
   try { window.localStorage.setItem('petit-labo-son', voixActive ? '1' : '0'); } catch (e) { /* tant pis */ }
   rafraichirBoutonsVoix();
   if (!narrateur) return;
-  if (voixActive) { raconterScenario(); prechargerBravoDefi(); demanderRechauffement(); } else narrateur.stop();
+  if (voixActive) {
+    if (window.jalon) window.jalon('audio'); /* le conteur des scénarios compte aussi */
+    raconterScenario(); prechargerBravoDefi(); demanderRechauffement();
+  } else narrateur.stop();
 }
 
 /* Le RÉCHAUFFEMENT des premiers clips (retour utilisateur, réseau faible :
@@ -1032,6 +1036,7 @@ function gagnerDefi(maintenant) {
   bravoJeu.hidden = false;
   boutonEncore.hidden = false;
   if (premiere) {
+    if (window.jalon) window.jalon('fin'); /* premier défi gagné : l'épisode est allé au bout */
     raconterDefi('bravo', defi.bravo);
     /* Le recalage doux : l'année glisse jusqu'au jour d'ancrage du défi —
      * toujours un des quatre repères (solstices et équinoxes, comme les
